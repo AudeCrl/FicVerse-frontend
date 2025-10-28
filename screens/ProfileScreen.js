@@ -21,7 +21,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-        <View>
+        <View style={styles.avatarContainer}>
             <Image style={styles.avatarImage} source={require('../assets/avatar-default.png')}/>
         </View>
         <View></View>
@@ -77,5 +77,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',    
     // 4. Centrer le contenu verticalement
     justifyContent: 'center', 
+  },
+  avatarContainer: {
+    width: 90,
+    height: 90,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
 });
