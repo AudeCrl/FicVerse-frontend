@@ -130,7 +130,7 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffe5e5f8',    
+    backgroundColor: '#f4fcfff8',    
     // 2. Prendre toute la hauteur et largeur de l'écran
     flex: 1,    
     // 3. Centrer le contenu horizontalement
@@ -147,14 +147,24 @@ const styles = StyleSheet.create({
     width: '50%',
     height: '50%',
   },
+  inputUsername: {
+    ...typography.input,
+  },
+  inputEmail: {
+    ...typography.input,
+  },
+  inputPassword: {
+    ...typography.input,
+  },
   manageAccountContainer: {
     backgroundColor: '#9c9c9c1c',
     width: '90%',
-    height: '15%',
+    height: '11%',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent:'space-around',
   },
   logout: {
+    ...typography.button,
     backgroundColor: '#ffffff01',
     borderColor: '#7474743d',
     borderWidth: 2,
@@ -166,6 +176,7 @@ const styles = StyleSheet.create({
     color: '#333333ff',
   },
   removeAccount: {
+    ...typography.button,
     backgroundColor: '#d64d48f6',
     borderColor: '#7474743d',
     borderWidth: 2,
