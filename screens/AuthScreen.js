@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login } from '../reducers/user';
+import { typography } from '../styles/globalStyles.js';
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_IP);
@@ -315,13 +316,14 @@ const styles = StyleSheet.create({
   switchBtnInactive: { backgroundColor: '#E6E6E6' },
   switchText: { fontWeight: '600' },
 
-  label: { fontWeight: '600', marginBottom: 4 },
+  label: { ...typography.label, fontWeight: '600', marginBottom: 4 },
 
   input: {
+    ...typography.input,    
     backgroundColor: '#FFF',
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 5,
     marginBottom: 6,
     borderWidth: 1,
     borderColor: '#DDD',

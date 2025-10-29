@@ -1,11 +1,13 @@
 import { Provider } from 'react-redux';
 import store from './store';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFonts, Roboto_400Regular, Roboto_400Regular_Italic, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import * as SplashScreen from 'expo-splash-screen';
 
 import AuthScreen from './screens/AuthScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
@@ -15,6 +17,9 @@ import ProfileScreen from './screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Prevent Splash Screen from hiding automatically
+SplashScreen.preventAutoHideAsync();
 
 const TabNavigator = () => {
   return (
@@ -45,6 +50,26 @@ const TabNavigator = () => {
 }
 
 export default function App() {
+
+  const [fontsLoaded, fontError] = useFonts({
+    Roboto_400Regular,
+    Roboto_400Regular_Italic, 
+    Roboto_500Medium,
+    Roboto_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      // Hide splash screen once the fonts have been loaded
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  // Don't display anything during fonts loading
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <Provider store={store}>
       <NavigationContainer>
