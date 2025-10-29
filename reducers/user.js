@@ -1,18 +1,34 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: { example: null },
+    value: { 
+        token: null, 
+        email: null, 
+        username: null, 
+      //  avatar: null,     On a l'avatar par défaut ?
+    },
 };
 
 export const userSlice = createSlice({
-  name: 'user',
-  initialState,
-  reducers: {
-    example: (state, action) => {
-      state.value.example = action.payload;
+    name: 'user',
+    initialState,
+    reducers: {
+        login: (state, action) => {
+            state.value.token = action.payload.token;
+            state.value.email = action.payload.email;
+            state.value.username = action.payload.username;
+           // state.value.avatar = action.payload.avatar;
+        },
+        /* Pour la déconnexion
+        logout: (state) => {
+            state.value.token = null;
+            state.value.username = null;
+            state.value.firstname = null;
+            state.value.avatar = null;
+        },
+        */
     },
-  },
 });
 
-export const { example } = userSlice.actions;
+export const { login } = userSlice.actions;
 export default userSlice.reducer;
