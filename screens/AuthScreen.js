@@ -10,6 +10,8 @@ import {
 import { useDispatch } from 'react-redux';
 import { login } from '../reducers/user';
 
+const API_IP = process.env.EXPO_PUBLIC_API_URL;
+console.log(API_IP);
 
 export default function AuthScreen({ navigation }) {
 
@@ -97,7 +99,7 @@ export default function AuthScreen({ navigation }) {
     if (!validSignup) return; // si l'un des champs est mal rempli, on ne lance même pas la route
 
     try {
-      const res = await fetch('http://192.168.1.101:3000/user/signup', {
+      const res = await fetch(`${API_IP}/user/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username.trim(), email: emailSignup.trim(), password: passwordSignup }),
@@ -131,7 +133,7 @@ export default function AuthScreen({ navigation }) {
     if (!validLogin) return;
 
     try {
-      const res = await fetch('http://192.168.1.101:3000/user/signin', {
+      const res = await fetch(`${API_IP}/user/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailLogin.trim(), password: passwordLogin }),
