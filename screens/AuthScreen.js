@@ -15,10 +15,12 @@ import { typography } from '../styles/globalStyles.js';
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_IP);
 
-export default function AuthScreen({ navigation }) {
+export default function AuthScreen({ navigation, route }) {
+
+  const initialSignUp = route.params?.initialForm === 'login' ? false : true;
 
   // true = affichage du formulaire Inscription et false = formulaire Connexion
-  const [signUp, setSignUp] = useState(true);
+  const [signUp, setSignUp] = useState(initialSignUp);
   
   // Inscription : il faut un useState PAR champ. 4 champs donc 4 useState.
   const [username, setUsername] = useState('');

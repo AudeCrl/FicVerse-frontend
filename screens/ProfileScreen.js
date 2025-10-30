@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { typography } from '../styles/globalStyles';
+import { useDispatch } from 'react-redux';
+import { logout } from '../reducers/user';
 
 export default function ProfileScreen({ navigation }) {
+    const dispatch = useDispatch();
+
     const [username, setUsername] = useState('username');
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [tempUsername, setTempUsername] = useState('');
@@ -37,11 +41,8 @@ export default function ProfileScreen({ navigation }) {
     };
 
     const handleLogout = () => {
-        console.log('Logout clicked');
-        /*
-        Action Logout sur reducer user
-        renvoi sur l'ecran de connexion, insciption ?
-        */
+        dispatch(logout());
+        navigation.navigate('Auth', { initialForm: 'login'});
     };
 
     const handleRemoveAccount = () => {

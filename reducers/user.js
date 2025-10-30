@@ -19,16 +19,14 @@ export const userSlice = createSlice({
             state.value.username = action.payload.username;
            // state.value.avatar = action.payload.avatar;
         },
-        /* Pour la déconnexion
-        logout: (state) => {
+        /* Pour la déconnexion */
+        logout: (state) => {           
             state.value.token = null;
             state.value.username = null;
-            state.value.firstname = null;
             state.value.avatar = null;
         },
-        */
     },
 });
 
-export const { login } = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 export default userSlice.reducer;

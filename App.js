@@ -1,5 +1,6 @@
 import { Provider } from 'react-redux';
-import store from './store';
+import { store, persistor } from './store';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -13,6 +14,7 @@ import AuthScreen from './screens/AuthScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import { useSelector } from 'react-redux';
 
 
 const Stack = createNativeStackNavigator();
@@ -49,6 +51,22 @@ const TabNavigator = () => {
   );
 }
 
+const RootNavigation = () => {
+  const user = useSelector((state) => state.user.value);
+  const isConnected = !!user.token;
+
+  const initialRoute = isConnected ? 'TabNavigator' : 'Auth';
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
+      <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
 
   const [fontsLoaded, fontError] = useFonts({
@@ -72,14 +90,11 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Auth" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Auth" component={AuthScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <PersistGate loading={null} persistor={persistor}>
+        <NavigationContainer>
+          <RootNavigation />
+        </NavigationContainer>
+      </PersistGate>
     </Provider>
   );
 }
