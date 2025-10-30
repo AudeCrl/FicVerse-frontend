@@ -2,17 +2,23 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { typography } from '../styles/globalStyles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../reducers/user';
+
+const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ProfileScreen({ navigation }) {
     const dispatch = useDispatch();
 
-    const [username, setUsername] = useState('username');
+    const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
+    console.log(user);
+    
+
+    const [username, setUsername] = useState(user.username);
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [tempUsername, setTempUsername] = useState('');
 
-    const [currentEmail, setCurrentEmail] = useState('mail');
+    const [currentEmail, setCurrentEmail] = useState(user.email);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [tempEmail, setTempEmail] = useState('mail');
 
@@ -47,11 +53,36 @@ export default function ProfileScreen({ navigation }) {
 
     const handleRemoveAccount = () => {
         console.log('Remove Account clicked');
-        /*
-        Fetch route remove account
-        Si result true :
-        Renvoi sur l'ecran de creation de compte
-        */
+        const userToken = user.token;
+
+        if (!userToken) {
+            console.error('Erreur: Token utilisateur manquant.');
+            return;
+        }
+        // console.log('Remove Account clicked. Deleting user with token:', userToken);
+
+        // fetch(`${API_IP}/user/remove`, {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ token: userToken }),
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     if (data.result) {
+        //         console.log('Compte supprimé avec succès.');
+        //         dispatch(logout());
+        //         navigation.navigate('Auth');
+        //     } else {
+        //         console.error('Échec de la suppression du compte:', data.error);
+        //         alert(`Erreur de suppression: ${data.error}`);
+        //     }
+        // })
+        // .catch(error => {
+        //     console.error('Erreur réseau lors de la suppression:', error);
+        //     alert('Erreur de connexion au serveur. Veuillez vérifier votre réseau.');
+        // });
     };
 
   return (
@@ -116,6 +147,15 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.themeContainer}>
             <Text>Thème de l'interface</Text>
+        </View>
+        <View style={styles.ttagsContainer}>
+            <Text>Gestion des tags</Text>
+        </View>
+        <View style={styles.languageContainer}>
+            <Text>Gestion des langue</Text>
+        </View>
+        <View style={styles.likeContainer}>
+            <Text>Gestion de l'icone de like</Text>
         </View>
         <View style={styles.manageAccountContainer}>
             <TouchableOpacity onPress={handleLogout}>

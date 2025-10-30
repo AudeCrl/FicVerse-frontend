@@ -22,8 +22,8 @@ export const userSlice = createSlice({
         /* Pour la déconnexion */
         logout: (state) => {           
             state.value.token = null;
+            state.value.email = null;
             state.value.username = null;
-            state.value.avatar = null;
         },
     },
 });
