@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler'; // le tout 1er import de l'app doit être Gesture Handler car React Navigation en dépend pour tous les gestes (swipe, drag, etc.).
 import { registerRootComponent } from 'expo';
 
 import App from './App';
