@@ -49,21 +49,22 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     justifyContent: 'flex-end',
+    minHeight: 140,
   },
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: '100%',
+    alignItems: 'flex-end',
   },
   left: {
     justifyContent: 'flex-end',
-    flex: 1,
   },
   title: {
     fontSize: 22,
     fontWeight: '600',
   },
   right: {
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
   },

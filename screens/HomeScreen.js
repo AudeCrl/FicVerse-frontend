@@ -134,16 +134,5 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  avatar: { width: 40, height: 40, borderRadius: 50, backgroundColor: '#FFF' },
-
   tabs: { flex: 1, paddingTop: 20 },
 });
