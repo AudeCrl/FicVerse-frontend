@@ -225,7 +225,6 @@ export default function ReadingList({ readingStatus }) {
         Onglet actif : {readingStatus}
       </Text>
 
-      {/* TODO: FandomCard listée ici, chacune rendra ses FictionCard */}
       <Text>Affichage des FandomCard & FictionCard {readingStatus} ici !</Text>
       <ScrollView showsVerticalScrollIndicator={false}>{fandoms}</ScrollView>
       

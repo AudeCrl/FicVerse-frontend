@@ -4,12 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';   // import of the module "material top tabs"
 import ReadingList from '../components/fiction/ReadingList';
 import PillButton from '../components/ui/PillButton';
+import Header from '../components/Header';
 
+/* 
+Fonction TopPills qui permet de customiser la barre incluant les 3 toptabs
 
-function TopPills({ state, descriptors, navigation }) {   // Fonction TopPills qui permet de customiser la barre incluant les 3 toptabs
+state, descriptors et navigation sont les 3 props à mettre obligatoirement dans une barre d'onglets customisée (custom tabBar).
+Ces trois props sont fournies automatiquement par React Navigation. 
+*/
 
-/* state, descriptors et navigation sont les 3 props à mettre obligatoirement dans une barre d'onglets customisée (custom tabBar).
-Ces trois props sont fournies automatiquement par React Navigation. */
+function TopPills({ state, descriptors, navigation }) {
 
   return (
     <View
@@ -17,39 +21,45 @@ Ces trois props sont fournies automatiquement par React Navigation. */
         flexDirection: 'row',
         paddingHorizontal: 16,
         paddingBottom: 8,
-        gap: 8,
-      }}>
-        {/*
-        flexDirection: 'row',  ==>  on place les 3 buttons côte à côte
-        gap: 8,  ==> espace entre les boutons
-        */}        
+        justifyContent:'space-between'
+      }}>    
 
       {state.routes.map((route, index) => {
         const focused = state.index === index;
         const { options } = descriptors[route.key];
         const label = options.title ?? route.name;
-        {/*
-        {state.routes.map((route, index) => {       ==>  On parcourt les 3 routes déclarées dans le Tab.Navigator, via le map
-        const focused = state.index === index;      ==> chaque route a un index. Lorsque le map aura un index égale à celui de la route, elle saura que cet onglet est l'onglet actif.
-        const { options } = descriptors[route.key]; ==> chaque route a un descriptior qui permet de récupérer les infos dans options. Ex plus bas : options={{ title: 'En cours' }} 
-        const label = options.title ?? route.name;  ==> On met le title qui était dans options (ex : "En cours"), sinon le nom de la route. Ex : name="Reading" 
-        */}
 
         return (
           <PillButton
-            key={route.key}     // key pour dérouler le map
-            label={label}       // texte du button : son title
-            active={focused}    // si l'index de la route est égal à l'index du map alors focused = true, sinon focused = false. Et dans notre composant PillButton, si active = true alors c'est violet.
-            onPress={() => navigation.navigate(route.name)}     // en appuyant dessus, ça nous amène sur la route Reading par exemple. Puis la route Reading fait appel au composant enfant "ReadingList". Ce composant enfant va passer en prop "reading" qui va fetch les fictions ayant ce status "reading".
+            key={route.key}
+            label={label}
+            active={focused}
+            onPress={() => navigation.navigate(route.name)}
           />
           
         );
-      })}
+      })}     
     </View>
   );
 }
 
 /*
+flexDirection: 'row',  ==>  on place les 3 buttons côte à côte
+gap: 8,  ==> espace entre les boutons
+
+{state.routes.map((route, index) => {       ==> On parcourt les 3 routes déclarées dans le Tab.Navigator, via le map. Pour chaque route, on crée dans le return un PillButton.
+const focused = state.index === index;      ==> chaque route a un index. Lorsque le map aura un index égale à celui de la route, elle saura que cet onglet est l'onglet actif.
+const { options } = descriptors[route.key]; ==> chaque route a un descriptior qui permet de récupérer les infos dans options. Ex plus bas : options={{ title: 'En cours' }} 
+const label = options.title ?? route.name;  ==> On met le title qui était dans options (ex : "En cours"), sinon le nom de la route. Ex : name="Reading" 
+
+<PillButton
+  key={route.key}     ==> key pour dérouler le map
+  label={label}       ==> texte du button : son title
+  active={focused}    ==> si l'index de la route est égal à l'index du map alors focused = true, sinon focused = false. Et dans notre composant PillButton, si active = true alors c'est violet.
+  onPress={() => navigation.navigate(route.name)}     ==> en appuyant dessus, ça nous amène sur la route Reading par exemple. Puis la route Reading fait appel au composant enfant "ReadingList". Ce composant enfant va passer en prop "reading" qui va fetch les fictions ayant ce status "reading".
+/>
+
+
 On a fait state.routes.map au lieu de faire directement routes.map car routes.map n'est pas accessible directement.
 Il faut d'abord aller dans state puis dans route. State est comme ça :
 {
@@ -75,19 +85,7 @@ export default function HomeScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text>Mes histoires</Text>
-        </View>
-
-        {/* Button profile */}
-        <Pressable style={styles.headerRight} onPress={() => navigation.navigate('Profile')}>
-          <Image
-            source={require('../assets/avatar-default.png')}
-            style={styles.avatar}
-            resizeMode="cover"/>
-        </Pressable>
-      </View>
+      <Header onProfilePress={() => navigation.navigate('Profile')} />
 
       {/* Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen */}
       <View style={styles.tabs}>
@@ -108,7 +106,7 @@ export default function HomeScreen({ navigation }) {
             options={{ title: 'En cours' }}
             children={() => <ReadingList readingStatus="reading" />}
           />
-          {/* Ce Tab.Screen       ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
+          {/* Ce Tab.Screen                ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
           name="Reading"                   ==>  Nom de la route pour la navigation
           options={{ title: 'En cours' }}  ==>  Titre affiché pour l'utilisateur
           children={() => <ReadingList readingStatus="reading" />}  ==>  Le composant ReadingList a readingStatus comme prop. Ici, on dit readingStatus ="reading"
@@ -147,5 +145,5 @@ const styles = StyleSheet.create({
 
   avatar: { width: 40, height: 40, borderRadius: 50, backgroundColor: '#FFF' },
 
-  tabs: { flex: 1 },
+  tabs: { flex: 1, paddingTop: 20 },
 });
