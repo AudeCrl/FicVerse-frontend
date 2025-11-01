@@ -1,15 +1,15 @@
 export const typography = {
   h1: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 28,
+    fontFamily: 'Roboto_500Medium',
+    fontSize: 26,
   },
   h2: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 22,
+    fontFamily: 'Roboto_600SemiBold',
+    fontSize: 24,
   },
   h3: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 18,
+    fontFamily: 'Roboto_600SemiBold',
+    fontSize: 20,
   },
   body: {
     fontFamily: 'Roboto_400Regular',
@@ -20,8 +20,8 @@ export const typography = {
     fontSize: 16,
   },
   button: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 16,
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 18,
   },
   input: {
     fontFamily: 'Roboto_400Regular',

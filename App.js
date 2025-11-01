@@ -7,7 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFonts, Roboto_400Regular, Roboto_400Regular_Italic, Roboto_500Medium, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import { useFonts, Roboto_400Regular, Roboto_400Regular_Italic, Roboto_500Medium, Roboto_600SemiBold, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AuthScreen from './screens/AuthScreen';
@@ -73,6 +73,7 @@ export default function App() {
     Roboto_400Regular,
     Roboto_400Regular_Italic, 
     Roboto_500Medium,
+    Roboto_600SemiBold,
     Roboto_700Bold,
   });
 
