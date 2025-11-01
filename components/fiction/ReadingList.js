@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import FandomCard from './FandomCard';
+import { useSelector } from "react-redux";
+
+const API_IP = process.env.EXPO_PUBLIC_API_URL;
+
 
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus }) {
+  const user = useSelector((state) => state.user.value);
+  const [fandomsFetch, setFandomsFetch] = useState([]);
 
   const fandomsData = [
     {
@@ -216,7 +222,37 @@ export default function ReadingList({ readingStatus }) {
     }
   ];
 
-  const fandoms = fandomsData.map((fandom, index) => <FandomCard key={index} fandomName={fandom.name} fictions={fandom.fictions} />);
+  useEffect(() => {
+    const fetchFandoms = async () => {
+      try {
+        const url = `${API_IP}/fiction/${readingStatus}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.token}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json();
+          throw new Error(errorBody.error || `Erreur HTTP ${response.status} lors du fetch.`);
+        }
+
+        const data = await response.json();
+
+        setFandomsFetch(data.fandoms);
+
+      } catch (e) {
+        console.error('Fetch Error:', e);        
+      }
+    };
+
+    fetchFandoms();
+  }, [readingStatus]);
+
+  const fandoms = fandomsFetch.map((fandom, index) => <FandomCard key={index} fandomName={fandom.name} fictions={fandom.fictions} />);
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
