@@ -23,6 +23,7 @@ export default function FictionCard({ fiction, collapsingState, showReadingStatu
 
     const handleNavigate = () => {
         fiction.link && Linking.openURL(fiction.link);
+        console.log('LIEN =>', fiction.link);
     };
 
     const metadata =

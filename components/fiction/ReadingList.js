@@ -18,6 +18,7 @@ export default function ReadingList({ readingStatus }) {
           "userId": "6903a24eaa428a59e046adc6",
           "fandomId": "655a6a690e5f03d61b34a101",
           "title": "Action in the Serpent's Heart",
+          "link": "https://archiveofourown.org/works/13871511",
           "author": "Jane_Blossom",
           "summary": "Drago Malfoy doit naviguer dans les eaux troubles de l'après-guerre...",
           "numberOfWords": 150000,
