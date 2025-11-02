@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext.js';
 import { typography } from '../../styles/globalStyles.js';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Tags from './Tags.js';
 import * as Linking from "expo-linking";
 
 export default function FictionCard({ fiction, collapsingState, showReadingStatus }) {
@@ -167,6 +168,9 @@ export default function FictionCard({ fiction, collapsingState, showReadingStatu
             }
             {fiction.lastChapterRead &&
                 <Text style={styles.lastChapterRead}>Dernier chapitre lu : {fiction.lastChapterRead}</Text>
+            }
+            {fiction.tags.length &&
+                <Tags tags={fiction.tags} withCross={false} />
             }
         </View>
     );
