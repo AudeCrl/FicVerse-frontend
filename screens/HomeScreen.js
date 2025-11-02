@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, Pressable, Text, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';   // import of the module "material top tabs"
 import ReadingList from '../components/fiction/ReadingList';
-import PillButton from '../components/ui/PillButton';
+import RoundedButton from '../components/ui/RoundedButton';
 import Header from '../components/Header';
+import { useTheme } from '../context/ThemeContext.js';
 
 /* 
-Fonction TopPills qui permet de customiser la barre incluant les 3 toptabs
+Fonction TopTabs qui permet de customiser la barre incluant les 3 toptabs
 
 state, descriptors et navigation sont les 3 props à mettre obligatoirement dans une barre d'onglets customisée (custom tabBar).
 Ces trois props sont fournies automatiquement par React Navigation. 
 */
 
-function TopPills({ state, descriptors, navigation }) {
+function TopTabs({ state, descriptors, navigation }) {
 
   return (
     <View
@@ -30,7 +31,7 @@ function TopPills({ state, descriptors, navigation }) {
         const label = options.title ?? route.name;
 
         return (
-          <PillButton
+          <RoundedButton
             key={route.key}
             label={label}
             active={focused}
@@ -52,7 +53,7 @@ const focused = state.index === index;      ==> chaque route a un index. Lorsque
 const { options } = descriptors[route.key]; ==> chaque route a un descriptior qui permet de récupérer les infos dans options. Ex plus bas : options={{ title: 'En cours' }} 
 const label = options.title ?? route.name;  ==> On met le title qui était dans options (ex : "En cours"), sinon le nom de la route. Ex : name="Reading" 
 
-<PillButton
+<TopTab
   key={route.key}     ==> key pour dérouler le map
   label={label}       ==> texte du button : son title
   active={focused}    ==> si l'index de la route est égal à l'index du map alors focused = true, sinon focused = false. Et dans notre composant PillButton, si active = true alors c'est violet.
@@ -81,6 +82,23 @@ Il faut d'abord aller dans state puis dans route. State est comme ça :
 const Tab = createMaterialTopTabNavigator();   // import of the module "material top tabs"
 
 export default function HomeScreen({ navigation }) {
+  const { currentTheme } = useTheme();
+
+  // Memorize styles so they only update when the theme changes
+  const styles = useMemo(() =>
+      StyleSheet.create({
+          container: {
+              flex: 1,
+              backgroundColor: currentTheme.background,
+          },
+          tabs: {
+              flex: 1,
+              paddingVertical: 10,
+          },
+      }),
+      [currentTheme] // Regenerate styles only when theme or variant changes
+  );
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -99,7 +117,7 @@ export default function HomeScreen({ navigation }) {
             tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
           }}
 
-          tabBar={(props) => <TopPills {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
+          tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
         >
           <Tab.Screen
             name="Reading"
@@ -130,9 +148,3 @@ export default function HomeScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-
-  tabs: { flex: 1, paddingTop: 20 },
-});

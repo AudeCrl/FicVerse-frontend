@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import FandomCard from './FandomCard';
 import { useSelector } from "react-redux";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
-
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus }) {
   const user = useSelector((state) => state.user.value);
   const [fandomsFetch, setFandomsFetch] = useState([]);
-
+  
   const fandomsData = [
     {
       "_id": "655a6a690e5f03d61b34a101",
@@ -255,15 +254,14 @@ export default function ReadingList({ readingStatus }) {
   const fandoms = fandomsFetch.map((fandom, index) => <FandomCard key={index} fandomName={fandom.name} fictions={fandom.fictions} />);
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-
-      <Text style={{ fontSize: 16, fontWeight: '700', marginBottom: 8 }}>
-        Onglet actif : {readingStatus}
-      </Text>
-
-      <Text>Affichage des FandomCard & FictionCard {readingStatus} ici !</Text>
-      <ScrollView showsVerticalScrollIndicator={false}>{fandoms}</ScrollView>
-      
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>{fandoms}</ScrollView>      
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 14,
+    },
+});

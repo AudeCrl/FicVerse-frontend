@@ -1,14 +1,11 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-export default function PillButton({
-    
+export default function RoundedButton({    
   label,
   active = false,
   onPress,
-}) 
-
-{
+}) {
   const background = active ? '#DEDAFF' : '#E6E6E6';
 
   return (
@@ -22,12 +19,12 @@ const styles = StyleSheet.create({
     containerButton: {
         justifyContent: 'center',      
         alignItems: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 12,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 8,
     },
     text: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: '600',
         color: '#1E1E1E',
     },
@@ -35,7 +32,7 @@ const styles = StyleSheet.create({
 
 /*
 Liste des props :
-  label,                ==> texte du bouton pillule
+  label,                ==> texte du bouton
   active = false,       ==> true = fond #DEDAFF, false = #E6E6E6
   onPress,              ==> la fonction qu'il appellera quand on va le press
 

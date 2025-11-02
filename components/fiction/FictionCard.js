@@ -1,12 +1,106 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-// import FictionCard from './FictionCard';
+import { useTheme } from '../../context/ThemeContext.js';
 import { typography } from '../../styles/globalStyles.js';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Linking from "expo-linking";
 
 export default function FictionCard({ fiction, collapsingState, showReadingStatus }) {
+    const { currentTheme } = useTheme();
+
+    // Memorize styles so they only update when the theme changes
+    const styles = useMemo(() =>
+        StyleSheet.create({
+            fictionCard: {
+                ...typography.body,
+                paddingTop: 10,
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
+                borderColor: currentTheme.segmentation,
+            },
+            readingStatus: {
+                color: currentTheme.text,
+            },
+            titleContainer: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 8,
+            },
+            title: {
+                ...typography.h3,
+                color: currentTheme.text,
+            },
+            moreIcon: {
+                color: currentTheme.text,
+            },
+            authorRateContainer: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 8,
+            },
+            authorContainer: {
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                borderRadius: 2,
+            },
+            authorBy: {
+                color: currentTheme.text,
+            },
+            authorChip: {
+                backgroundColor: currentTheme.tagPalette[3],
+                height: 27,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                paddingHorizontal: 6,
+            },
+            authorChipText: {
+                color: currentTheme.text,
+            },
+            rate: {
+                height: 27,
+                justifyContent: 'center',
+            },
+            metadataContainer: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: 8,
+            },
+            metadataLeftCol: {
+                alignItems: 'flex-start',        
+            },
+            metadataRightCol: {
+                alignItems: 'flex-end',        
+            },
+            metadata: {
+                color: currentTheme.secondaryText,
+            },
+            summary: {
+                ...typography.body,
+                color: currentTheme.text,
+                marginBottom: 8,
+            },
+            personalNotes: {
+                ...typography.bodyItalic,
+                color: currentTheme.text,
+                marginBottom: 8,
+            },
+            lastChapterRead: {
+                ...typography.body,
+                color: currentTheme.text,
+                marginBottom: 8,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+            }
+        }),
+        [currentTheme] // Regenerate styles only when theme or variant changes
+    );
+    
 
     const readingStatusLabels = {
         'to-read': 'A lire',
@@ -30,12 +124,12 @@ export default function FictionCard({ fiction, collapsingState, showReadingStatu
         (fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords) ? (
             <View style={styles.metadataContainer}>
                 <View style={styles.metadataLeftCol}>
-                    {fiction.lang && <Text style={styles.metadataLeft}>{fiction.lang}</Text>}
-                    {fiction.storyStatus && <Text style={styles.metadataLeft}>{storyStatusLabels[fiction.storyStatus]}</Text>}
+                    {fiction.lang && <Text style={styles.metadata}>{fiction.lang}</Text>}
+                    {fiction.storyStatus && <Text style={styles.metadata}>{storyStatusLabels[fiction.storyStatus]}</Text>}
                 </View>
                 <View style={styles.metadataRightCol}>
-                    {fiction.numberOfChapters && <Text style={styles.metadataRight}>{fiction.numberOfChapters} chapitres</Text>}
-                    {fiction.numberOfWords && <Text style={styles.metadataRight}>{fiction.numberOfWords} mots</Text>}
+                    {fiction.numberOfChapters && <Text style={styles.metadata}>{fiction.numberOfChapters} chapitres</Text>}
+                    {fiction.numberOfWords && <Text style={styles.metadata}>{fiction.numberOfWords} mots</Text>}
                 </View>
             </View>
         ) : null;
@@ -47,14 +141,14 @@ export default function FictionCard({ fiction, collapsingState, showReadingStatu
             }
             <View style={styles.titleContainer}>
                 <Text style={styles.title} onPress={handleNavigate}>{fiction.title}</Text>
-                <MaterialIcons name="more-horiz" size={24} color="black" />
+                <MaterialIcons name="more-horiz" size={24} style={styles.moreIcon} />
             </View>
             {(fiction.author || fiction.rate.display) && 
                 <View style={styles.authorRateContainer}>
                     {fiction.author && 
                         <View style={styles.authorContainer}>
-                            <Text>par </Text>
-                            <View style={styles.authorChip}><Text>{fiction.author}</Text></View>
+                            <Text style={styles.authorBy}>par </Text>
+                            <View style={styles.authorChip}><Text style={styles.authorChipText}>{fiction.author}</Text></View>
                         </View>
                     }
                     {fiction.rate.display && 
@@ -77,77 +171,3 @@ export default function FictionCard({ fiction, collapsingState, showReadingStatu
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    fictionCard: {
-        ...typography.body,
-        paddingVertical: 10,
-        marginBottom: 14,
-        borderBottomWidth: 1,
-        borderStyle: 'dashed',
-        borderColor: '#C4C4C4',
-    },
-    readingStatus: {
-
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    title: {
-        ...typography.h3,
-        color: '#000',
-    },
-    authorRateContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    authorContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderRadius: 2,
-    },
-    authorChip: {
-        backgroundColor: '#C6DCFF',
-        height: 27,
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-        paddingHorizontal: 6,
-    },
-    rate: {
-        height: 27,
-        justifyContent: 'center',
-    },
-    metadataContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 8,
-    },
-    metadataLeftCol: {
-        alignItems: 'flex-start',        
-    },
-    metadataRightCol: {
-        alignItems: 'flex-end',        
-    },
-    summary: {
-        ...typography.body,
-        marginBottom: 8,
-    },
-    personalNotes: {
-        ...typography.bodyItalic,
-        marginBottom: 8,
-    },
-    lastChapterRead: {
-        ...typography.body,
-        marginBottom: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-    }
-});
