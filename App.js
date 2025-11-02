@@ -2,14 +2,15 @@ import { Provider, useSelector } from 'react-redux';
 import { store, persistor } from './store';
 import { PersistGate } from 'redux-persist/integration/react';
 
-import { ThemeProvider } from './context/ThemeContext';
-
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { ImageBackground } from 'react-native';
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFonts, Roboto_400Regular, Roboto_400Regular_Italic, Roboto_500Medium, Roboto_600SemiBold, Roboto_700Bold } from '@expo-google-fonts/roboto';
+import { useFonts, Roboto_400Regular, Roboto_400Regular_Italic, Roboto_500Medium, 
+  Roboto_600SemiBold, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import * as SplashScreen from 'expo-splash-screen';
 
 import AuthScreen from './screens/AuthScreen';
@@ -24,17 +25,32 @@ const Tab = createBottomTabNavigator();
 SplashScreen.preventAutoHideAsync();
 
 const TabNavigator = () => {
+  const { currentTheme } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarActiveTintColor: currentTheme.text,
+        tabBarInactiveTintColor: currentTheme.text,
 
-        tabBarIcon: ({ color, size }) => {
+        tabBarStyle: {
+          borderTopWidth: 0,
+        },
+        
+        tabBarBackground: () => (
+          <ImageBackground
+            source={currentTheme.footerBackground}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+        ),
+
+        tabBarIcon: ({ focused, color, size }) => {
           let iconName = '';
 
           if (route.name === 'Home') {
-            iconName = 'home-outline';
+            iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Add') {
             iconName = 'add-sharp';
           } else if (route.name === 'Search') {
