@@ -1,34 +1,40 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
+import { typography } from '../../styles/globalStyles.js';
+import { useTheme } from '../../context/ThemeContext.js';
 
 export default function RoundedButton({    
   label,
   active = false,
   onPress,
 }) {
-  const background = active ? '#DEDAFF' : '#E6E6E6';
-
+  const { currentTheme } = useTheme();
+  
   return (
-    <Pressable onPress={onPress} style={[styles.containerButton, {backgroundColor: background} ]}>
-      <Text style={styles.text}>{label}</Text>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-    containerButton: {
+    <Pressable 
+      onPress={onPress} 
+      style={{
         justifyContent: 'center',      
         alignItems: 'center',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 8,
-    },
-    text: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#1E1E1E',
-    },
-});
+        backgroundColor: active ? currentTheme.primary : currentTheme.inactive,
+
+      }}
+    >
+      <Text 
+        style={{
+          ...typography.body,
+          fontWeight: '600',
+          color: currentTheme.text,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
 
 /*
 Liste des props :
