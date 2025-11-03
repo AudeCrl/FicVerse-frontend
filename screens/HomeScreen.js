@@ -99,6 +99,20 @@ export default function HomeScreen({ navigation }) {
       [currentTheme] // Regenerate styles only when theme or variant changes
   );
 
+        //   <Tab.Navigator
+        //   initialRouteName="Reading" // tab "En cours" by default
+
+        //   screenOptions={{          // screenOptions définit les options par défaut pour tous les onglets.
+        //     swipeEnabled: true,     // Permet le swipe
+        //     lazy: true,             //  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
+        //     tabBarIndicatorStyle: { height: 0 },   // Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
+        //     tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
+        //   }}
+
+        //   tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
+        // >
+
+  
   return (
     <SafeAreaView style={styles.container}>
 
@@ -108,16 +122,16 @@ export default function HomeScreen({ navigation }) {
       {/* Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen */}
       <View style={styles.tabs}>
         <Tab.Navigator
-          initialRouteName="Reading" // tab "En cours" by default
+          initialRouteName="Reading"
 
-          screenOptions={{          // screenOptions définit les options par défaut pour tous les onglets.
-            swipeEnabled: true,     // Permet le swipe
-            lazy: true,             //  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
-            tabBarIndicatorStyle: { height: 0 },   // Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
-            tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
+          screenOptions={{
+            swipeEnabled: true,
+            lazy: true,
+            tabBarIndicatorStyle: { height: 0 },
+            tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },
           }}
 
-          tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
+          tabBar={(props) => <TopTabs {...props} />} 
         >
           <Tab.Screen
             name="Reading"
