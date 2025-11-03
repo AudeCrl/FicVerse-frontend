@@ -5,10 +5,13 @@ import { useSelector } from "react-redux";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
+const defaultSort = { sort: 'lastReadAt', order: 'desc'};
+
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus }) {
   const user = useSelector((state) => state.user.value);
   const [fandomsFetch, setFandomsFetch] = useState([]);
+  const [globalSortState, setGlobalSortState] = useState(defaultSort);
   
   const fandomsData = [
     {
@@ -221,10 +224,14 @@ export default function ReadingList({ readingStatus }) {
     }
   ];
 
+  const handleGlobalSortChange = (newSortType, newSortOrder) => {
+    setGlobalSortState({ sort: newSortType, order: newSortOrder});
+  }
+
   useEffect(() => {
     const fetchFandoms = async () => {
       try {
-        const url = `${API_IP}/fiction/${readingStatus}`;
+        const url = `${API_IP}/fiction/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
 
         const response = await fetch(url, {
           method: 'GET',
@@ -249,9 +256,9 @@ export default function ReadingList({ readingStatus }) {
     };
 
     fetchFandoms();
-  }, [readingStatus]);
+  }, [readingStatus, globalSortState]);
 
-  const fandoms = fandomsFetch.map((fandom, index) => <FandomCard key={index} fandomName={fandom.name} fictions={fandom.fictions} />);
+  const fandoms = fandomsFetch.map((fandom, index) => <FandomCard key={index} fandomName={fandom.name} fictions={fandom.fictions} onGlobalSortChange={handleGlobalSortChange} currentGlobalSort={globalSortState}/>);
 
   return (
     <View style={styles.container}>
