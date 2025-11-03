@@ -12,7 +12,7 @@ export default function Tags({ tags, withCross }) {
                 flexWrap: 'wrap',
             }}>
                 {tags.map((tag, index) => 
-                    <Tag key={index} label={tag.name} colorIndex={tag.color}  withCross={withCross} />)}
+                    <Tag key={index} label={tag.name} colorIndex={tag.color} withCross={withCross} />)}
         </View>
     );
 }
