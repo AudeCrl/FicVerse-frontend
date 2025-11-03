@@ -90,6 +90,7 @@ export default function FictionCard({
         summary: {
           ...typography.body,
           color: currentTheme.text,
+          opacity: 0.9,
           marginBottom: 8,
         },
         personalNotes: {
