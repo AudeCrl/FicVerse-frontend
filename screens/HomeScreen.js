@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { Image, Pressable, Text, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';   // import of the module "material top tabs"
-import ReadingList from '../components/fiction/ReadingList';
-import RoundedButton from '../components/ui/RoundedButton';
-import Header from '../components/Header';
-import { useTheme } from '../context/ThemeContext.js';
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs"; // import of the module "material top tabs"
+import { useMemo } from "react";
+import { StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ReadingList from "../components/fiction/ReadingList";
+import Header from "../components/Header";
+import RoundedButton from "../components/ui/RoundedButton";
+import { useTheme } from "../context/ThemeContext.js";
 
 /* 
 Fonction TopTabs qui permet de customiser la barre incluant les 3 toptabs
@@ -15,16 +15,15 @@ Ces trois props sont fournies automatiquement par React Navigation.
 */
 
 function TopTabs({ state, descriptors, navigation }) {
-
   return (
     <View
       style={{
-        flexDirection: 'row',
+        flexDirection: "row",
         paddingHorizontal: 16,
         paddingBottom: 8,
-        justifyContent:'space-between'
-      }}>    
-
+        justifyContent: "space-between",
+      }}
+    >
       {state.routes.map((route, index) => {
         const focused = state.index === index;
         const { options } = descriptors[route.key];
@@ -37,9 +36,8 @@ function TopTabs({ state, descriptors, navigation }) {
             active={focused}
             onPress={() => navigation.navigate(route.name)}
           />
-          
         );
-      })}     
+      })}
     </View>
   );
 }
@@ -79,64 +77,63 @@ Il faut d'abord aller dans state puis dans route. State est comme ça :
     ]
 */
 
-const Tab = createMaterialTopTabNavigator();   // import of the module "material top tabs"
+const Tab = createMaterialTopTabNavigator(); // import of the module "material top tabs"
 
 export default function HomeScreen({ navigation }) {
   const { currentTheme } = useTheme();
 
   // Memorize styles so they only update when the theme changes
-  const styles = useMemo(() =>
+  const styles = useMemo(
+    () =>
       StyleSheet.create({
-          container: {
-              flex: 1,
-              backgroundColor: currentTheme.background,
-          },
-          tabs: {
-              flex: 1,
-              paddingVertical: 10,
-          },
+        container: {
+          flex: 1,
+          backgroundColor: currentTheme.background,
+        },
+        tabs: {
+          flex: 1,
+          paddingVertical: 10,
+        },
       }),
-      [currentTheme] // Regenerate styles only when theme or variant changes
+    [currentTheme] // Regenerate styles only when theme or variant changes
   );
 
-        //   <Tab.Navigator
-        //   initialRouteName="Reading" // tab "En cours" by default
+  //   <Tab.Navigator
+  //   initialRouteName="Reading" // tab "En cours" by default
 
-        //   screenOptions={{          // screenOptions définit les options par défaut pour tous les onglets.
-        //     swipeEnabled: true,     // Permet le swipe
-        //     lazy: true,             //  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
-        //     tabBarIndicatorStyle: { height: 0 },   // Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
-        //     tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
-        //   }}
+  //   screenOptions={{          // screenOptions définit les options par défaut pour tous les onglets.
+  //     swipeEnabled: true,     // Permet le swipe
+  //     lazy: true,             //  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
+  //     tabBarIndicatorStyle: { height: 0 },   // Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
+  //     tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
+  //   }}
 
-        //   tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
-        // >
+  //   tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
+  // >
 
-  
   return (
     <SafeAreaView style={styles.container}>
-
       {/* Header */}
-      <Header onProfilePress={() => navigation.navigate('Profile')} />
+      <Header onProfilePress={() => navigation.navigate("Profile")} />
 
       {/* Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen */}
       <View style={styles.tabs}>
         <Tab.Navigator
           initialRouteName="Reading"
-
           screenOptions={{
             swipeEnabled: true,
             lazy: true,
             tabBarIndicatorStyle: { height: 0 },
-            tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },
+            tabBarStyle: { backgroundColor: "transparent", elevation: 0 },
           }}
-
-          tabBar={(props) => <TopTabs {...props} />} 
+          tabBar={(props) => <TopTabs {...props} />}
         >
           <Tab.Screen
             name="Reading"
-            options={{ title: 'En cours' }}
-            children={() => <ReadingList readingStatus="reading" />}
+            options={{ title: "En cours" }}
+            children={() => (
+              <ReadingList readingStatus="reading" navigation={navigation} />
+            )}
           />
           {/* Ce Tab.Screen                ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
           name="Reading"                   ==>  Nom de la route pour la navigation
@@ -146,19 +143,22 @@ export default function HomeScreen({ navigation }) {
 
           <Tab.Screen
             name="ToRead"
-            options={{ title: 'À lire' }}
-            children={() => <ReadingList readingStatus="to-read" />}
+            options={{ title: "À lire" }}
+            children={() => (
+              <ReadingList readingStatus="to-read" navigation={navigation} />
+            )}
           />
           {/*  Ce Tab.Screen ==> tab "À lire" ou route "ToRead"  */}
 
-          <Tab.Screen 
+          <Tab.Screen
             name="Finished"
-            options={{ title: 'Terminées' }}
-            children={() => <ReadingList readingStatus="finished" />}
+            options={{ title: "Terminées" }}
+            children={() => (
+              <ReadingList readingStatus="finished" navigation={navigation} />
+            )}
           />
         </Tab.Navigator>
       </View>
-
     </SafeAreaView>
   );
 }
