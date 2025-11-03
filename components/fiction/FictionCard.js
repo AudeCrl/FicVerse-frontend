@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
 import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import Tags from "./Tags";
@@ -11,6 +11,8 @@ export default function FictionCard({
   fiction,
   collapsingState,
   showReadingStatus,
+  navigation,
+  allFictions,
 }) {
   const { currentTheme } = useTheme();
 
@@ -88,6 +90,7 @@ export default function FictionCard({
         summary: {
           ...typography.body,
           color: currentTheme.text,
+          opacity: 0.9,
           marginBottom: 8,
         },
         personalNotes: {
@@ -123,6 +126,20 @@ export default function FictionCard({
   const handleNavigate = () => {
     fiction.link && Linking.openURL(fiction.link);
     console.log("LIEN =>", fiction.link);
+  };
+
+  const handleAuthorPress = () => {
+    if (navigation && allFictions) {
+      const fictionsByAuthor = allFictions.filter(
+        (f) => f.author === fiction.author
+      );
+
+      navigation.navigate("SearchResults", {
+        fictions: fictionsByAuthor,
+        searchType: "author",
+        searchTerm: fiction.author,
+      });
+    }
   };
 
   const metadata = !!(
@@ -169,12 +186,15 @@ export default function FictionCard({
       {(!!fiction.author || !!fiction.rate?.display) && (
         <View style={styles.authorRateContainer}>
           {!!fiction.author && (
-            <View style={styles.authorContainer}>
+            <Pressable
+              style={styles.authorContainer}
+              onPress={handleAuthorPress}
+            >
               <Text style={styles.authorBy}>par </Text>
               <View style={styles.authorChip}>
                 <Text style={styles.authorChipText}>{fiction.author}</Text>
               </View>
-            </View>
+            </Pressable>
           )}
           {!!fiction.rate?.display && (
             <View style={styles.rate}>
@@ -196,7 +216,12 @@ export default function FictionCard({
         </Text>
       )}
       {fiction.tags.length > 0 && (
-        <Tags tags={fiction.tags} withCross={false} />
+        <Tags
+          tags={fiction.tags}
+          withCross={false}
+          navigation={navigation}
+          allFictions={allFictions}
+        />
       )}
     </View>
   );
