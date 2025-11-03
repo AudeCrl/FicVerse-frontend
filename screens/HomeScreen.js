@@ -12,39 +12,8 @@ Fonction TopTabs qui permet de customiser la barre incluant les 3 toptabs
 
 state, descriptors et navigation sont les 3 props à mettre obligatoirement dans une barre d'onglets customisée (custom tabBar).
 Ces trois props sont fournies automatiquement par React Navigation. 
-*/
 
-function TopTabs({ state, descriptors, navigation }) {
 
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        paddingBottom: 8,
-        justifyContent:'space-between'
-      }}>    
-
-      {state.routes.map((route, index) => {
-        const focused = state.index === index;
-        const { options } = descriptors[route.key];
-        const label = options.title ?? route.name;
-
-        return (
-          <RoundedButton
-            key={route.key}
-            label={label}
-            active={focused}
-            onPress={() => navigation.navigate(route.name)}
-          />
-          
-        );
-      })}     
-    </View>
-  );
-}
-
-/*
 flexDirection: 'row',  ==>  on place les 3 buttons côte à côte
 gap: 8,  ==> espace entre les boutons
 
@@ -79,12 +48,41 @@ Il faut d'abord aller dans state puis dans route. State est comme ça :
     ]
 */
 
-const Tab = createMaterialTopTabNavigator();   // import of the module "material top tabs"
+function TopTabs({ state, descriptors, navigation }) {
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingBottom: 8,
+        justifyContent:'space-between'
+      }}>    
+
+      {state.routes.map((route, index) => {
+        const focused = state.index === index;
+        const { options } = descriptors[route.key];
+        const label = options.title ?? route.name;
+
+        return (
+          <RoundedButton
+            key={route.key}
+            label={label}
+            active={focused}
+            onPress={() => navigation.navigate(route.name)}
+          />
+          
+        );
+      })}     
+    </View>
+  );
+}
+
+const Tab = createMaterialTopTabNavigator();
 
 export default function HomeScreen({ navigation }) {
   const { currentTheme } = useTheme();
 
-  // Memorize styles so they only update when the theme changes
   const styles = useMemo(() =>
       StyleSheet.create({
           container: {
@@ -96,30 +94,14 @@ export default function HomeScreen({ navigation }) {
               paddingVertical: 10,
           },
       }),
-      [currentTheme] // Regenerate styles only when theme or variant changes
+      [currentTheme]
   );
-
-        //   <Tab.Navigator
-        //   initialRouteName="Reading" // tab "En cours" by default
-
-        //   screenOptions={{          // screenOptions définit les options par défaut pour tous les onglets.
-        //     swipeEnabled: true,     // Permet le swipe
-        //     lazy: true,             //  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
-        //     tabBarIndicatorStyle: { height: 0 },   // Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
-        //     tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    // La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
-        //   }}
-
-        //   tabBar={(props) => <TopTabs {...props} />} // La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
-        // >
-
   
   return (
     <SafeAreaView style={styles.container}>
 
-      {/* Header */}
       <Header onProfilePress={() => navigation.navigate('Profile')} />
 
-      {/* Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen */}
       <View style={styles.tabs}>
         <Tab.Navigator
           initialRouteName="Reading"
@@ -138,18 +120,13 @@ export default function HomeScreen({ navigation }) {
             options={{ title: 'En cours' }}
             children={() => <ReadingList readingStatus="reading" />}
           />
-          {/* Ce Tab.Screen                ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
-          name="Reading"                   ==>  Nom de la route pour la navigation
-          options={{ title: 'En cours' }}  ==>  Titre affiché pour l'utilisateur
-          children={() => <ReadingList readingStatus="reading" />}  ==>  Le composant ReadingList a readingStatus comme prop. Ici, on dit readingStatus ="reading"
-          */}
+
 
           <Tab.Screen
             name="ToRead"
             options={{ title: 'À lire' }}
             children={() => <ReadingList readingStatus="to-read" />}
           />
-          {/*  Ce Tab.Screen ==> tab "À lire" ou route "ToRead"  */}
 
           <Tab.Screen 
             name="Finished"
@@ -162,3 +139,46 @@ export default function HomeScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
+/* 
+
+const Tab = createMaterialTopTabNavigator();  ==> import of the module "material top tabs"
+
+Memorize styles so they only update when the theme changes
+  const styles = useMemo(() =>
+      StyleSheet.create({
+          container: {
+              flex: 1,
+              backgroundColor: currentTheme.background,
+          },
+          tabs: {
+              flex: 1,
+              paddingVertical: 10,
+          },
+      }),
+      [currentTheme] ==> Regenerate styles only when theme or variant changes
+  );
+
+
+< Tab.Navigator
+initialRouteName="Reading" ==> tab "En cours" by default
+
+screenOptions={{          ==> screenOptions définit les options par défaut pour tous les onglets.
+  swipeEnabled: true,     ==> Permet le swipe
+  lazy: true,             ==>  seul l'onglet visible cad En cours est monté. Les autres onglets sont créés uniquement quand on les appelle
+  tabBarIndicatorStyle: { height: 0 },   ==> Par défaut, il y a un trait bleu sous l'onglet actif. height: 0 permet de le disparaître
+  tabBarStyle: { backgroundColor: 'transparent', elevation: 0 },    ==> La barre des 3 tabs reste transparente grâce à background transparent. elevation:0 supprime l'ombre qui apparaît par défaut
+}}
+
+tabBar={(props) => <TopTabs {...props} />} ==> La barre qui inclut les 3 onglets. On la customise avec TopPills en haut.
+>
+
+
+Le TabNavigator inclut la Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen
+
+
+Ce Tab.Screen                      ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
+  name="Reading"                   ==>  Nom de la route pour la navigation, ici la route est "Reading"
+  options={{ title: 'En cours' }}  ==>  Titre affiché pour l'utilisateur
+  children={() => <ReadingList readingStatus="reading" />}  ==>  Le composant ReadingList a readingStatus comme prop. Ici, on dit readingStatus ="reading"
+*/
