@@ -36,7 +36,7 @@ export default function Input({
       ]}
       {...rest} // Pour pouvoir ajouter d'autres props côté parent si on le souhaite, en dehors de celles mises dans le composant
       placeholder={placeholder}
-      placeholderTextColor={useThemeColors ? currentTheme.text : "#999"}
+      placeholderTextColor={useThemeColors ? currentTheme.primary : "#999"}
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
