@@ -175,7 +175,7 @@ export default function ProfileScreen({ navigation }) {
             value={displayedPassword}
             onChangeText={setNewPassword}
             editable={isEditingPassword}
-            secureTextEntry={!isEditingPassword || true}
+            secureTextEntry={isEditingPassword}
           />
           <TouchableOpacity onPress={handleEditPassword}>
             <Feather name="edit" size={24} color="black" />
