@@ -116,7 +116,6 @@ export default function HomeScreen({ navigation }) {
       {/* Header */}
       <Header onProfilePress={() => navigation.navigate("Profile")} />
 
-      {/* Navigation of the 3 top Tabs : "En cours", "à lire", "terminées" in HomeScreen */}
       <View style={styles.tabs}>
         <Tab.Navigator
           initialRouteName="Reading"
@@ -135,11 +134,6 @@ export default function HomeScreen({ navigation }) {
               <ReadingList readingStatus="reading" navigation={navigation} />
             )}
           />
-          {/* Ce Tab.Screen                ==>  Tab "En cours" ou d'un point de vue technique "ma route Reading"
-          name="Reading"                   ==>  Nom de la route pour la navigation
-          options={{ title: 'En cours' }}  ==>  Titre affiché pour l'utilisateur
-          children={() => <ReadingList readingStatus="reading" />}  ==>  Le composant ReadingList a readingStatus comme prop. Ici, on dit readingStatus ="reading"
-          */}
 
           <Tab.Screen
             name="ToRead"
@@ -148,7 +142,6 @@ export default function HomeScreen({ navigation }) {
               <ReadingList readingStatus="to-read" navigation={navigation} />
             )}
           />
-          {/*  Ce Tab.Screen ==> tab "À lire" ou route "ToRead"  */}
 
           <Tab.Screen
             name="Finished"

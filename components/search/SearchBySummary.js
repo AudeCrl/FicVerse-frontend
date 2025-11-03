@@ -170,6 +170,7 @@ export default function SearchBySummary({ fictions, navigation }) {
         placeholder="Rechercher dans résumé/notes"
         value={searchTerm}
         onChangeText={setSearchTerm}
+        useThemeColors={true}
       />
 
       {filteredFictions.length > 0 ? (

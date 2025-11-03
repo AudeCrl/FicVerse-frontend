@@ -95,6 +95,7 @@ export default function SearchByAuthor({ allAuthors, fictions, navigation }) {
         placeholder="Rechercher par auteur"
         value={searchTerm}
         onChangeText={setSearchTerm}
+        useThemeColors={true}
       />
 
       {displayedAuthors.length > 0 ? (

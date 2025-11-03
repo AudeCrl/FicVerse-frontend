@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { typography } from "../../styles/globalStyles";
 import Tag from "../fiction/Tag";
@@ -78,19 +78,22 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
       <Text style={styles.header}>
         {showAllTags ? "Tous les tags" : "Top 10 tags"}
       </Text>
-
       <Input
         placeholder="Rechercher par tag"
         value={searchTerm}
         onChangeText={setSearchTerm}
+        useThemeColors={true}
       />
-
       {displayedTags.length > 0 ? (
         <View style={styles.tagsContainer}>
           {displayedTags.map((tag, index) => (
-            <Pressable key={tag._id} onPress={() => handleSelectTag(tag)}>
-              <Tag label={tag.name} colorIndex={tag.color || (index % 9) + 1} />
-            </Pressable>
+            <Tag
+              key={tag._id}
+              label={tag.name}
+              colorIndex={tag.color || (index % 9) + 1}
+              tag={tag}
+              onPress={handleSelectTag}
+            />
           ))}
         </View>
       ) : searchTerm.trim() ? (
@@ -105,7 +108,6 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
           style={styles.toggleButton}
         />
       )}
-
       {showAllTags && allTags.length > 10 && (
         <RoundedButton
           label="Masquer les autres tags"

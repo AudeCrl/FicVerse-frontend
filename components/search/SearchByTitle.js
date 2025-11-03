@@ -101,6 +101,7 @@ export default function SearchByTitle({ fictions, navigation }) {
         placeholder="Rechercher par titre"
         value={searchTerm}
         onChangeText={setSearchTerm}
+        useThemeColors={true}
       />
 
       {filteredFictions.length > 0 ? (

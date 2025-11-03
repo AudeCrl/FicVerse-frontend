@@ -4,19 +4,19 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login } from '../reducers/user';
 import { typography } from '../styles/globalStyles.js';
+import Input from '../components/ui/Input.js'
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_IP);
 
 export default function AuthScreen({ navigation, route }) {
-
+  // provient de ProfileScreen avec la fonction handleLogout. Depuis ProfileScreen, un initialForm login est envoyé vers Auth et si cela arrive, alors initialSignUp = false et signUp = false et donc on arrive direct à la connexion
   const initialSignUp = route.params?.initialForm === 'login' ? false : true;
 
   // true = affichage du formulaire Inscription et false = formulaire Connexion
@@ -28,9 +28,13 @@ export default function AuthScreen({ navigation, route }) {
   const [passwordSignup, setPasswordSignup] = useState('');
   const [confirmPassword, setconfirmPassword] = useState('');
 
+  const [submittedSignup, setSubmittedSignup] = useState(false); // champ servant à transformer l'input en rouge
+
   // Connexion
   const [emailLogin, setEmailLogin] = useState('');
   const [passwordLogin, setPasswordLogin] = useState('');
+
+  const [submittedLogin, setSubmittedLogin] = useState(false);
 
   // useState pour stocker le message d'erreur
   const [invalid, setInvalid] = useState('');
@@ -100,6 +104,7 @@ export default function AuthScreen({ navigation, route }) {
 // Lorsqu'on appuiera sur le boutton S'inscrire, on déclenche cette fonction
   const submitSignup = async () => {
     setInvalid('');
+    setSubmittedSignup(true);  
     if (!validSignup) return; // si l'un des champs est mal rempli, on ne lance même pas la route
 
     try {
@@ -134,6 +139,7 @@ export default function AuthScreen({ navigation, route }) {
 // Lorsqu'on appuiera sur le boutton Se connecter, on déclenche cette fonction
   const submitLogin = async () => {
     setInvalid('');
+    setSubmittedLogin(true);
     if (!validLogin) return;
 
     try {
@@ -174,14 +180,22 @@ export default function AuthScreen({ navigation, route }) {
           {/* Quand on appuie sur S'inscrire, signUp devient true et on applie les styles switchBtn et switchBtnActive */}
             <TouchableOpacity
               style={[styles.switchBtn, signUp ? styles.switchBtnActive : styles.switchBtnInactive]}
-              onPress={() => { setInvalid(''); setSignUp(true); }}>
+              onPress={() => {
+                setInvalid('');
+                setSignUp(true);
+                setSubmittedSignup(false); // quand on switch, il faut que l'input ne soit plus rouge
+                }}>
               <Text style={styles.switchText}>Inscription</Text>
             </TouchableOpacity>
 
           {/* Quand on appuie sur Se Connecter, signUp devient false et on applie les styles switchBtn et switchBtnActive */}
             <TouchableOpacity
               style={[styles.switchBtn, !signUp ? styles.switchBtnActive : styles.switchBtnInactive]}
-              onPress={() => { setInvalid(''); setSignUp(false); }}>
+              onPress={() => {
+                setInvalid('');
+                setSignUp(false);
+                setSubmittedLogin(false); // quand on switch, il faut que l'input ne soit plus rouge
+                }}>
               <Text style={styles.switchText}>Connexion</Text>
             </TouchableOpacity>
           </View>
@@ -191,44 +205,46 @@ export default function AuthScreen({ navigation, route }) {
           {signUp && (     // signUp = true => affichage du formulaire Inscription
             <View>
               <Text style={styles.label}>Identifiant</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="LunaLvgd"
                 value={username}
-                onChangeText={setUsername}/>
+                onChangeText={setUsername}
+                isInvalid={submittedSignup && !checkUsername}/>
 
               {/* Si l'user commence à taper donc length > 0 ET que le champ username est faux alors on affiche le Text d'erreur */}
               {!checkUsername && username.length > 0 && (<Text style={styles.error}>Identifiant requis</Text>)}
               
               <Text style={styles.label}>Adresse mail</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="lunalvgd@hogwarts.school"
                 keyboardType="email-address"   // propriété native qui facilite la saisie d'adresse mail
                 autoCapitalize="none"   // pas de majuscule sur la 1ère lettre
                 value={emailSignup}
-                onChangeText={setEmailSignup}/>
+                onChangeText={setEmailSignup}
+                isInvalid={submittedSignup && !checkEmailSignup}/>
 
               {/* Si l'user commence à taper donc length > 0 ET que checkEmailSignup est faux alors on affiche le Text d'erreur */}
               {!checkEmailSignup && emailSignup.length > 0 && (<Text style={styles.error}>Adresse e-mail invalide</Text>)}
 
               <Text style={styles.label}>Mot de passe</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="6d-A83!r#7erVk5_"
                 secureTextEntry            // pour masquer les caractères tapés
+                autoCapitalize="none"
                 value={passwordSignup}
-                onChangeText={setPasswordSignup}/>
+                onChangeText={setPasswordSignup}
+                isInvalid={submittedSignup && !checkPasswordSignup}/>
 
               {!checkPasswordSignup && passwordSignup.length > 0 && (<Text style={styles.error}>Mot de passe requis</Text>)}
 
               <Text style={styles.label}>Confirmer le mot de passe</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="6d-A83!r#7erVk5_"
                 secureTextEntry
+                autoCapitalize="none"
                 value={confirmPassword}
-                onChangeText={setconfirmPassword}/>
+                onChangeText={setconfirmPassword}
+                isInvalid={submittedSignup && !checkConfirmPassword}/>
 
               {!checkConfirmPassword && confirmPassword.length > 0 
               && (<Text style={styles.error}>Les mots de passe ne correspondent pas</Text>)}
@@ -237,9 +253,8 @@ export default function AuthScreen({ navigation, route }) {
               {invalid && <Text style={styles.errorCenter}>{invalid}</Text>}
 
               <TouchableOpacity
-                style={[styles.submitButton, !validSignup && styles.submitButtonDisabled]}  // Si l'un des champs est mal rempli alors !validSignup (revoir useMemo) et donc button disabled
-                onPress={submitSignup}
-                disabled={!validSignup}>
+                style={styles.submitButton}  // Si l'un des champs est mal rempli alors !validSignup (revoir useMemo)
+                onPress={submitSignup}>
                 <Text style={styles.submitButtonText}>S’inscrire</Text>
               </TouchableOpacity>
             </View>
@@ -250,32 +265,32 @@ export default function AuthScreen({ navigation, route }) {
           {!signUp && (     // signUp = false => affichage du formulaire Connexion
             <View>
               <Text style={styles.label}>Adresse mail</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="Adresse e-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={emailLogin}
-                onChangeText={setEmailLogin}/>
+                onChangeText={setEmailLogin}
+                isInvalid={submittedLogin && !checkEmailLogin}/>
 
               {!checkEmailLogin && emailLogin.length > 0 && (<Text style={styles.error}>Adresse e-mail invalide</Text>)}
 
               <Text style={styles.label}>Mot de passe</Text>
-              <TextInput
-                style={styles.input}
+              <Input
                 placeholder="Mot de passe"
                 secureTextEntry
+                autoCapitalize="none"
                 value={passwordLogin}
-                onChangeText={setPasswordLogin}/>
+                onChangeText={setPasswordLogin}
+                isInvalid={submittedLogin && !checkPasswordLogin}/>
 
               {!checkPasswordLogin && passwordLogin.length > 0 && (<Text style={styles.error}>Mot de passe requis</Text>)}
 
               {invalid && <Text style={styles.errorCenter}>{invalid}</Text>}
 
               <TouchableOpacity
-                style={[styles.submitButton, !validLogin && styles.submitButtonDisabled]}
-                onPress={submitLogin}
-                disabled={!validLogin}>
+                style={styles.submitButton}
+                onPress={submitLogin}>
                 <Text style={styles.submitButtonText}>Se connecter</Text>
               </TouchableOpacity>
 
@@ -319,17 +334,6 @@ const styles = StyleSheet.create({
 
   label: { ...typography.label, fontWeight: '600', marginBottom: 4 },
 
-  input: {
-    ...typography.input,    
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginBottom: 6,
-    borderWidth: 1,
-    borderColor: '#DDD',
-  },
-
   error: { marginBottom: 6 },
   errorCenter: { textAlign: 'center', marginVertical: 6 },
 
@@ -340,7 +344,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-  submitButtonDisabled: { opacity: 0.6 },
   submitButtonText: { fontWeight: '700' },
 
   linksRow: { marginTop: 10 },
