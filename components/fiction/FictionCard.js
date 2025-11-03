@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext.js';
 import { typography } from '../../styles/globalStyles.js';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Tags from './Tags.js';
+import Tags from './Tags';
 import * as Linking from "expo-linking";
 
 export default function FictionCard({ fiction, collapsingState, showReadingStatus }) {
