@@ -2468,7 +2468,7 @@ expo-status-bar@~3.0.8:
   dependencies:
     react-native-is-edge-to-edge "^1.2.1"
 
-expo@54.0.21:
+expo@^54.0.21:
   version "54.0.21"
   resolved "https://registry.yarnpkg.com/expo/-/expo-54.0.21.tgz#c6a492eaad8e13cfd3d74cd2705c6d23d931b3f8"
   integrity sha512-I3kzMNW/43a71pt6hT0Zebd2zAPIMMeucUDDEdfUKYrzzTRwISZfVAv0dp8GWKHHDjZsy+FjE4RQCMdyKmiDeQ==
