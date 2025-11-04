@@ -5,7 +5,7 @@ import FandomCard from "./FandomCard";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
-const defaultSort = { sort: 'lastReadAt', order: 'desc'};
+const defaultSort = { sort: "lastReadAt", order: "desc" };
 
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus, navigation }) {
@@ -230,8 +230,8 @@ export default function ReadingList({ readingStatus, navigation }) {
   ];
 
   const handleGlobalSortChange = (newSortType, newSortOrder) => {
-    setGlobalSortState({ sort: newSortType, order: newSortOrder});
-  }
+    setGlobalSortState({ sort: newSortType, order: newSortOrder });
+  };
 
   useEffect(() => {
     const fetchFandoms = async () => {
@@ -264,9 +264,13 @@ export default function ReadingList({ readingStatus, navigation }) {
     fetchFandoms();
   }, [readingStatus, globalSortState]);
 
-  const fandoms = fandomsFetch.map((fandom, index) => {
+  const fandoms = (
+    fandomsFetch && Array.isArray(fandomsFetch) ? fandomsFetch : []
+  ).map((fandom, index) => {
     // Collecter toutes les fictions de tous les fandoms
-    const allFictions = fandomsFetch.flatMap((f) => f.fictions);
+    const allFictions = (
+      fandomsFetch && Array.isArray(fandomsFetch) ? fandomsFetch : []
+    ).flatMap((f) => f.fictions || []);
 
     return (
       <FandomCard

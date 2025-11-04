@@ -8,7 +8,7 @@ export default function Tags({ tags, withCross, navigation, allFictions }) {
         (fiction) => fiction.tags && fiction.tags.some((t) => t._id === tag._id)
       );
 
-      navigation.navigate("SearchResults", {
+      navigation.setParams({
         fictions: fictionsWithTag,
         searchType: "tag",
         searchTerm: tag.name,
@@ -24,16 +24,18 @@ export default function Tags({ tags, withCross, navigation, allFictions }) {
         flexWrap: "wrap",
       }}
     >
-      {tags.map((tag, index) => (
-        <Tag
-          key={index}
-          label={tag.name}
-          colorIndex={tag.color}
-          withCross={withCross}
-          tag={tag}
-          onPress={handleTagPress}
-        />
-      ))}
+      {tags &&
+        Array.isArray(tags) &&
+        tags.map((tag, index) => (
+          <Tag
+            key={index}
+            label={tag.name}
+            colorIndex={tag.color}
+            withCross={withCross}
+            tag={tag}
+            onPress={handleTagPress}
+          />
+        ))}
     </View>
   );
 }

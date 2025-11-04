@@ -47,17 +47,21 @@ export default function SearchBySummary({ fictions, navigation }) {
 
   // Filter fictions by summary or personalNotes
   const filteredFictions = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+
+    if (!searchTerm.trim() || !fictionsArray.length) return [];
 
     try {
       const regex = new RegExp(searchTerm, "i");
-      return fictions
-        .filter((fiction) => {
-          const summary = fiction.summary || "";
-          const notes = fiction.personalNotes || "";
-          return regex.test(summary) || regex.test(notes);
-        })
-        .sort((a, b) => a.title.localeCompare(b.title));
+      const filtered = fictionsArray.filter((fiction) => {
+        const summary = fiction.summary || "";
+        const notes = fiction.personalNotes || "";
+        return regex.test(summary) || regex.test(notes);
+      });
+
+      return filtered && Array.isArray(filtered)
+        ? filtered.sort((a, b) => a.title.localeCompare(b.title))
+        : [];
     } catch (error) {
       console.error("Invalid regex:", error);
       return [];
@@ -68,23 +72,30 @@ export default function SearchBySummary({ fictions, navigation }) {
     // Get all fictions that have this summary or notes content
     const fictionsWithMatch = filteredFictions;
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsWithMatch,
-      searchType: "summary",
-      searchTerm: searchTerm,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsWithMatch,
+        searchType: "summary",
+        searchTerm: searchTerm,
+      },
     });
   };
 
   const handleSelectAuthor = (author, fictions) => {
     // Get all fictions by this author
-    const fictionsByAuthor = fictions.filter(
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+    const fictionsByAuthor = fictionsArray.filter(
       (fiction) => fiction.author === author
     );
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsByAuthor,
-      searchType: "author",
-      searchTerm: author,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsByAuthor,
+        searchType: "author",
+        searchTerm: author,
+      },
     });
   };
 

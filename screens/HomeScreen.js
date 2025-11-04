@@ -1,7 +1,15 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs"; // import of the module "material top tabs"
-import { useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FandomCard from "../components/fiction/FandomCard";
 import ReadingList from "../components/fiction/ReadingList";
 import Header from "../components/Header";
 import RoundedButton from "../components/ui/RoundedButton";
@@ -79,8 +87,77 @@ Il faut d'abord aller dans state puis dans route. State est comme ça :
 
 const Tab = createMaterialTopTabNavigator(); // import of the module "material top tabs"
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const { currentTheme } = useTheme();
+  const [globalSort, setGlobalSort] = useState({
+    sort: "lastReadAt",
+    order: "desc",
+  });
+  const [searchResults, setSearchResults] = useState(null);
+  const [originalSearchResults, setOriginalSearchResults] = useState(null);
+  const [searchType, setSearchType] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Update state when route params change
+  useEffect(() => {
+    const newFictions = route?.params?.fictions || null;
+    setSearchResults(newFictions);
+    // Only set original results if they haven't been set yet (first search)
+    if (!originalSearchResults && newFictions) {
+      setOriginalSearchResults(newFictions);
+    }
+    setSearchType(route?.params?.searchType || "");
+    setSearchTerm(route?.params?.searchTerm || "");
+  }, [
+    route?.params?.fictions,
+    route?.params?.searchType,
+    route?.params?.searchTerm,
+  ]);
+
+  const handleGlobalSortChange = (newSortType, newSortOrder) => {
+    setGlobalSort({ sort: newSortType, order: newSortOrder });
+  };
+
+  const closeSearchResults = () => {
+    setOriginalSearchResults(null);
+    navigation.navigate("Home", { screen: "HomeMain", params: {} });
+  };
+
+  // Find tag color by name
+  const getTagColor = (tagName) => {
+    if (!originalSearchResults || searchType !== "tag") return 2; // default color index
+
+    for (const fiction of originalSearchResults) {
+      if (fiction.tags && Array.isArray(fiction.tags)) {
+        const foundTag = fiction.tags.find((t) => t.name === tagName);
+        if (foundTag) {
+          return foundTag.color || 2;
+        }
+      }
+    }
+    return 2; // default fallback
+  };
+
+  // Group fictions by fandom for search results
+  const groupedByFandom = useMemo(() => {
+    if (!searchResults || searchResults.length === 0) return [];
+
+    const grouped = {};
+    searchResults.forEach((fiction) => {
+      const fandomId = fiction.fandomId || "other";
+      const fandomName = fiction.fandomName || "Autres";
+
+      if (!grouped[fandomId]) {
+        grouped[fandomId] = {
+          _id: fandomId,
+          name: fandomName,
+          fictions: [],
+        };
+      }
+      grouped[fandomId].fictions.push(fiction);
+    });
+    return Object.values(grouped);
+  }, [searchResults]);
 
   // Memorize styles so they only update when the theme changes
   const styles = useMemo(
@@ -94,8 +171,54 @@ export default function HomeScreen({ navigation }) {
           flex: 1,
           paddingVertical: 10,
         },
+        searchHeader: {
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: currentTheme.primary,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        },
+        searchHeaderContent: {
+          flex: 1,
+          marginRight: 12,
+        },
+        closeButton: {
+          padding: 4,
+        },
+        searchTitle: {
+          fontSize: 18,
+          fontWeight: "600",
+          color: currentTheme.text,
+          marginBottom: 4,
+        },
+        searchSubtitle: {
+          fontSize: 14,
+          color: currentTheme.text,
+          opacity: 0.7,
+        },
+        resultCount: {
+          fontSize: 12,
+          color: currentTheme.text,
+          opacity: 0.7,
+          marginHorizontal: 16,
+          marginTop: 12,
+          marginBottom: 12,
+        },
+        noResults: {
+          textAlign: "center",
+          marginTop: 40,
+          fontSize: 16,
+          color: currentTheme.text,
+          opacity: 0.5,
+        },
+        fandomContainer: {
+          marginHorizontal: 14,
+          marginBottom: 16,
+        },
       }),
-    [currentTheme] // Regenerate styles only when theme or variant changes
+    [currentTheme]
   );
 
   //   <Tab.Navigator
@@ -112,46 +235,130 @@ export default function HomeScreen({ navigation }) {
   // >
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       {/* Header */}
       <Header onProfilePress={() => navigation.navigate("Profile")} />
 
-      <View style={styles.tabs}>
-        <Tab.Navigator
-          initialRouteName="Reading"
-          screenOptions={{
-            swipeEnabled: true,
-            lazy: true,
-            tabBarIndicatorStyle: { height: 0 },
-            tabBarStyle: { backgroundColor: "transparent", elevation: 0 },
-          }}
-          tabBar={(props) => <TopTabs {...props} />}
-        >
-          <Tab.Screen
-            name="Reading"
-            options={{ title: "En cours" }}
-            children={() => (
-              <ReadingList readingStatus="reading" navigation={navigation} />
-            )}
-          />
+      {/* Display search results or normal tabs */}
+      {searchResults ? (
+        // Search Results View
+        <ScrollView style={styles.tabs} showsVerticalScrollIndicator={false}>
+          <View style={styles.searchHeader}>
+            <View style={styles.searchHeaderContent}>
+              <Text style={styles.searchTitle}>
+                {searchType === "title"
+                  ? "Résultats pour le titre"
+                  : searchType === "tag"
+                  ? "Résultats pour le tag"
+                  : searchType === "author"
+                  ? "Résultats pour l'auteur"
+                  : searchType === "summary"
+                  ? "Résultats pour résumé/notes"
+                  : "Résultats de recherche"}
+              </Text>
+              {searchType === "author" ? (
+                <View
+                  style={{
+                    backgroundColor: currentTheme.tagPalette[3],
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 4,
+                    alignSelf: "flex-start",
+                    marginTop: 8,
+                  }}
+                >
+                  <Text style={{ color: currentTheme.text, fontWeight: "500" }}>
+                    {searchTerm}
+                  </Text>
+                </View>
+              ) : searchType === "tag" ? (
+                <View
+                  style={{
+                    backgroundColor:
+                      currentTheme.tagPalette[getTagColor(searchTerm) - 1],
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 4,
+                    alignSelf: "flex-start",
+                    marginTop: 8,
+                  }}
+                >
+                  <Text style={{ color: currentTheme.text, fontWeight: "500" }}>
+                    {searchTerm}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.searchSubtitle}>{searchTerm}</Text>
+              )}
+            </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={closeSearchResults}
+            >
+              <MaterialIcons name="close" size={24} color={currentTheme.text} />
+            </TouchableOpacity>
+          </View>
 
-          <Tab.Screen
-            name="ToRead"
-            options={{ title: "À lire" }}
-            children={() => (
-              <ReadingList readingStatus="to-read" navigation={navigation} />
-            )}
-          />
+          <Text style={styles.resultCount}>
+            {searchResults.length} résultat{searchResults.length > 1 ? "s" : ""}
+          </Text>
 
-          <Tab.Screen
-            name="Finished"
-            options={{ title: "Terminées" }}
-            children={() => (
-              <ReadingList readingStatus="finished" navigation={navigation} />
-            )}
-          />
-        </Tab.Navigator>
-      </View>
+          {groupedByFandom.length > 0 ? (
+            groupedByFandom.map((fandom) => (
+              <View key={fandom._id} style={styles.fandomContainer}>
+                <FandomCard
+                  fandomName={fandom.name}
+                  fictions={fandom.fictions}
+                  navigation={navigation}
+                  allFictions={originalSearchResults}
+                  onGlobalSortChange={handleGlobalSortChange}
+                  currentGlobalSort={globalSort}
+                />
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noResults}>Aucun résultat trouvé</Text>
+          )}
+        </ScrollView>
+      ) : (
+        // Normal Tabs View
+        <View style={styles.tabs}>
+          <Tab.Navigator
+            initialRouteName="Reading"
+            screenOptions={{
+              swipeEnabled: true,
+              lazy: true,
+              tabBarIndicatorStyle: { height: 0 },
+              tabBarStyle: { backgroundColor: "transparent", elevation: 0 },
+            }}
+            tabBar={(props) => <TopTabs {...props} />}
+          >
+            <Tab.Screen
+              name="Reading"
+              options={{ title: "En cours" }}
+              children={() => (
+                <ReadingList readingStatus="reading" navigation={navigation} />
+              )}
+            />
+
+            <Tab.Screen
+              name="ToRead"
+              options={{ title: "À lire" }}
+              children={() => (
+                <ReadingList readingStatus="to-read" navigation={navigation} />
+              )}
+            />
+
+            <Tab.Screen
+              name="Finished"
+              options={{ title: "Terminées" }}
+              children={() => (
+                <ReadingList readingStatus="finished" navigation={navigation} />
+              )}
+            />
+          </Tab.Navigator>
+        </View>
+      )}
     </SafeAreaView>
   );
 }

@@ -134,7 +134,7 @@ export default function FictionCard({
         (f) => f.author === fiction.author
       );
 
-      navigation.navigate("SearchResults", {
+      navigation.setParams({
         fictions: fictionsByAuthor,
         searchType: "author",
         searchTerm: fiction.author,
@@ -169,7 +169,6 @@ export default function FictionCard({
       </View>
     </View>
   ) : null;
-  console.log("TAGS", fiction.title, "=>", fiction.tags);
   return (
     <View style={styles.fictionCard}>
       {showReadingStatus && (
@@ -215,14 +214,16 @@ export default function FictionCard({
           Dernier chapitre lu : {fiction.lastChapterRead}
         </Text>
       )}
-      {fiction.tags.length > 0 && (
-        <Tags
-          tags={fiction.tags}
-          withCross={false}
-          navigation={navigation}
-          allFictions={allFictions}
-        />
-      )}
+      {fiction.tags &&
+        Array.isArray(fiction.tags) &&
+        fiction.tags.length > 0 && (
+          <Tags
+            tags={fiction.tags}
+            withCross={false}
+            navigation={navigation}
+            allFictions={allFictions}
+          />
+        )}
     </View>
   );
 }

@@ -23,7 +23,6 @@ import AuthScreen from "./screens/AuthScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
-import SearchResultsScreen from "./screens/SearchResultsScreen";
 import SearchScreen from "./screens/SearchScreen";
 
 const Stack = createNativeStackNavigator();
@@ -38,7 +37,6 @@ const HomeNavigator = () => {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="HomeMain" component={HomeScreen} />
-      <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} />
     </HomeStack.Navigator>
   );
 };
@@ -47,10 +45,6 @@ const SearchNavigator = () => {
   return (
     <SearchStack.Navigator screenOptions={{ headerShown: false }}>
       <SearchStack.Screen name="SearchMain" component={SearchScreen} />
-      <SearchStack.Screen
-        name="SearchResults"
-        component={SearchResultsScreen}
-      />
     </SearchStack.Navigator>
   );
 };
