@@ -23,6 +23,7 @@ export default function Input({
     ? {
         backgroundColor: currentTheme.cardBackground,
         borderColor: currentTheme.primary,
+        color: currentTheme.text,
       }
     : {};
 
