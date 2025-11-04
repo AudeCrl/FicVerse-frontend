@@ -236,7 +236,7 @@ export default function ReadingList({ readingStatus, navigation }) {
   useEffect(() => {
     const fetchFandoms = async () => {
       try {
-        const url = `${API_IP}/fiction/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
+        const url = `${API_IP}/fiction/status/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
 
         const response = await fetch(url, {
           method: "GET",
