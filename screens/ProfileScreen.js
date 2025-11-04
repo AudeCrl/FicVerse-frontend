@@ -11,8 +11,9 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { typography } from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../reducers/user";
+import { logout, updateAvatar } from "../reducers/user";
 import Input from "../components/ui/Input"
+import * as ImagePicker from 'expo-image-picker'
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -32,9 +33,11 @@ export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
-  console.log(user);
+  // console.log(user);
 
   const formattedDate = formatDate(user.createdAt);
+
+  const [avatarUri, setAvatarUri] = useState(user.avatar || require('../assets/avatar-default.png'));
 
   const [username, setUsername] = useState(user.username);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -53,6 +56,7 @@ export default function ProfileScreen({ navigation }) {
 
   useEffect(() => {
     if (user.username) {
+        setAvatarUri(user.avatar || require ('../assets/avatar-default.png'));
         setUsername(user.username);
         setCurrentEmail(user.email);
         setIsEditingUsername(false); 
@@ -61,13 +65,71 @@ export default function ProfileScreen({ navigation }) {
     } else {
         setUsername('');
         setCurrentEmail('');
+        setAvatarUri(require("../assets/avatar-default.png"));
     }
     setDisplayedPassword('••••••••');
     setNewPassword('');
   }, [user]);
 
-  const handleEditAvatar = () => {
+  const handleEditAvatar = async () => {
     console.log("Edit Avatar clicked");
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Désolé, nous avons besoin des autorisations de la galerie pour cela !');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const { uri, mimeType, fileName } = result.assets[0];      
+      handleUploadAvatar(uri, mimeType, fileName);
+    }
+    
+  };
+
+  const handleUploadAvatar = (uri, mimeType, fileName) => {
+    const userToken = user.token;
+    if (!userToken) {
+      return console.log('Invalid or missing user token');      
+    };
+
+    const formData = new FormData();
+
+    formData.append('avatarFromFront', {
+      uri: uri,
+      name: fileName || 'avatar.jpg',
+      type: mimeType || 'image/jpeg',
+    });
+
+    fetch(`${API_IP}/user/upload`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${userToken}`,
+        //Pas de 'Content-Type': 'application/json' avec un 'formData'
+      },
+      body: formData,
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.result) {
+        setAvatarUri(data.avatarUrl);
+        dispatch(updateAvatar(data.avatarUrl));
+
+      } else {
+        console.error('Upload failed:', data.error);
+        alert(`Echec de l'upload: ${data.error}`);        
+      }      
+    })
+    .catch((error) => {
+      console.error('Network error during upload', error);
+      alert('Erreur réseau lors de l\'envoi de l\'avatar.');      
+    });
   };
 
   const handleEditUsername = () => {
@@ -146,7 +208,7 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.avatarContainer}>
           <Image
             style={styles.avatarImage}
-            source={require("../assets/avatar-default.png")}
+            source={typeof avatarUri === 'string' ? { uri: avatarUri} : avatarUri}
           />
           <TouchableOpacity onPress={handleEditAvatar}>
             <Feather name="edit" size={24} color="black" />
@@ -245,6 +307,7 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: "50%",
     height: "50%",
+    borderRadius: 45,
   },
   inputUsername: {
     ...typography.input,
