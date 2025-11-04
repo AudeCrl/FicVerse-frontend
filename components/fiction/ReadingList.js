@@ -5,10 +5,13 @@ import FandomCard from "./FandomCard";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
+const defaultSort = { sort: 'lastReadAt', order: 'desc'};
+
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus, navigation }) {
   const user = useSelector((state) => state.user.value);
   const [fandomsFetch, setFandomsFetch] = useState([]);
+  const [globalSortState, setGlobalSortState] = useState(defaultSort);
 
   const fandomsData = [
     {
@@ -226,10 +229,14 @@ export default function ReadingList({ readingStatus, navigation }) {
     },
   ];
 
+  const handleGlobalSortChange = (newSortType, newSortOrder) => {
+    setGlobalSortState({ sort: newSortType, order: newSortOrder});
+  }
+
   useEffect(() => {
     const fetchFandoms = async () => {
       try {
-        const url = `${API_IP}/fiction/${readingStatus}`;
+        const url = `${API_IP}/fiction/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
 
         const response = await fetch(url, {
           method: "GET",
@@ -255,7 +262,7 @@ export default function ReadingList({ readingStatus, navigation }) {
     };
 
     fetchFandoms();
-  }, [readingStatus]);
+  }, [readingStatus, globalSortState]);
 
   const fandoms = fandomsFetch.map((fandom, index) => {
     // Collecter toutes les fictions de tous les fandoms
@@ -268,6 +275,8 @@ export default function ReadingList({ readingStatus, navigation }) {
         fictions={fandom.fictions}
         navigation={navigation}
         allFictions={allFictions}
+        onGlobalSortChange={handleGlobalSortChange}
+        currentGlobalSort={globalSortState}
       />
     );
   });
