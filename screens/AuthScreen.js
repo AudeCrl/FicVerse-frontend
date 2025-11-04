@@ -124,6 +124,7 @@ export default function AuthScreen({ navigation, route }) {
             token: data.user.token,
             email: data.user.email,
             username: data.user.username,
+            createdAt: data.user.createdAt,
           }));
         goToTabNavigator(); // go vers HomeScreen result: true
       } else {
@@ -152,10 +153,12 @@ export default function AuthScreen({ navigation, route }) {
       const data = await res.json();
 
       if (data.result) {
+        console.log(data.user);
         dispatch(login({
             token: data.token,
             email: data.email,
             username: data.username,
+            createdAt: data.createdAt,
           }));
         goToTabNavigator();
       } else {

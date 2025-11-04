@@ -12,14 +12,29 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { typography } from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../reducers/user";
+import Input from "../components/ui/Input"
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
   console.log(user);
+
+  const formattedDate = formatDate(user.createdAt);
 
   const [username, setUsername] = useState(user.username);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -138,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.usernameContainer}>
-          <TextInput
+          <Input
             style={styles.inputUsername}
             value={username}
             onChangeText={setTempUsername}
@@ -147,11 +162,12 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity onPress={handleEditUsername}>
             <Feather name="edit" size={24} color="black" />
           </TouchableOpacity>
+          <Text>Membre FicVerse depuis le {formattedDate}</Text>
         </View>
         <View></View>
         <View style={styles.emailContainer}>
           <Text>Votre mail :</Text>
-          <TextInput
+          <Input
             style={styles.inputEmail}
             value={currentEmail}
             onChangeText={setTempEmail}
@@ -170,7 +186,7 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.passwordContainer}>
           <Text>Mot de passe :</Text>
-          <TextInput
+          <Input
             style={styles.inputPassword}
             value={displayedPassword}
             onChangeText={setNewPassword}

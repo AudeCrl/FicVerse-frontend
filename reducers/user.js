@@ -4,7 +4,8 @@ const initialState = {
     value: { 
         token: null, 
         email: null, 
-        username: null, 
+        username: null,
+        createdAt: null, 
       //  avatar: null,     On a l'avatar par défaut ?
     },
 };
@@ -17,6 +18,7 @@ export const userSlice = createSlice({
             state.value.token = action.payload.token;
             state.value.email = action.payload.email;
             state.value.username = action.payload.username;
+            state.value.createdAt = action.payload.createdAt;
            // state.value.avatar = action.payload.avatar;
         },
         /* Pour la déconnexion */
@@ -24,6 +26,7 @@ export const userSlice = createSlice({
             state.value.token = null;
             state.value.email = null;
             state.value.username = null;
+            state.value.createdAt = null
         },
     },
 });
