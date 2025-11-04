@@ -98,13 +98,13 @@ export const SortModal = ({ isVisible, onClose, defaultSort, onApplySort }) => {
         },
         optionText: {
             ...typography.small,
-            color: currentTheme.secondaryText,
+            color: currentTheme.text,
         },
         // Style de l'option sélectionnée
         selectedText: {
             ...typography.small,
             fontSize: 15,
-            color: currentTheme.primaryPlus, 
+            color: currentTheme.selectedText, 
         },
 
         // --- FOOTER ---
@@ -122,7 +122,7 @@ export const SortModal = ({ isVisible, onClose, defaultSort, onApplySort }) => {
             paddingHorizontal: 15,
         },
         applyButton: {
-            backgroundColor: currentTheme.primaryPlus,
+            backgroundColor: currentTheme.primary,
             borderRadius: 5,
         },
         buttonText: {
