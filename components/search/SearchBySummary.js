@@ -5,8 +5,9 @@ import { typography } from "../../styles/globalStyles";
 import Input from "../ui/Input";
 
 // Composant pour afficher le texte avec le regex surlighté
-function HighlightedText({ text, searchTerm, highlightColor }) {
-  if (!text || !searchTerm) return <Text>{text}</Text>;
+function HighlightedText({ text, searchTerm, highlightColor, textColor }) {
+  if (!text || !searchTerm)
+    return <Text style={{ color: textColor }}>{text}</Text>;
 
   try {
     // Create a regex pattern that matches the search term (case-insensitive)
@@ -17,7 +18,7 @@ function HighlightedText({ text, searchTerm, highlightColor }) {
     const parts = text.split(regex);
 
     return (
-      <Text>
+      <Text style={{ color: textColor }}>
         {parts.map((part, index) => {
           // Even indices are non-matching parts, odd indices are matches
           if (index % 2 === 1) {
@@ -36,7 +37,7 @@ function HighlightedText({ text, searchTerm, highlightColor }) {
     );
   } catch (error) {
     console.error("Highlight error:", error);
-    return <Text>{text}</Text>;
+    return <Text style={{ color: textColor }}>{text}</Text>;
   }
 }
 
@@ -90,7 +91,7 @@ export default function SearchBySummary({ fictions, navigation }) {
   const getReadingStatusLabel = (status) => {
     const statusMap = {
       "to-read": "À lire",
-      reading: "En cours à lire",
+      reading: "En cours",
       finished: "Terminé",
     };
     return statusMap[status] || status;
@@ -144,6 +145,7 @@ export default function SearchBySummary({ fictions, navigation }) {
           ...typography.caption,
           color: currentTheme.text,
           lineHeight: 18,
+          opacity: 0.95,
         },
         highlightColor: {
           backgroundColor: "#FFC107",
@@ -207,6 +209,7 @@ export default function SearchBySummary({ fictions, navigation }) {
                     text={fiction.summary}
                     searchTerm={searchTerm}
                     highlightColor="#FFC107"
+                    textColor={currentTheme.text}
                   />
                 </View>
               )}
@@ -222,6 +225,7 @@ export default function SearchBySummary({ fictions, navigation }) {
                       text={fiction.personalNotes}
                       searchTerm={searchTerm}
                       highlightColor="#FFC107"
+                      textColor={currentTheme.text}
                     />
                   </Text>
                 </View>
