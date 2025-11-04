@@ -67,7 +67,7 @@ export default function SearchScreen({ navigation }) {
       let fictions = [];
 
       for (const status of statuses) {
-        const url = `${API_IP}/fiction/${status}`;
+        const url = `${API_IP}/fiction/status/${status}`;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -91,7 +91,7 @@ export default function SearchScreen({ navigation }) {
       setAllFictions(fictions);
 
       // Fetch tags directly from backend
-      const tagsResponse = await fetch(`${API_IP}/tags`, {
+      const tagsResponse = await fetch(`${API_IP}/tag`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
