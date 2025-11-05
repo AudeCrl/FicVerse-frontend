@@ -59,7 +59,7 @@ export default function Header({
         height: 65,
         marginBottom: 2,
         borderRadius: 50,
-        // backgroundColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF',
       },
     }),
     [currentTheme] // Regenerate styles only when theme or variant changes
