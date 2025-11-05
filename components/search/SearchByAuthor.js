@@ -10,15 +10,18 @@ export default function SearchByAuthor({ allAuthors, fictions, navigation }) {
 
   // Get top 10 authors or filtered authors sorted alphabetically
   const displayedAuthors = useMemo(() => {
+    const authors = allAuthors && Array.isArray(allAuthors) ? allAuthors : [];
+
     if (!searchTerm.trim()) {
-      return allAuthors.slice(0, 10);
+      return authors.slice(0, 10);
     }
 
     try {
       const regex = new RegExp(searchTerm, "i");
-      return allAuthors
-        .filter((author) => regex.test(author))
-        .sort((a, b) => a.localeCompare(b));
+      const filtered = authors.filter((author) => regex.test(author));
+      return filtered && Array.isArray(filtered)
+        ? filtered.sort((a, b) => a.localeCompare(b))
+        : [];
     } catch (error) {
       console.error("Invalid regex:", error);
       return [];
@@ -27,14 +30,18 @@ export default function SearchByAuthor({ allAuthors, fictions, navigation }) {
 
   const handleSelectAuthor = (author) => {
     // Get all fictions by this author
-    const fictionsByAuthor = fictions.filter(
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+    const fictionsByAuthor = fictionsArray.filter(
       (fiction) => fiction.author === author
     );
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsByAuthor,
-      searchType: "author",
-      searchTerm: author,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsByAuthor,
+        searchType: "author",
+        searchTerm: author,
+      },
     });
   };
 

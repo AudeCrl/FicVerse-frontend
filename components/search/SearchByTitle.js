@@ -10,13 +10,18 @@ export default function SearchByTitle({ fictions, navigation }) {
 
   // Filter and sort fictions by title
   const filteredFictions = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+
+    if (!searchTerm.trim() || !fictionsArray.length) return [];
 
     try {
       const regex = new RegExp(searchTerm, "i"); // case-insensitive
-      return fictions
-        .filter((fiction) => regex.test(fiction.title))
-        .sort((a, b) => a.title.localeCompare(b.title));
+      const filtered = fictionsArray.filter((fiction) =>
+        regex.test(fiction.title)
+      );
+      return filtered && Array.isArray(filtered)
+        ? filtered.sort((a, b) => a.title.localeCompare(b.title))
+        : [];
     } catch (error) {
       console.error("Invalid regex:", error);
       return [];
@@ -33,11 +38,14 @@ export default function SearchByTitle({ fictions, navigation }) {
   };
 
   const handleSelectFiction = (fiction) => {
-    // Navigate to ResultsScreen with filtered fictions
-    navigation.navigate("SearchResults", {
-      fictions: [fiction],
-      searchType: "title",
-      searchTerm: fiction.title,
+    // Navigate to Home screen with search results
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: [fiction],
+        searchType: "title",
+        searchTerm: fiction.title,
+      },
     });
   };
 

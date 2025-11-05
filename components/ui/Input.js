@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput } from "react-native";
+import { StyleSheet, TextInput, View, Text } from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
@@ -14,6 +14,7 @@ export default function Input({
   multiline = false,
   numberOfLines = 1,
   style,
+  inputLabel = null,
   ...rest
 }) {
   const { currentTheme } = useTheme();
@@ -23,28 +24,34 @@ export default function Input({
     ? {
         backgroundColor: currentTheme.cardBackground,
         borderColor: currentTheme.primary,
+        color: currentTheme.text,
       }
     : {};
 
   return (
-    <TextInput
-      style={[
-        styles.input,
-        isInvalid && styles.inputInvalid, // inputInvalid va mettre en rouge si isInvalid est true
-        useThemeColors && dynamicStyle,
-        style, // style côté parent si on veut ajouter d'autres modifs
-      ]}
-      {...rest} // Pour pouvoir ajouter d'autres props côté parent si on le souhaite, en dehors de celles mises dans le composant
-      placeholder={placeholder}
-      placeholderTextColor={useThemeColors ? currentTheme.primary : "#999"}
-      value={value}
-      onChangeText={onChangeText}
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyboardType}
-      autoCapitalize={autoCapitalize}
-      multiline={multiline}
-      numberOfLines={numberOfLines}
-    />
+    <View style={styles.inputContainer}>
+      {!!inputLabel && (
+        <Text style={{...styles.inputLabel, color: currentTheme.text}}>{inputLabel}</Text>
+      )}
+      <TextInput
+        style={[
+          styles.input,
+          isInvalid && styles.inputInvalid, // inputInvalid va mettre en rouge si isInvalid est true
+          useThemeColors && dynamicStyle,
+          style, // style côté parent si on veut ajouter d'autres modifs
+        ]}
+        {...rest} // Pour pouvoir ajouter d'autres props côté parent si on le souhaite, en dehors de celles mises dans le composant
+        placeholder={placeholder}
+        placeholderTextColor={useThemeColors ? currentTheme.secondaryText : "#999"}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        multiline={multiline}
+        numberOfLines={numberOfLines}
+      />
+    </View>
   );
 }
 
@@ -62,4 +69,8 @@ const styles = StyleSheet.create({
   inputInvalid: {
     borderColor: "#E03131",
   },
+  inputLabel: {
+    ...typography.body,
+    marginBottom: 6,
+  }
 });

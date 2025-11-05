@@ -52,16 +52,22 @@ export default function SearchScreen({ navigation }) {
   // Fetch all fictions, tags, and authors on mount
   useEffect(() => {
     fetchAllData();
-  }, []);
+  }, [user.token]);
 
   const fetchAllData = async () => {
     try {
+      // Check if user is authenticated
+      if (!user || !user.token) {
+        console.warn("User not authenticated");
+        return;
+      }
+
       // Fetch all fictions from all reading statuses
       const statuses = ["to-read", "reading", "finished"];
       let fictions = [];
 
       for (const status of statuses) {
-        const url = `${API_IP}/fiction/${status}`;
+        const url = `${API_IP}/fiction/status/${status}`;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -84,34 +90,49 @@ export default function SearchScreen({ navigation }) {
 
       setAllFictions(fictions);
 
-      // Extract unique tags and authors
-      const tagsMap = {};
-      const authorsSet = new Set();
-
-      fictions.forEach((fiction) => {
-        if (fiction.author) {
-          authorsSet.add(fiction.author);
-        }
-        if (fiction.tags && Array.isArray(fiction.tags)) {
-          fiction.tags.forEach((tag) => {
-            if (!tagsMap[tag._id]) {
-              tagsMap[tag._id] = {
-                ...tag,
-                usageCount: tag.usageCount || 0,
-              };
-            }
-          });
-        }
+      // Fetch tags directly from backend
+      const tagsResponse = await fetch(`${API_IP}/tag`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
       });
 
-      // Sort tags by usage count descending
-      const sortedTags = Object.values(tagsMap).sort(
-        (a, b) => b.usageCount - a.usageCount
-      );
-      setAllTags(sortedTags);
+      if (tagsResponse.ok) {
+        const tagsData = await tagsResponse.json();
+        let tags =
+          tagsData.tags && Array.isArray(tagsData.tags) ? tagsData.tags : [];
+
+        // Transform tags to use 'count' instead of 'usageCount' for consistency
+        if (tags && Array.isArray(tags)) {
+          tags = tags.map((tag) => ({
+            ...tag,
+            count: tag.usageCount || tag.count || 0,
+          }));
+        } else {
+          tags = [];
+        }
+
+        setAllTags(tags);
+      } else {
+        setAllTags([]);
+      }
+
+      // Extract authors from fictions
+      const authorsSet = new Set();
+      if (fictions && Array.isArray(fictions)) {
+        fictions.forEach((fiction) => {
+          if (fiction.author) {
+            authorsSet.add(fiction.author);
+          }
+        });
+      }
 
       // Sort authors alphabetically
-      const sortedAuthors = Array.from(authorsSet).sort();
+      const authorsArray = Array.from(authorsSet);
+      const sortedAuthors =
+        authorsArray && Array.isArray(authorsArray) ? authorsArray.sort() : [];
       setAllAuthors(sortedAuthors);
     } catch (error) {
       console.error("Error fetching search data:", error);

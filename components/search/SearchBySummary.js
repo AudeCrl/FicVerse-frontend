@@ -5,8 +5,9 @@ import { typography } from "../../styles/globalStyles";
 import Input from "../ui/Input";
 
 // Composant pour afficher le texte avec le regex surlighté
-function HighlightedText({ text, searchTerm, highlightColor }) {
-  if (!text || !searchTerm) return <Text>{text}</Text>;
+function HighlightedText({ text, searchTerm, highlightColor, textColor }) {
+  if (!text || !searchTerm)
+    return <Text style={{ color: textColor }}>{text}</Text>;
 
   try {
     // Create a regex pattern that matches the search term (case-insensitive)
@@ -17,7 +18,7 @@ function HighlightedText({ text, searchTerm, highlightColor }) {
     const parts = text.split(regex);
 
     return (
-      <Text>
+      <Text style={{ color: textColor }}>
         {parts.map((part, index) => {
           // Even indices are non-matching parts, odd indices are matches
           if (index % 2 === 1) {
@@ -36,7 +37,7 @@ function HighlightedText({ text, searchTerm, highlightColor }) {
     );
   } catch (error) {
     console.error("Highlight error:", error);
-    return <Text>{text}</Text>;
+    return <Text style={{ color: textColor }}>{text}</Text>;
   }
 }
 
@@ -46,17 +47,21 @@ export default function SearchBySummary({ fictions, navigation }) {
 
   // Filter fictions by summary or personalNotes
   const filteredFictions = useMemo(() => {
-    if (!searchTerm.trim()) return [];
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+
+    if (!searchTerm.trim() || !fictionsArray.length) return [];
 
     try {
       const regex = new RegExp(searchTerm, "i");
-      return fictions
-        .filter((fiction) => {
-          const summary = fiction.summary || "";
-          const notes = fiction.personalNotes || "";
-          return regex.test(summary) || regex.test(notes);
-        })
-        .sort((a, b) => a.title.localeCompare(b.title));
+      const filtered = fictionsArray.filter((fiction) => {
+        const summary = fiction.summary || "";
+        const notes = fiction.personalNotes || "";
+        return regex.test(summary) || regex.test(notes);
+      });
+
+      return filtered && Array.isArray(filtered)
+        ? filtered.sort((a, b) => a.title.localeCompare(b.title))
+        : [];
     } catch (error) {
       console.error("Invalid regex:", error);
       return [];
@@ -67,30 +72,37 @@ export default function SearchBySummary({ fictions, navigation }) {
     // Get all fictions that have this summary or notes content
     const fictionsWithMatch = filteredFictions;
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsWithMatch,
-      searchType: "summary",
-      searchTerm: searchTerm,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsWithMatch,
+        searchType: "summary",
+        searchTerm: searchTerm,
+      },
     });
   };
 
   const handleSelectAuthor = (author, fictions) => {
     // Get all fictions by this author
-    const fictionsByAuthor = fictions.filter(
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+    const fictionsByAuthor = fictionsArray.filter(
       (fiction) => fiction.author === author
     );
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsByAuthor,
-      searchType: "author",
-      searchTerm: author,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsByAuthor,
+        searchType: "author",
+        searchTerm: author,
+      },
     });
   };
 
   const getReadingStatusLabel = (status) => {
     const statusMap = {
       "to-read": "À lire",
-      reading: "En cours à lire",
+      reading: "En cours",
       finished: "Terminé",
     };
     return statusMap[status] || status;
@@ -144,6 +156,7 @@ export default function SearchBySummary({ fictions, navigation }) {
           ...typography.caption,
           color: currentTheme.text,
           lineHeight: 18,
+          opacity: 0.95,
         },
         highlightColor: {
           backgroundColor: "#FFC107",
@@ -207,6 +220,7 @@ export default function SearchBySummary({ fictions, navigation }) {
                     text={fiction.summary}
                     searchTerm={searchTerm}
                     highlightColor="#FFC107"
+                    textColor={currentTheme.text}
                   />
                 </View>
               )}
@@ -222,6 +236,7 @@ export default function SearchBySummary({ fictions, navigation }) {
                       text={fiction.personalNotes}
                       searchTerm={searchTerm}
                       highlightColor="#FFC107"
+                      textColor={currentTheme.text}
                     />
                   </Text>
                 </View>

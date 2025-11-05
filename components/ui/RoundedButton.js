@@ -3,7 +3,12 @@ import { Pressable, Text } from 'react-native';
 import { typography } from '../../styles/globalStyles.js';
 import { useTheme } from '../../context/ThemeContext.js';
 
-export default function RoundedButton({ label, active = false, onPress }) {
+export default function RoundedButton({    
+  label,
+  active = false,
+  onPress,
+  style = {},
+}) {
   const { currentTheme } = useTheme();
   
   return (
@@ -16,7 +21,7 @@ export default function RoundedButton({ label, active = false, onPress }) {
         paddingHorizontal: 10,
         borderRadius: 8,
         backgroundColor: active ? currentTheme.primary : currentTheme.inactive,
-
+        ...style
       }}
     >
       <Text 

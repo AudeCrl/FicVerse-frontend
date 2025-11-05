@@ -1,11 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
-import { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import Tags from "./Tags";
+import { FictionActionsModal } from './FictionActionsModal'
+
 
 export default function FictionCard({
   fiction,
@@ -15,6 +17,7 @@ export default function FictionCard({
   allFictions,
 }) {
   const { currentTheme } = useTheme();
+  const [ isFictionActionsModalVisible, setIsFictionActionsModalVisible ] = useState(false);
 
   // Memorize styles so they only update when the theme changes
   const styles = useMemo(
@@ -123,10 +126,7 @@ export default function FictionCard({
     abandoned: "Publication abandonée",
   };
 
-  const handleNavigate = () => {
-    fiction.link && Linking.openURL(fiction.link);
-    console.log("LIEN =>", fiction.link);
-  };
+  const handleNavigate = () => { fiction.link && Linking.openURL(fiction.link); };
 
   const handleAuthorPress = () => {
     if (navigation && allFictions) {
@@ -134,7 +134,7 @@ export default function FictionCard({
         (f) => f.author === fiction.author
       );
 
-      navigation.navigate("SearchResults", {
+      navigation.setParams({
         fictions: fictionsByAuthor,
         searchType: "author",
         searchTerm: fiction.author,
@@ -142,12 +142,7 @@ export default function FictionCard({
     }
   };
 
-  const metadata = !!(
-    fiction.lang ||
-    fiction.storyStatus ||
-    fiction.numberOfChapters ||
-    fiction.numberOfWords
-  ) ? (
+  const metadata = !!(fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords) ? (
     <View style={styles.metadataContainer}>
       <View style={styles.metadataLeftCol}>
         {!!fiction.lang && <Text style={styles.metadata}>{fiction.lang}</Text>}
@@ -169,7 +164,7 @@ export default function FictionCard({
       </View>
     </View>
   ) : null;
-  console.log("TAGS", fiction.title, "=>", fiction.tags);
+
   return (
     <View style={styles.fictionCard}>
       {showReadingStatus && (
@@ -181,15 +176,14 @@ export default function FictionCard({
         <Text style={styles.title} onPress={handleNavigate}>
           {fiction.title}
         </Text>
+        <TouchableOpacity onPress={() => setIsFictionActionsModalVisible(true)}>
         <MaterialIcons name="more-horiz" size={24} style={styles.moreIcon} />
+        </TouchableOpacity>
       </View>
       {(!!fiction.author || !!fiction.rate?.display) && (
         <View style={styles.authorRateContainer}>
           {!!fiction.author && (
-            <Pressable
-              style={styles.authorContainer}
-              onPress={handleAuthorPress}
-            >
+            <Pressable style={styles.authorContainer} onPress={handleAuthorPress}>
               <Text style={styles.authorBy}>par </Text>
               <View style={styles.authorChip}>
                 <Text style={styles.authorChipText}>{fiction.author}</Text>
@@ -215,14 +209,21 @@ export default function FictionCard({
           Dernier chapitre lu : {fiction.lastChapterRead}
         </Text>
       )}
-      {fiction.tags.length > 0 && (
-        <Tags
-          tags={fiction.tags}
-          withCross={false}
-          navigation={navigation}
-          allFictions={allFictions}
+      {fiction.tags &&
+        Array.isArray(fiction.tags) &&
+        fiction.tags.length > 0 && (
+          <Tags
+            tags={fiction.tags}
+            withCross={false}
+            navigation={navigation}
+            allFictions={allFictions}
+          />
+        )}
+        <FictionActionsModal
+          isVisible={isFictionActionsModalVisible}
+          onClose={() => setIsFictionActionsModalVisible(false)}
+          fiction={fiction}
         />
-      )}
     </View>
   );
 }

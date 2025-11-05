@@ -4,8 +4,9 @@ const initialState = {
     value: { 
         token: null, 
         email: null, 
-        username: null, 
-      //  avatar: null,     On a l'avatar par défaut ?
+        username: null,
+        createdAt: null, 
+        avatar: null,
     },
 };
 
@@ -13,20 +14,32 @@ export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        login: (state, action) => {
+        login: (state, action) => {            
             state.value.token = action.payload.token;
             state.value.email = action.payload.email;
             state.value.username = action.payload.username;
-           // state.value.avatar = action.payload.avatar;
+            state.value.createdAt = action.payload.createdAt;
+            state.value.avatar = action.payload.avatarURL;
         },
         /* Pour la déconnexion */
         logout: (state) => {           
             state.value.token = null;
             state.value.email = null;
             state.value.username = null;
+            state.value.createdAt = null;
+            state.value.avatar = null;
+        },
+        updateAvatar: (state, action) => {
+            state.value.avatar = action.payload;
+        },
+        updateUsername: (state, action) => {
+            state.value.username = action.payload;
+        },
+        updateEmail: (state, action) => {
+            state.value.email = action.payload;
         },
     },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateAvatar, updateUsername, updateEmail } = userSlice.actions;
 export default userSlice.reducer;

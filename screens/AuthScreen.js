@@ -10,7 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { login } from '../reducers/user';
 import { typography } from '../styles/globalStyles.js';
-import Input from '../components/ui/Input.js'
+import Input from '../components/ui/Input.js';
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_IP);
@@ -124,6 +124,8 @@ export default function AuthScreen({ navigation, route }) {
             token: data.user.token,
             email: data.user.email,
             username: data.user.username,
+            createdAt: data.user.createdAt,
+            avatarURL: data.user.avatarURL,
           }));
         goToTabNavigator(); // go vers HomeScreen result: true
       } else {
@@ -156,6 +158,8 @@ export default function AuthScreen({ navigation, route }) {
             token: data.token,
             email: data.email,
             username: data.username,
+            createdAt: data.createdAt,
+            avatarURL: data.avatarURL,
           }));
         goToTabNavigator();
       } else {
@@ -204,8 +208,8 @@ export default function AuthScreen({ navigation, route }) {
           {/* FORMULAIRE INSCRIPTION */}
           {signUp && (     // signUp = true => affichage du formulaire Inscription
             <View>
-              <Text style={styles.label}>Identifiant</Text>
               <Input
+                inputLabel="Identifiant"
                 placeholder="LunaLvgd"
                 value={username}
                 onChangeText={setUsername}
@@ -214,8 +218,8 @@ export default function AuthScreen({ navigation, route }) {
               {/* Si l'user commence à taper donc length > 0 ET que le champ username est faux alors on affiche le Text d'erreur */}
               {!checkUsername && username.length > 0 && (<Text style={styles.error}>Identifiant requis</Text>)}
               
-              <Text style={styles.label}>Adresse mail</Text>
               <Input
+                inputLabel="Adresse mail"
                 placeholder="lunalvgd@hogwarts.school"
                 keyboardType="email-address"   // propriété native qui facilite la saisie d'adresse mail
                 autoCapitalize="none"   // pas de majuscule sur la 1ère lettre
@@ -226,8 +230,8 @@ export default function AuthScreen({ navigation, route }) {
               {/* Si l'user commence à taper donc length > 0 ET que checkEmailSignup est faux alors on affiche le Text d'erreur */}
               {!checkEmailSignup && emailSignup.length > 0 && (<Text style={styles.error}>Adresse e-mail invalide</Text>)}
 
-              <Text style={styles.label}>Mot de passe</Text>
               <Input
+                inputLabel="Mot de passe"
                 placeholder="6d-A83!r#7erVk5_"
                 secureTextEntry            // pour masquer les caractères tapés
                 autoCapitalize="none"
@@ -237,8 +241,8 @@ export default function AuthScreen({ navigation, route }) {
 
               {!checkPasswordSignup && passwordSignup.length > 0 && (<Text style={styles.error}>Mot de passe requis</Text>)}
 
-              <Text style={styles.label}>Confirmer le mot de passe</Text>
               <Input
+                inputLabel="Confirmer le mot de passe"
                 placeholder="6d-A83!r#7erVk5_"
                 secureTextEntry
                 autoCapitalize="none"
@@ -264,9 +268,9 @@ export default function AuthScreen({ navigation, route }) {
           {/* FORMULAIRE CONNEXION */}
           {!signUp && (     // signUp = false => affichage du formulaire Connexion
             <View>
-              <Text style={styles.label}>Adresse mail</Text>
               <Input
-                placeholder="Adresse e-mail"
+                inputLabel="Adresse mail"
+                placeholder="lunalvgd@hogwarts.school"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={emailLogin}
@@ -275,9 +279,9 @@ export default function AuthScreen({ navigation, route }) {
 
               {!checkEmailLogin && emailLogin.length > 0 && (<Text style={styles.error}>Adresse e-mail invalide</Text>)}
 
-              <Text style={styles.label}>Mot de passe</Text>
               <Input
-                placeholder="Mot de passe"
+                inputLabel="Mot de passe"
+                placeholder="6d-A83!r#7erVk5_"
                 secureTextEntry
                 autoCapitalize="none"
                 value={passwordLogin}

@@ -13,7 +13,8 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
 
   // Get top 10 tags or all tags based on showAllTags
   const displayedTags = useMemo(() => {
-    const tags = showAllTags ? allTags : allTags.slice(0, 10);
+    const tagsArray = allTags && Array.isArray(allTags) ? allTags : [];
+    const tags = showAllTags ? tagsArray : tagsArray.slice(0, 10);
 
     if (!searchTerm.trim()) return tags;
 
@@ -28,14 +29,18 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
 
   const handleSelectTag = (tag) => {
     // Get all fictions with this tag
-    const fictionsWithTag = fictions.filter(
+    const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
+    const fictionsWithTag = fictionsArray.filter(
       (fiction) => fiction.tags && fiction.tags.some((t) => t._id === tag._id)
     );
 
-    navigation.navigate("SearchResults", {
-      fictions: fictionsWithTag,
-      searchType: "tag",
-      searchTerm: tag.name,
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictionsWithTag,
+        searchType: "tag",
+        searchTerm: tag.name,
+      },
     });
   };
 
@@ -100,7 +105,7 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
         <Text style={styles.noResults}>Aucun tag trouvé</Text>
       ) : null}
 
-      {!showAllTags && allTags.length > 10 && (
+      {!showAllTags && allTags && allTags.length > 10 && (
         <RoundedButton
           label="Afficher tous les tags"
           active={false}
@@ -108,7 +113,7 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
           style={styles.toggleButton}
         />
       )}
-      {showAllTags && allTags.length > 10 && (
+      {showAllTags && allTags && allTags.length > 10 && (
         <RoundedButton
           label="Masquer les autres tags"
           active={false}
