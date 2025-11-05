@@ -12,7 +12,11 @@ export default function Header({
   onProfilePress,
 }) {
   const username = useSelector((state) => state.user.value.username); // on récupère le username du store reducers
+  const avatar = {uri: useSelector((state) => state.user.value.avatar)};
   const { currentTheme, variant, toggleVariant } = useTheme();
+
+  console.log(avatar);
+  
 
   // Memorize styles so they only update when the theme changes
   const styles = useMemo(() =>
@@ -57,7 +61,7 @@ export default function Header({
         height: 65,
         marginBottom: 2,
         borderRadius: 50,
-        backgroundColor: '#FFFFFF',
+        // backgroundColor: '#FFFFFF',
       },
     }),
     [currentTheme] // Regenerate styles only when theme or variant changes
@@ -78,7 +82,7 @@ export default function Header({
                 
                 <Pressable style={styles.right} onPress={onProfilePress}>
                     <View style={styles.profileInfos}>
-                        <Image source={avatarSource} style={styles.avatar} resizeMode="cover" />
+                        <Image source={avatar ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
                         <Text style={styles.username}>{username}</Text>
                     </View>
                 </Pressable>
