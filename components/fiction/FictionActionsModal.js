@@ -51,34 +51,6 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
             alignItems: "center",
             paddingVertical: 12,
         },
-  left: {
-    flex: 1,
-  },
-  actionText: {
-    fontSize: 16,
-    marginLeft: 8,
-  },
-  rightRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  roundButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ddd",
-  },
-  input: {
-    width: 50,
-    textAlign: "center",
-    marginHorizontal: 8,
-    borderBottomWidth: 1,
-  },
-  heartsRow: {
-    flexDirection: "row",
-  },
 
         // --- FOOTER ---
         footerContainer: {
@@ -132,75 +104,6 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
                                 onPress={handleReadingStatusChange}
                             />
                         </View>
-
-                        {/* ACTION 2: Update lastChapterRead */}
-                        <View style={styles.actionRow}>
-                            <View style={styles.left}>
-                            <Text style={styles.actionText}>Dernier chapitre lu</Text>
-                        </View>
-
-                            <View style={styles.rightRow}>
-                            <Pressable style={styles.roundButton}><Text>-</Text></Pressable>
-                            <TextInput
-                                style={styles.input}
-                                value={String(fiction?.lastChapterRead ?? 0)}
-                                keyboardType="numeric"
-                            />
-                            <Pressable style={styles.roundButton}><Text>+</Text></Pressable>
-                            </View>
-                        </View>
-
-                        {/* --- ACTION 3 : Modifier sa note (1 à 5 coeurs) --- */}
-                        <View style={styles.actionRow}>
-                            <View style={styles.left}>
-                            <Text style={styles.actionText}>Votre note</Text>
-                            </View>
-
-                            <View style={styles.heartsRow}>
-                            {[1,2,3,4,5].map(index => (
-                                <Ionicons
-                                key={index}
-                                name="heart"
-                                size={32} // taille plus grande
-                                style={{ marginHorizontal: 4 }}
-                                color={index <= (fiction?.rate?.value ?? 0) ? "#E91E63" : "gray"}
-                                />
-                            ))}
-                            </View>
-                        </View>
-
-                        {/* --- ACTION 4 : Modifier infos fanfiction --- */}
-                        <Pressable style={styles.actionRow} onPress={() => console.log("TODO modify info")}>
-                            <MaterialIcons name="edit" size={22} />
-                            <Text style={styles.actionText}>Modifier les informations</Text>
-                        </Pressable>
-
-                        {/* --- ACTION 5 : Dupliquer la fiction --- */}
-                        <Pressable style={styles.actionRow} onPress={() => console.log("TODO duplicate")}>
-                            <Ionicons name="copy" size={22} />
-                            <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
-                        </Pressable>
-
-                        {/* --- ACTION 6 : Supprimer la fiction --- */}
-                        <Pressable style={styles.actionRow} onPress={() => console.log("TODO delete")}>
-                            <MaterialIcons name="delete" size={22} color="red" />
-                            <Text style={[styles.actionText, { color: "red" }]}>Supprimer la fanfiction</Text>
-                        </Pressable>
-
-
-                    </View>
-                    <View style={styles.footerContainer}>
-                        <TouchableOpacity
-                            style={styles.footerButton}
-                            onPress={onClose}
-                        >
-                            <Text style={styles.buttonText}>Annuler</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.footerButton, styles.applyButton]}
-                        >
-                            <Text style={styles.buttonText}>Appliquer</Text>
-                        </TouchableOpacity>
                     </View>                
                 </View>
             </View>
@@ -208,57 +111,3 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
     )
 
 }
-
-                        // {/* --- ACTION 2 : Modifier le dernier chapitre lu --- */}
-                        // <View style={styles.actionRow}>
-                        //     <View style={styles.left}>
-                        //     <Text style={styles.actionText}>Dernier chapitre lu</Text>
-                        //     </View>
-
-                        //     <View style={styles.rightRow}>
-                        //     <Pressable style={styles.roundButton}><Text>-</Text></Pressable>
-                        //     <TextInput
-                        //         style={styles.input}
-                        //         value={String(fiction?.lastChapterRead ?? 0)}
-                        //         keyboardType="numeric"
-                        //     />
-                        //     <Pressable style={styles.roundButton}><Text>+</Text></Pressable>
-                        //     </View>
-                        // </View>
-
-                        // {/* --- ACTION 3 : Modifier sa note (1 à 5 coeurs) --- */}
-                        // <View style={styles.actionRow}>
-                        //     <View style={styles.left}>
-                        //     <Text style={styles.actionText}>Votre note</Text>
-                        //     </View>
-
-                        //     <View style={styles.heartsRow}>
-                        //     {[1,2,3,4,5].map(index => (
-                        //         <Ionicons
-                        //         key={index}
-                        //         name="heart"
-                        //         size={32} // taille plus grande
-                        //         style={{ marginHorizontal: 4 }}
-                        //         color={index <= (fiction?.rate?.value ?? 0) ? "#E91E63" : "gray"}
-                        //         />
-                        //     ))}
-                        //     </View>
-                        // </View>
-
-                        // {/* --- ACTION 4 : Modifier infos fanfiction --- */}
-                        // <Pressable style={styles.actionRow} onPress={() => console.log("TODO modify info")}>
-                        //     <MaterialIcons name="edit" size={22} />
-                        //     <Text style={styles.actionText}>Modifier les informations</Text>
-                        // </Pressable>
-
-                        // {/* --- ACTION 5 : Dupliquer la fiction --- */}
-                        // <Pressable style={styles.actionRow} onPress={() => console.log("TODO duplicate")}>
-                        //     <Ionicons name="copy" size={22} />
-                        //     <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
-                        // </Pressable>
-
-                        // {/* --- ACTION 6 : Supprimer la fiction --- */}
-                        // <Pressable style={styles.actionRow} onPress={() => console.log("TODO delete")}>
-                        //     <MaterialIcons name="delete" size={22} color="red" />
-                        //     <Text style={[styles.actionText, { color: "red" }]}>Supprimer la fanfiction</Text>
-                        // </Pressable>
