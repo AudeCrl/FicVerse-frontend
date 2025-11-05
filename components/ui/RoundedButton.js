@@ -7,6 +7,7 @@ export default function RoundedButton({
   label,
   active = false,
   onPress,
+  style = {},
 }) {
   const { currentTheme } = useTheme();
   
@@ -20,7 +21,7 @@ export default function RoundedButton({
         paddingHorizontal: 10,
         borderRadius: 8,
         backgroundColor: active ? currentTheme.primary : currentTheme.inactive,
-
+        ...style
       }}
     >
       <Text 
