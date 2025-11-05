@@ -39,7 +39,7 @@ export const SortModal = ({ isVisible, onClose, defaultSort, onApplySort }) => {
             flex: 1,
             justifyContent: 'center',        
             alignItems: 'flex-end',
-            backgroundColor: '#646464af',        
+            backgroundColor: 'rgba(100, 100, 100, 0.51)',
             paddingTop: 60,
         },
         modalView: {
