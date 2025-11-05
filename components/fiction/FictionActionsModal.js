@@ -6,7 +6,7 @@ import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import ChosenStatus from './ChosenStatus.js';
 
-export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
+export const FictionActionsModal = ({ isVisible, onClose, fiction, navigation }) => {
 
     const { currentTheme } = useTheme();    
 
@@ -51,6 +51,34 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
             alignItems: "center",
             paddingVertical: 12,
         },
+  left: {
+    flex: 1,
+  },
+  actionText: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  rightRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  roundButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ddd",
+  },
+  input: {
+    width: 50,
+    textAlign: "center",
+    marginHorizontal: 8,
+    borderBottomWidth: 1,
+  },
+  heartsRow: {
+    flexDirection: "row",
+  },
 
         // --- FOOTER ---
         footerContainer: {
@@ -80,6 +108,10 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
         }
     });
     
+    const handleNavigate = () => {
+        //navigation.navigate("ManageFiction", { fictionId: fiction._id });
+        console.log('Go to ManageFictionScreen');
+    };
 
     return (
         <Modal
@@ -104,6 +136,41 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction }) => {
                                 onPress={handleReadingStatusChange}
                             />
                         </View>
+
+
+
+                        {/* --- ACTION 4 : Modifier infos fanfiction --- */}
+                        <Pressable style={styles.actionRow} onPress={handleNavigate}>
+                            <MaterialIcons name="edit" size={22} />
+                            <Text style={styles.actionText}>Modifier les informations</Text>
+                        </Pressable>
+
+                        {/* --- ACTION 5 : Dupliquer la fiction --- */}
+                        <Pressable style={styles.actionRow} onPress={() => console.log("TODO duplicate")}>
+                            <Ionicons name="copy" size={22} />
+                            <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
+                        </Pressable>
+
+                        {/* --- ACTION 6 : Supprimer la fiction --- */}
+                        <Pressable style={styles.actionRow} onPress={() => console.log("TODO delete")}>
+                            <MaterialIcons name="delete" size={22} color="red" />
+                            <Text style={[styles.actionText, { color: "red" }]}>Supprimer la fanfiction</Text>
+                        </Pressable>
+
+
+                    </View>
+                    <View style={styles.footerContainer}>
+                        <TouchableOpacity
+                            style={styles.footerButton}
+                            onPress={onClose}
+                        >
+                            <Text style={styles.buttonText}>Annuler</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.footerButton, styles.applyButton]}
+                        >
+                            <Text style={styles.buttonText}>Appliquer</Text>
+                        </TouchableOpacity>
                     </View>                
                 </View>
             </View>
