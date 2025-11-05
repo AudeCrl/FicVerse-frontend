@@ -33,7 +33,7 @@ export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
-  console.log(user);
+  // console.log(user);
 
   const formattedDate = formatDate(user.createdAt);
 
@@ -49,10 +49,13 @@ export default function ProfileScreen({ navigation }) {
 
   const [displayedPassword, setDisplayedPassword] = useState("••••••••");
   const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState(null);
   const [newPassword, setNewPassword] = useState("");
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  const [isModalPasswordVisible, setIsModalPasswordVisible] = useState(false);
 
   useEffect(() => {
     if (user.username) {
@@ -234,10 +237,57 @@ export default function ProfileScreen({ navigation }) {
 
   const handleEditPassword = () => {
     console.log("Edit Password clicked");
-    /*
-        Fetch route patch user password
-        */
+    
+    const token = user.token;
+
+    if (!isEditingPassword) {
+      setIsEditingPassword(true)
+    } else if (isEditingPassword) {      
+      if (newPassword === '') {
+        setIsEditingPassword(false);
+        setNewPassword('');
+        return;
+      }
+
+      setIsModalPasswordVisible(true);
+    }
   };
+
+  const fetchNewPassword = () => {
+
+    const token = user.token;
+
+    if (!user.token) {
+        console.error('Erreur: Token utilisateur manquant.');
+        alert('Erreur: Token manquant.');
+        return;        
+      }
+
+    fetch(`${API_IP}/user/password`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result) {
+        setIsEditingPassword(false);
+        setNewPassword('');
+        alert('Changement du mot de passe effectué')
+      } else {
+        alert(`Echec de la mise à jour du mot de passe: ${data.error}`);
+        setIsEditingPassword(false);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur réseau lors de la mise à jour du mot de passe :', error);
+      alert('Erreur réseau lors de la mise à jour.');
+      setIsEditingPassword(false);
+    })
+  }
 
   const handleLogout = () => {
     dispatch(logout());
