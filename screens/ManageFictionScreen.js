@@ -30,8 +30,8 @@ export default function ManageFictionScreen({ route, navigation }) {
   const [lastChapterRead, setLastChapterRead] = useState(0);
   const [tagIds, setTagIds] = useState([]);   // tagIds remontés par ChosenTag
 
-  const [errorTitle, setErrorTitle] = useState(false);
-  const [errorFandom, setErrorFandom] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [fandomError, setFandomError] = useState(false);
 
   useEffect(() => { // Pré-remplissage de tous les champs si fiction déjà existante
     if (!fictionId) return; // si pas de fictionId alors cela veut dire nouvelle fiction et donc pas de fetch

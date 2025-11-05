@@ -24,7 +24,7 @@ import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
-//import ManageFictionScreen from "./screens/ManageFictionScreen";
+import ManageFictionScreen from "./screens/ManageFictionScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,7 +88,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeNavigator} />
-      <Tab.Screen name="Add" component={HomeScreen} />
+      <Tab.Screen name="Add" component={ManageFictionScreen} />
       <Tab.Screen name="Search" component={SearchNavigator} />
     </Tab.Navigator>
   );
@@ -109,7 +109,7 @@ const RootNavigation = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
-      {/*<Stack.Screen name="ManageFiction" component={ManageFictionScreen} />*/}
+      <Stack.Screen name="ManageFiction" component={ManageFictionScreen} />
     </Stack.Navigator>
   );
 };
