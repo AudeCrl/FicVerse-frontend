@@ -11,7 +11,7 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { typography } from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, updateAvatar } from "../reducers/user";
+import { logout, updateAvatar, updateUsername, updateEmail } from "../reducers/user";
 import Input from "../components/ui/Input"
 import * as ImagePicker from 'expo-image-picker'
 
@@ -33,7 +33,7 @@ export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
-  // console.log(user);
+  console.log(user);
 
   const formattedDate = formatDate(user.createdAt);
 
@@ -45,7 +45,7 @@ export default function ProfileScreen({ navigation }) {
 
   const [currentEmail, setCurrentEmail] = useState(user.email);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [tempEmail, setTempEmail] = useState("mail");
+  const [tempEmail, setTempEmail] = useState("");
 
   const [displayedPassword, setDisplayedPassword] = useState("••••••••");
   const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -133,11 +133,103 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const handleEditUsername = () => {
-    console.log("Edit Username clicked");
+    console.log("Edit Username clicked");    
+
+    const token = user.token
+
+    if (!isEditingUsername) {
+      setIsEditingUsername(true);
+    } else if (isEditingUsername) {
+      if (!user.token) {
+        console.error('Erreur: Token utilisateur manquant.');
+        alert('Erreur: Token manquant.');
+        return;        
+    }
+    setTempUsername(tempUsername.trim())
+
+    if (tempUsername === '' || tempUsername === username) {
+      setIsEditingUsername(false);
+      setTempUsername('');
+      return;
+    }
+
+    fetch(`${API_IP}/user/username`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ username: tempUsername})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result) {
+        setUsername(data.username);
+        dispatch(updateUsername(data.username));
+        setIsEditingUsername(false);
+        setTempUsername('');
+        alert('Nom d\'utilisateur mis à jour');
+      } else {
+        alert (`Echec de la mise à jour: ${data.error}`);
+        setIsEditingUsername(false);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur réseau lors de la mise à jour du username:', error);
+      alert('Erreur réseau lors de la mise à jour.');
+      setIsEditingUsername(false);      
+    })
+    }
   };
 
   const handleEditEmail = () => {
     console.log("Edit Email clicked");
+
+    const token = user.token
+
+    if (!isEditingEmail) {
+      setIsEditingEmail(true);
+    } else if (isEditingEmail) {
+      if (!user.token) {
+        console.error('Erreur: Token utilisateur manquant.');
+        alert('Erreur: Token manquant.');
+        return;        
+    }
+    setTempEmail(tempEmail.trim())
+
+    if (tempEmail === '' || tempEmail === currentEmail) {
+      setIsEditingEmail(false);
+      setTempEmail('');
+      return;
+    }
+
+    fetch(`${API_IP}/user/email`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ email: tempEmail})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result) {
+        setCurrentEmail(data.email);
+        dispatch(updateEmail(data.email));
+        setIsEditingEmail(false);
+        setTempEmail('');
+        alert('Email mis à jour');
+      } else {
+        alert (`Echec de la mise à jour: ${data.error}`);
+        setIsEditingEmail(false);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur réseau lors de la mise à jour de l\'adresse email:', error);
+      alert('Erreur réseau lors de la mise à jour.');
+      setIsEditingEmail(false);      
+    })
+    }
   };
 
   const handleEditPassword = () => {
@@ -211,19 +303,25 @@ export default function ProfileScreen({ navigation }) {
             source={typeof avatarUri === 'string' ? { uri: avatarUri} : avatarUri}
           />
           <TouchableOpacity onPress={handleEditAvatar}>
-            <Feather name="edit" size={24} color="black" />
+            <Feather name='edit' size={24} color="black" />
           </TouchableOpacity>
         </View>
         <View style={styles.usernameContainer}>
           <Input
             style={styles.inputUsername}
-            value={username}
+            value={isEditingUsername ? tempUsername : username}
             onChangeText={setTempUsername}
             editable={isEditingUsername}
+            placeholder={isEditingUsername ? username : null}
           />
           <TouchableOpacity onPress={handleEditUsername}>
-            <Feather name="edit" size={24} color="black" />
+            <Feather name={isEditingUsername ? 'check' : 'edit'} size={24} color="black" />
           </TouchableOpacity>
+          {isEditingUsername && (
+            <TouchableOpacity onPress={() => setIsEditingUsername(false)}>
+              <Ionicons name= 'close-circle-outline' size={24} color='grey' />
+            </TouchableOpacity>
+          )}
           <Text>Membre FicVerse depuis le {formattedDate}</Text>
         </View>
         <View></View>
@@ -231,17 +329,18 @@ export default function ProfileScreen({ navigation }) {
           <Text>Votre mail :</Text>
           <Input
             style={styles.inputEmail}
-            value={currentEmail}
+            value={isEditingEmail ? tempEmail : currentEmail}
             onChangeText={setTempEmail}
             editable={isEditingEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholder={isEditingEmail ? currentEmail : null}
           />
           <TouchableOpacity onPress={handleEditEmail}>
-            <Feather name="edit" size={24} color="black" />
+            <Feather name={isEditingEmail ? 'check' : 'edit'} size={24} color="black" />
           </TouchableOpacity>
           {isEditingEmail && (
-            <TouchableOpacity onPress={handleCancelEmail}>
+            <TouchableOpacity onPress={() => setIsEditingEmail(false)}>
               <Ionicons name="close-circle-outline" size={24} color="grey" />
             </TouchableOpacity>
           )}
@@ -258,8 +357,8 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity onPress={handleEditPassword}>
             <Feather name="edit" size={24} color="black" />
           </TouchableOpacity>
-          {isEditingEmail && (
-            <TouchableOpacity onPress={handleCancelEmail}>
+          {isEditingPassword && (
+            <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
               <Ionicons name="close-circle-outline" size={24} color="grey" />
             </TouchableOpacity>
           )}

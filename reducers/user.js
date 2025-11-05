@@ -31,9 +31,15 @@ export const userSlice = createSlice({
         },
         updateAvatar: (state, action) => {
             state.value.avatar = action.payload;
-        }
+        },
+        updateUsername: (state, action) => {
+            state.value.username = action.payload;
+        },
+        updateEmail: (state, action) => {
+            state.value.email = action.payload;
+        },
     },
 });
 
-export const { login, logout, updateAvatar } = userSlice.actions;
+export const { login, logout, updateAvatar, updateUsername, updateEmail } = userSlice.actions;
 export default userSlice.reducer;
