@@ -80,7 +80,7 @@ export default function Header({
                 
                 <Pressable style={styles.right} onPress={onProfilePress}>
                     <View style={styles.profileInfos}>
-                        <Image source={avatar ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
+                        <Image source={avatar.uri ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
                         <Text style={styles.username}>{username}</Text>
                     </View>
                 </Pressable>
