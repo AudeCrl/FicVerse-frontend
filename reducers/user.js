@@ -7,6 +7,7 @@ const initialState = {
         username: null,
         createdAt: null, 
         avatar: null,
+        notationIcon: null,
     },
 };
 
@@ -20,6 +21,7 @@ export const userSlice = createSlice({
             state.value.username = action.payload.username;
             state.value.createdAt = action.payload.createdAt;
             state.value.avatar = action.payload.avatarURL;
+            state.value.notationIcon = action.payload.notationIcon;
         },
         /* Pour la déconnexion */
         logout: (state) => {           
@@ -28,6 +30,7 @@ export const userSlice = createSlice({
             state.value.username = null;
             state.value.createdAt = null;
             state.value.avatar = null;
+            state.value.notationIcon = null;
         },
         updateAvatar: (state, action) => {
             state.value.avatar = action.payload;

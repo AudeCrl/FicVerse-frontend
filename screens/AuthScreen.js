@@ -126,6 +126,7 @@ export default function AuthScreen({ navigation, route }) {
             username: data.user.username,
             createdAt: data.user.createdAt,
             avatarURL: data.user.avatarURL,
+            notationIcon: data.user.notationIcon,
           }));
         goToTabNavigator(); // go vers HomeScreen result: true
       } else {
@@ -160,6 +161,7 @@ export default function AuthScreen({ navigation, route }) {
             username: data.username,
             createdAt: data.createdAt,
             avatarURL: data.avatarURL,
+            notationIcon: data.notationIcon,
           }));
         goToTabNavigator();
       } else {
