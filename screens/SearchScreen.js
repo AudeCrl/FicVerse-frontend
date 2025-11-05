@@ -97,7 +97,7 @@ export default function SearchScreen({ navigation }) {
             if (!tagsMap[tag._id]) {
               tagsMap[tag._id] = {
                 ...tag,
-                count: tag.count || 0,
+                usageCount: tag.usageCount || 0,
               };
             }
           });
@@ -106,7 +106,7 @@ export default function SearchScreen({ navigation }) {
 
       // Sort tags by usage count descending
       const sortedTags = Object.values(tagsMap).sort(
-        (a, b) => b.count - a.count
+        (a, b) => b.usageCount - a.usageCount
       );
       setAllTags(sortedTags);
 
