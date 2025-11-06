@@ -78,26 +78,6 @@ export default function ManageFictionScreen({ route, navigation }) {
       return !(titleEmpty || fandomEmpty);                        // Retourne true si tout est OK
   }  
   
-  const resetFields = () => {
-  setFandomName("");
-  setTitle("");
-  setLink("");
-  setAuthor("");
-  setLang("");
-  setSummary("");
-  setPersonalNotes("");
-  setNumberOfChapters("");
-  setNumberOfWords("");
-  setLastChapterRead(0);
-  setTagIds([]);
-  setReadingStatus("reading");
-  setStoryStatus("in-progress");
-  setTitleError(false);
-  setFandomError(false);
-  setRateValue(0);
-  setDisplayRate(false);
-};
-
 const toggleHideRate = () => {
     setDisplayRate((toggle) => !toggle);
   };
@@ -133,7 +113,6 @@ const toggleHideRate = () => {
 
       if (data.result) {
         Alert.alert("Succès", "Fiction créée !");
-        resetFields(); // vide tous les champs
         navigation.navigate("Home", { screen: "HomeMain" }); 
       } else {
         Alert.alert("Erreur", data.error || "Création échouée");

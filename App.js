@@ -92,7 +92,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeNavigator} />
-      <Tab.Screen name="Add" component={ManageFictionScreen} />
+      <Tab.Screen name="Add" component={ManageFictionScreen} options={{ unmountOnBlur: true }} />{/* Démonte tous les champs */}
       <Tab.Screen name="Search" component={SearchNavigator} />
     </Tab.Navigator>
   );
