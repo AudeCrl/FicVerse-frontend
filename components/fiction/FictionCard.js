@@ -1,16 +1,12 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
 import { useMemo, useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
+import AddTagModal from "./AddTagModal";
+import Author from "./Author";
 import { FictionActionsModal } from "./FictionActionsModal";
 import Rate from "./Rate.js";
 import Tags from "./Tags";
@@ -25,6 +21,8 @@ export default function FictionCard({
   const { currentTheme } = useTheme();
   const [isFictionActionsModalVisible, setIsFictionActionsModalVisible] =
     useState(false);
+  const [showAddTagModal, setShowAddTagModal] = useState(false);
+  const [fictionData, setFictionData] = useState(fiction);
   const user = useSelector((state) => state.user.value);
   // console.log('user =>', user);
 
@@ -203,15 +201,11 @@ export default function FictionCard({
         <View style={styles.authorRateContainer}>
           {/* Author */}
           {!!fiction.author && (
-            <Pressable
-              style={styles.authorContainer}
+            <Author
+              author={fiction.author}
               onPress={handleAuthorPress}
-            >
-              <Text style={styles.authorBy}>par </Text>
-              <View style={styles.authorChip}>
-                <Text style={styles.authorChipText}>{fiction.author}</Text>
-              </View>
-            </Pressable>
+              theme={currentTheme}
+            />
           )}
 
           {/* Rate */}
@@ -235,21 +229,36 @@ export default function FictionCard({
           Dernier chapitre lu : {fiction.lastChapterRead}
         </Text>
       )}
-      {fiction.tags &&
-        Array.isArray(fiction.tags) &&
-        fiction.tags.length > 0 && (
+      {fictionData.tags &&
+        Array.isArray(fictionData.tags) &&
+        fictionData.tags.length > 0 && (
           <Tags
-            tags={fiction.tags}
+            tags={fictionData.tags}
             withCross={false}
             navigation={navigation}
             allFictions={allFictions}
+            onAddTagPress={() => setShowAddTagModal(true)}
+            theme={currentTheme}
           />
         )}
       <FictionActionsModal
         isVisible={isFictionActionsModalVisible}
         onClose={() => setIsFictionActionsModalVisible(false)}
-        fiction={fiction}
+        fiction={fictionData}
         navigation={navigation}
+      />
+      <AddTagModal
+        visible={showAddTagModal}
+        onClose={() => setShowAddTagModal(false)}
+        fictionId={fictionData._id}
+        currentTags={fictionData.tags || []}
+        onTagsAdded={(newTags) => {
+          setFictionData({
+            ...fictionData,
+            tags: [...(fictionData.tags || []), ...newTags],
+          });
+          setShowAddTagModal(false);
+        }}
       />
     </View>
   );

@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext";
 import { typography } from "../../styles/globalStyles";
+import Rate from "../fiction/Rate";
 import Input from "../ui/Input";
 
 export default function SearchByTitle({ fictions, navigation }) {
   const { currentTheme } = useTheme();
+  const user = useSelector((state) => state.user.value);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter and sort fictions by title
@@ -31,7 +34,7 @@ export default function SearchByTitle({ fictions, navigation }) {
   const getReadingStatusLabel = (status) => {
     const statusMap = {
       "to-read": "À lire",
-      reading: "En cours à lire",
+      reading: "En cours",
       finished: "Terminé",
     };
     return statusMap[status] || status;
@@ -45,6 +48,18 @@ export default function SearchByTitle({ fictions, navigation }) {
         fictions: [fiction],
         searchType: "title",
         searchTerm: fiction.title,
+      },
+    });
+  };
+
+  const handleAuthorPress = (author, fiction) => {
+    // Navigate with author filter
+    navigation.navigate("Home", {
+      screen: "HomeMain",
+      params: {
+        fictions: fictions.filter((f) => f.author === author),
+        searchType: "author",
+        searchTerm: author,
       },
     });
   };
@@ -106,7 +121,7 @@ export default function SearchByTitle({ fictions, navigation }) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Input
-        placeholder="Rechercher par titre"
+        placeholder="Rechercher par mot-clé dans le titre"
         value={searchTerm}
         onChangeText={setSearchTerm}
         useThemeColors={true}
@@ -125,6 +140,27 @@ export default function SearchByTitle({ fictions, navigation }) {
                 {getReadingStatusLabel(fiction.readingStatus)}
               </Text>
             </View>
+
+            {/* Author */}
+            {!!fiction.author && (
+              <View style={{ marginTop: 8, marginBottom: 8 }}>
+                <Author
+                  author={fiction.author}
+                  onPress={() => handleAuthorPress(fiction.author, fiction)}
+                  theme={currentTheme}
+                />
+              </View>
+            )}
+
+            {/* Bruno: Display rating if available */}
+            {!!fiction.rate?.display && (
+              <View style={{ marginTop: 8 }}>
+                <Rate
+                  iconName={user.notationIcon}
+                  value={fiction?.rate?.value ?? 0}
+                />
+              </View>
+            )}
           </Pressable>
         ))
       ) : searchTerm.trim() ? (
