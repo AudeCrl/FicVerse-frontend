@@ -1,8 +1,14 @@
 import { View } from "react-native";
 import Tag from "./Tag";
 
-export default function Tags({ tags, withCross, navigation, allFictions }) {
+export default function Tags({ tags, withCross, navigation, allFictions, pressTag }) {
+
   const handleTagPress = (tag) => {
+
+    if (pressTag) { 
+       return pressTag(tag);
+    }
+
     if (navigation && allFictions) {
       const fictionsWithTag = allFictions.filter(
         (fiction) => fiction.tags && fiction.tags.some((t) => t._id === tag._id)

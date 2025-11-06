@@ -27,8 +27,6 @@ import HomeScreen from "./screens/HomeScreen";
 import LanguagesManagerScreen from "./screens/LanguagesManagerScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
-import TagsManagerScreen from "./screens/TagsManagerScreen";
-import ThemeScreen from "./screens/ThemeScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -92,7 +90,7 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeNavigator} />
-      <Tab.Screen name="Add" component={HomeScreen} />
+      <Tab.Screen name="Add" component={ManageFictionScreen} />
       <Tab.Screen name="Search" component={SearchNavigator} />
     </Tab.Navigator>
   );
@@ -113,14 +111,6 @@ const RootNavigation = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="Theme" component={ThemeScreen} />
-      <Stack.Screen name="TagsManager" component={TagsManagerScreen} />
-      <Stack.Screen name="FandomsManager" component={FandomsManagerScreen} />
-      <Stack.Screen
-        name="LanguagesManager"
-        component={LanguagesManagerScreen}
-      />
-      <Stack.Screen name="AuthorsManager" component={AuthorsManagerScreen} />
     </Stack.Navigator>
   );
 };

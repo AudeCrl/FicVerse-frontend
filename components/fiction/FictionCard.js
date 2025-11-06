@@ -1,11 +1,14 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
-import { useMemo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { Pressable, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import Tags from "./Tags";
+import { FictionActionsModal } from './FictionActionsModal'
+import Rate from "./Rate.js";
 
 export default function FictionCard({
   fiction,
@@ -15,6 +18,10 @@ export default function FictionCard({
   allFictions,
 }) {
   const { currentTheme } = useTheme();
+  const [ isFictionActionsModalVisible, setIsFictionActionsModalVisible ] = useState(true);
+  const user = useSelector((state) => state.user.value);
+  // console.log('user =>', user);
+
 
   // Memorize styles so they only update when the theme changes
   const styles = useMemo(
@@ -54,6 +61,9 @@ export default function FictionCard({
           justifyContent: "flex-start",
           alignItems: "center",
           borderRadius: 2,
+        },
+        rateContainer: {
+          flexDirection: "row",
         },
         authorBy: {
           color: currentTheme.text,
@@ -123,10 +133,7 @@ export default function FictionCard({
     abandoned: "Publication abandonée",
   };
 
-  const handleNavigate = () => {
-    fiction.link && Linking.openURL(fiction.link);
-    console.log("LIEN =>", fiction.link);
-  };
+  const handleNavigate = () => { fiction.link && Linking.openURL(fiction.link); };
 
   const handleAuthorPress = () => {
     if (navigation && allFictions) {
@@ -142,12 +149,7 @@ export default function FictionCard({
     }
   };
 
-  const metadata = !!(
-    fiction.lang ||
-    fiction.storyStatus ||
-    fiction.numberOfChapters ||
-    fiction.numberOfWords
-  ) ? (
+  const metadata = !!(fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords) ? (
     <View style={styles.metadataContainer}>
       <View style={styles.metadataLeftCol}>
         {!!fiction.lang && <Text style={styles.metadata}>{fiction.lang}</Text>}
@@ -169,36 +171,44 @@ export default function FictionCard({
       </View>
     </View>
   ) : null;
+
   return (
     <View style={styles.fictionCard}>
+      
+      {/* --- ReadingStatus (only in "searchResults" mode) */}
       {showReadingStatus && (
         <Text style={styles.readingStatus}>
           {readingStatusLabels[fiction.readingStatus]}
         </Text>
       )}
+
+      {/* --- Title (with link if it exists) + "..." Icon (More) */}
       <View style={styles.titleContainer}>
         <Text style={styles.title} onPress={handleNavigate}>
           {fiction.title}
         </Text>
+        <TouchableOpacity onPress={() => setIsFictionActionsModalVisible(true)}>
         <MaterialIcons name="more-horiz" size={24} style={styles.moreIcon} />
+        </TouchableOpacity>
       </View>
+
+      {/* --- Author + Rate */}
       {(!!fiction.author || !!fiction.rate?.display) && (
         <View style={styles.authorRateContainer}>
+          
+          {/* Author */}
           {!!fiction.author && (
-            <Pressable
-              style={styles.authorContainer}
-              onPress={handleAuthorPress}
-            >
+            <Pressable style={styles.authorContainer} onPress={handleAuthorPress}>
               <Text style={styles.authorBy}>par </Text>
               <View style={styles.authorChip}>
                 <Text style={styles.authorChipText}>{fiction.author}</Text>
               </View>
             </Pressable>
           )}
+
+          {/* Rate */}
           {!!fiction.rate?.display && (
-            <View style={styles.rate}>
-              <Ionicons name="heart" size={24} color="black" />
-            </View>
+            <Rate iconName={user.notationIcon} value={fiction?.rate?.value ?? 0} />
           )}
         </View>
       )}
@@ -224,6 +234,12 @@ export default function FictionCard({
             allFictions={allFictions}
           />
         )}
+        <FictionActionsModal
+          isVisible={isFictionActionsModalVisible}
+          onClose={() => setIsFictionActionsModalVisible(false)}
+          fiction={fiction}
+          navigation={navigation}
+        />
     </View>
   );
 }
