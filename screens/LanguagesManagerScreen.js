@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
 const AVAILABLE_LANGUAGES = [
@@ -27,6 +28,9 @@ export default function LanguagesManagerScreen({ navigation }) {
   const [userLanguages, setUserLanguages] = useState([
     { id: "lang-1", name: "Français" },
   ]);
+  // Modale de confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [languageToDelete, setLanguageToDelete] = useState(null);
 
   const handleAddLanguage = (language) => {
     if (!userLanguages.find((l) => l.id === language.id)) {
@@ -34,8 +38,17 @@ export default function LanguagesManagerScreen({ navigation }) {
     }
   };
 
+  // Ouvrir modale de confirmation avant suppression locale
   const handleRemoveLanguage = (language) => {
-    setUserLanguages(userLanguages.filter((l) => l.id !== language.id));
+    setLanguageToDelete(language);
+    setShowDeleteModal(true);
+  };
+
+  // Confirmer la suppression après modale
+  const handleConfirmDelete = () => {
+    setUserLanguages(userLanguages.filter((l) => l.id !== languageToDelete.id));
+    setShowDeleteModal(false);
+    setLanguageToDelete(null);
   };
 
   const filteredAvailable = AVAILABLE_LANGUAGES.filter(
@@ -52,6 +65,22 @@ export default function LanguagesManagerScreen({ navigation }) {
         <Text style={styles.title}>Mes langues</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      {/* Modale de confirmation */}
+      {languageToDelete && (
+        <ConfirmDeleteModal
+          visible={showDeleteModal}
+          itemName={languageToDelete.name}
+          itemType="langue"
+          usageCount={0}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setLanguageToDelete(null);
+          }}
+          isLoading={false}
+        />
+      )}
 
       {/* User Languages */}
       <Text style={styles.sectionTitle}>

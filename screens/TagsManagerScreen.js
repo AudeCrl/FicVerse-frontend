@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
@@ -20,6 +21,11 @@ export default function TagsManagerScreen({ navigation }) {
   const [allTags, setAllTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // Modale de confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [tagToDelete, setTagToDelete] = useState(null);
+  const [usageCount, setUsageCount] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadTags();
@@ -66,18 +72,47 @@ export default function TagsManagerScreen({ navigation }) {
     }
   };
 
+  // Ouvrir modale après vérifier le nombre d'utilisations
   const handleRemoveTag = async (tag) => {
     try {
-      const response = await fetch(`${API_IP}/tag/${tag.id}?force=true`, {
-        method: "DELETE",
+      // Récupérer le nombre d'utilisations du tag
+      const response = await fetch(`${API_IP}/tag/${tag.id}/usage-count`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
       if (data.result) {
-        setUserTags(userTags.filter((t) => t.id !== tag.id));
+        setUsageCount(data.usageCount);
+        setTagToDelete(tag);
+        setShowDeleteModal(true);
+      }
+    } catch (error) {
+      console.error("Erreur récupération usage count:", error);
+    }
+  };
+
+  // Confirmer la suppression
+  const handleConfirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+      // Essayer soft delete d'abord, puis hard delete si utilisé
+      const queryParam = usageCount > 0 ? "?detach=true" : "";
+      const response = await fetch(
+        `${API_IP}/tag/${tagToDelete.id}${queryParam}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const data = await response.json();
+      if (data.result) {
+        setUserTags(userTags.filter((t) => t.id !== tagToDelete.id));
+        setShowDeleteModal(false);
+        setTagToDelete(null);
       }
     } catch (error) {
       console.error("Erreur suppression tag:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -97,6 +132,22 @@ export default function TagsManagerScreen({ navigation }) {
         <Text style={styles.title}>Mes tags</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      {/* Modale de confirmation */}
+      {tagToDelete && (
+        <ConfirmDeleteModal
+          visible={showDeleteModal}
+          itemName={tagToDelete.name}
+          itemType="tag"
+          usageCount={usageCount}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setTagToDelete(null);
+          }}
+          isLoading={isDeleting}
+        />
+      )}
 
       {/* Search */}
       <View style={styles.searchContainer}>

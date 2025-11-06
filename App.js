@@ -19,14 +19,16 @@ import { useEffect } from "react";
 import { ImageBackground } from "react-native";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
-import AuthorsManagerScreen from "./screens/AuthorsManagerScreen";
 import AuthScreen from "./screens/AuthScreen";
+import AuthorsManagerScreen from "./screens/AuthorsManagerScreen";
 import FandomsManagerScreen from "./screens/FandomsManagerScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
 import LanguagesManagerScreen from "./screens/LanguagesManagerScreen";
+import ManageFictionScreen from "./screens/ManageFictionScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
+import TagsManagerScreen from "./screens/TagsManagerScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,6 +113,13 @@ const RootNavigation = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="TagsManager" component={TagsManagerScreen} />
+      <Stack.Screen name="FandomsManager" component={FandomsManagerScreen} />
+      <Stack.Screen name="AuthorsManager" component={AuthorsManagerScreen} />
+      <Stack.Screen
+        name="LanguagesManager"
+        component={LanguagesManagerScreen}
+      />
     </Stack.Navigator>
   );
 };

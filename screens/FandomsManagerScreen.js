@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
@@ -20,6 +21,11 @@ export default function FandomsManagerScreen({ navigation }) {
   const [allFandoms, setAllFandoms] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // Modale de confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [fandomToDelete, setFandomToDelete] = useState(null);
+  const [usageCount, setUsageCount] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadFandoms();
@@ -66,18 +72,50 @@ export default function FandomsManagerScreen({ navigation }) {
     }
   };
 
+  // Ouvrir modale après vérifier le nombre d'utilisations
   const handleRemoveFandom = async (fandom) => {
     try {
-      const response = await fetch(`${API_IP}/fandom/${fandom.id}?force=true`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      // Récupérer le nombre d'utilisations du fandom
+      const response = await fetch(
+        `${API_IP}/fandom/${fandom.id}/usage-count`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       const data = await response.json();
       if (data.result) {
-        setUserFandoms(userFandoms.filter((f) => f.id !== fandom.id));
+        setUsageCount(data.usageCount);
+        setFandomToDelete(fandom);
+        setShowDeleteModal(true);
+      }
+    } catch (error) {
+      console.error("Erreur récupération usage count:", error);
+    }
+  };
+
+  // Confirmer la suppression
+  const handleConfirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+      // Essayer suppression avec detach si utilisé
+      const queryParam = usageCount > 0 ? "?detach=true" : "";
+      const response = await fetch(
+        `${API_IP}/fandom/${fandomToDelete.id}${queryParam}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const data = await response.json();
+      if (data.result) {
+        setUserFandoms(userFandoms.filter((f) => f.id !== fandomToDelete.id));
+        setShowDeleteModal(false);
+        setFandomToDelete(null);
       }
     } catch (error) {
       console.error("Erreur suppression fandom:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -97,6 +135,22 @@ export default function FandomsManagerScreen({ navigation }) {
         <Text style={styles.title}>Mes fandoms</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      {/* Modale de confirmation */}
+      {fandomToDelete && (
+        <ConfirmDeleteModal
+          visible={showDeleteModal}
+          itemName={fandomToDelete.name}
+          itemType="fandom"
+          usageCount={usageCount}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setFandomToDelete(null);
+          }}
+          isLoading={isDeleting}
+        />
+      )}
 
       {/* Search */}
       <View style={styles.searchContainer}>

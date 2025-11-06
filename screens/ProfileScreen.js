@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import ConfirmAccountDelete from "../components/ConfirmAccountDelete";
 import SettingsCard from "../components/SettingsCard";
 import Input from "../components/ui/Input";
 import { useTheme } from "../context/ThemeContext.js";
@@ -594,6 +595,7 @@ export default function ProfileScreen({ navigation }) {
     navigation.navigate("Auth", { initialForm: "login" });
   };
 
+  // Ouvrir modale double confirmation pour suppression de compte
   const handleRemoveAccount = () => {
     if (!user.token) {
       console.error("Erreur: Token utilisateur manquant.");
@@ -603,49 +605,51 @@ export default function ProfileScreen({ navigation }) {
     setIsModalVisible(true);
   };
 
-  const confirmDeletion = () => {
-    if (!passwordConfirmation) {
-      alert("Mot de passe requis pour la confirmation.");
-      return;
+  // Appelé par ConfirmAccountDelete après validation du mot de passe
+  const confirmDeletion = async (password) => {
+    try {
+      setIsModalPasswordVisible(true);
+
+      const response = await fetch(`${API_IP}/user/delete-account`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        alert("Compte supprimé avec succès.");
+        console.log("Compte supprimé avec succès.");
+        dispatch(logout());
+        navigation.navigate("Auth");
+      } else {
+        console.error("Échec de la suppression du compte:", data.error);
+        alert(`Erreur de suppression: ${data.error}`);
+        setIsModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Erreur réseau lors de la suppression:", error);
+      alert("Erreur de connexion au serveur. Veuillez vérifier votre réseau.");
+      setIsModalVisible(false);
+    } finally {
+      setIsModalPasswordVisible(false);
     }
-
-    const userToken = user.token;
-
-    setIsModalVisible(false);
-
-    // fetch(`${API_IP}/user/remove`, {
-    //   method: "DELETE",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     token: userToken,
-    //     password: passwordConfirmation,
-    //   }),
-    // })
-    //   .then(response => response.json())
-    //   .then((data) => {
-    //     if (data.result) {
-    //       alert("Compte supprimé avec succès.");
-    //       console.log("Compte supprimé avec succès.");
-    //       dispatch(logout());
-    //       navigation.navigate("Auth");
-    //     } else {
-    //       console.error("Échec de la suppression du compte:", data.error);
-    //       alert(`Erreur de suppression: ${data.error}`);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error("Erreur réseau lors de la suppression:", error);
-    //     alert( "Erreur de connexion au serveur. Veuillez vérifier votre réseau." );
-    //   })
-    //   .finally(() => {
-    //     setPasswordConfirmation('');
-    //   });
   };
 
   return (
     <View style={styles.container}>
+      {/* Modale suppression compte */}
+      <ConfirmAccountDelete
+        visible={isModalVisible}
+        userEmail={user.email}
+        onConfirm={confirmDeletion}
+        onCancel={() => setIsModalVisible(false)}
+        isLoading={isModalPasswordVisible}
+      />
       <View style={styles.profileHeader}>
         <ImageBackground
           source={currentTheme.headerBackground}

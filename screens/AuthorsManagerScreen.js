@@ -9,12 +9,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
 export default function AuthorsManagerScreen({ navigation }) {
   const [userAuthors, setUserAuthors] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [authorInput, setAuthorInput] = useState("");
+  // Modale de confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [authorToDelete, setAuthorToDelete] = useState(null);
 
   const handleAddAuthor = () => {
     if (authorInput.trim()) {
@@ -27,8 +31,17 @@ export default function AuthorsManagerScreen({ navigation }) {
     }
   };
 
-  const handleRemoveAuthor = (authorId) => {
-    setUserAuthors(userAuthors.filter((a) => a.id !== authorId));
+  // Ouvrir modale de confirmation avant suppression locale
+  const handleRemoveAuthor = (author) => {
+    setAuthorToDelete(author);
+    setShowDeleteModal(true);
+  };
+
+  // Confirmer la suppression après modale
+  const handleConfirmDelete = () => {
+    setUserAuthors(userAuthors.filter((a) => a.id !== authorToDelete.id));
+    setShowDeleteModal(false);
+    setAuthorToDelete(null);
   };
 
   const filteredAuthors = userAuthors.filter((author) =>
@@ -45,6 +58,22 @@ export default function AuthorsManagerScreen({ navigation }) {
         <Text style={styles.title}>Mes auteurs</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      {/* Modale de confirmation */}
+      {authorToDelete && (
+        <ConfirmDeleteModal
+          visible={showDeleteModal}
+          itemName={authorToDelete.name}
+          itemType="auteur"
+          usageCount={0}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setAuthorToDelete(null);
+          }}
+          isLoading={false}
+        />
+      )}
 
       {/* Search */}
       <View style={styles.searchContainer}>
@@ -82,7 +111,7 @@ export default function AuthorsManagerScreen({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.authorItem}>
             <Text style={styles.authorName}>{item.name}</Text>
-            <TouchableOpacity onPress={() => handleRemoveAuthor(item.id)}>
+            <TouchableOpacity onPress={() => handleRemoveAuthor(item)}>
               <Feather name="trash-2" size={18} color="#EF4444" />
             </TouchableOpacity>
           </View>
