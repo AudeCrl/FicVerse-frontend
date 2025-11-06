@@ -1,7 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext";
 import { typography } from "../../styles/globalStyles";
+import Author from "../fiction/Author";
+import Rate from "../fiction/Rate";
 import Input from "../ui/Input";
 
 // Composant pour afficher le texte avec le regex surlighté
@@ -43,16 +46,35 @@ function HighlightedText({ text, searchTerm, highlightColor, textColor }) {
 
 export default function SearchBySummary({ fictions, navigation }) {
   const { currentTheme } = useTheme();
+  const user = useSelector((state) => state.user.value);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const debounceTimer = useRef(null);
+
+  // Debounce search term (300ms)
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [searchTerm]);
 
   // Filter fictions by summary or personalNotes
   const filteredFictions = useMemo(() => {
     const fictionsArray = fictions && Array.isArray(fictions) ? fictions : [];
 
-    if (!searchTerm.trim() || !fictionsArray.length) return [];
+    if (!debouncedSearchTerm.trim() || !fictionsArray.length) return [];
 
     try {
-      const regex = new RegExp(searchTerm, "i");
+      const regex = new RegExp(debouncedSearchTerm, "i");
       const filtered = fictionsArray.filter((fiction) => {
         const summary = fiction.summary || "";
         const notes = fiction.personalNotes || "";
@@ -66,7 +88,7 @@ export default function SearchBySummary({ fictions, navigation }) {
       console.error("Invalid regex:", error);
       return [];
     }
-  }, [searchTerm, fictions]);
+  }, [debouncedSearchTerm, fictions]);
 
   const handleSelectFiction = (fiction) => {
     // Get all fictions that have this summary or notes content
@@ -157,6 +179,7 @@ export default function SearchBySummary({ fictions, navigation }) {
           color: currentTheme.text,
           lineHeight: 18,
           opacity: 0.95,
+          fontSize: 14,
         },
         highlightColor: {
           backgroundColor: "#FFC107",
@@ -180,7 +203,7 @@ export default function SearchBySummary({ fictions, navigation }) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Input
-        placeholder="Rechercher dans résumé/notes"
+        placeholder="Mot-clé dans le résumé ou les notes"
         value={searchTerm}
         onChangeText={setSearchTerm}
         useThemeColors={true}
@@ -202,45 +225,73 @@ export default function SearchBySummary({ fictions, navigation }) {
 
             {/* Display author if available */}
             {fiction.author && (
-              <Pressable
-                onPress={() =>
-                  handleSelectAuthor(fiction.author, filteredFictions)
-                }
-              >
-                <Text style={styles.authorText}>par {fiction.author}</Text>
-              </Pressable>
+              <View style={{ marginTop: 8, marginBottom: 8 }}>
+                <Author
+                  author={fiction.author}
+                  onPress={() =>
+                    handleSelectAuthor(fiction.author, filteredFictions)
+                  }
+                  theme={currentTheme}
+                />
+              </View>
             )}
 
-            {/* Display summary with highlight if it matches */}
-            {fiction.summary &&
-              searchTerm &&
-              new RegExp(searchTerm, "i").test(fiction.summary) && (
-                <View>
+            {/* Display summary */}
+            {fiction.summary && (
+              <View style={{ marginTop: 8 }}>
+                {debouncedSearchTerm &&
+                new RegExp(debouncedSearchTerm, "i").test(fiction.summary) ? (
                   <HighlightedText
                     text={fiction.summary}
-                    searchTerm={searchTerm}
-                    highlightColor="#FFC107"
+                    searchTerm={debouncedSearchTerm}
+                    highlightColor={currentTheme.selectedText}
                     textColor={currentTheme.text}
                   />
-                </View>
-              )}
+                ) : (
+                  <Text style={{ color: currentTheme.text }}>
+                    {fiction.summary}
+                  </Text>
+                )}
+              </View>
+            )}
 
-            {/* Display personal notes with highlight if it matches */}
-            {fiction.personalNotes &&
-              searchTerm &&
-              new RegExp(searchTerm, "i").test(fiction.personalNotes) && (
-                <View style={{ marginTop: 8 }}>
-                  <Text style={{ ...styles.excerpt, fontStyle: "italic" }}>
-                    Notes:{" "}
+            {/* Display personal notes */}
+            {fiction.personalNotes && (
+              <View style={{ marginTop: 8 }}>
+                <Text
+                  style={{
+                    color: currentTheme.text,
+                    fontStyle: "italic",
+                    ...typography.small,
+                  }}
+                >
+                  Notes:{" "}
+                  {debouncedSearchTerm &&
+                  new RegExp(debouncedSearchTerm, "i").test(
+                    fiction.personalNotes
+                  ) ? (
                     <HighlightedText
                       text={fiction.personalNotes}
-                      searchTerm={searchTerm}
-                      highlightColor="#FFC107"
+                      searchTerm={debouncedSearchTerm}
+                      highlightColor={currentTheme.selectedText}
                       textColor={currentTheme.text}
                     />
-                  </Text>
-                </View>
-              )}
+                  ) : (
+                    fiction.personalNotes
+                  )}
+                </Text>
+              </View>
+            )}
+
+            {/* Display personal rating (hearts) */}
+            {!!fiction.rate?.display && (
+              <View style={{ marginTop: 8 }}>
+                <Rate
+                  iconName={user.notationIcon}
+                  value={fiction?.rate?.value ?? 0}
+                />
+              </View>
+            )}
           </Pressable>
         ))
       ) : searchTerm.trim() ? (

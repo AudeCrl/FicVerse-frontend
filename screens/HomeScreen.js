@@ -179,6 +179,7 @@ export default function HomeScreen({ navigation, route }) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "flex-start",
+          backgroundColor: currentTheme.primary + "80",
         },
         searchHeaderContent: {
           flex: 1,
