@@ -11,6 +11,7 @@ import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
 import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
 import ChosenStatus from "../components/manageFiction/ChosenStatus";
 import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
+import Rate from "../components/fiction/Rate";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -71,6 +72,24 @@ export default function ManageFictionScreen({ route, navigation }) {
       setFandomError(fandomEmpty);                                // Donc fandomError devient true si fandomName est vide cad non sélectionné
       return !(titleEmpty || fandomEmpty);                        // Retourne true si tout est OK
   }  
+  
+  const resetFields = () => {
+  setFandomName("");
+  setTitle("");
+  setLink("");
+  setAuthor("");
+  setLang("");
+  setSummary("");
+  setPersonalNotes("");
+  setNumberOfChapters("");
+  setNumberOfWords("");
+  setLastChapterRead(0);
+  setTagIds([]);
+  setReadingStatus("reading");
+  setStoryStatus("in-progress");
+  setTitleError(false);
+  setFandomError(false);
+};
 
   const createFiction = async () => {   // création d'une nouvelle fiction
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
@@ -108,6 +127,7 @@ export default function ManageFictionScreen({ route, navigation }) {
       }
     } catch (error) {
       console.error(error);
+      resetFields(); // vide tous les champs
       Alert.alert("Erreur", "Problème de connexion");
     }
   };
@@ -238,6 +258,8 @@ export default function ManageFictionScreen({ route, navigation }) {
         fictionId={fictionId}
         idTags={setTagIds} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
       />
+
+      <Rate iconName = "heart"/>
 
       <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
 
