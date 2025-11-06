@@ -9,8 +9,8 @@ import ChosenTitle from "../components/manageFiction/ChosenTitle";
 import ChosenLink from "../components/manageFiction/ChosenLink";
 import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
 import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
-import LastReadChapter from "../components/manageFiction/LastReadChapter";
 import ChosenStatus from "../components/manageFiction/ChosenStatus";
+import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -230,7 +230,7 @@ export default function ManageFictionScreen({ route, navigation }) {
 
       <ChosenStatus sectionLabel="Avancement de votre lecture" readingStatus={readingStatus} onPress={setReadingStatus}/>
 
-      <LastReadChapter value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
+      <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
 
       <ChosenStatus sectionLabel="Statut de publication de la fanfiction" storyStatus={storyStatus} onPress={setStoryStatus}/>
 

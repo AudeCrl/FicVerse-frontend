@@ -41,8 +41,11 @@ export const userSlice = createSlice({
         updateEmail: (state, action) => {
             state.value.email = action.payload;
         },
+        updateNotationIcon: (state, action) => {
+            state.value.notationIcon = action.payload;
+        },
     },
 });
 
-export const { login, logout, updateAvatar, updateUsername, updateEmail } = userSlice.actions;
+export const { login, logout, updateAvatar, updateUsername, updateEmail, updateNotationIcon } = userSlice.actions;
 export default userSlice.reducer;
