@@ -54,7 +54,6 @@ export const FictionActionsModal = ({
       borderTopRightRadius: 8,
       paddingVertical: 10,
       elevation: 10,
-      maxHeight: "80%",
     },
     header: {
       paddingHorizontal: 15,
@@ -69,8 +68,8 @@ export const FictionActionsModal = ({
     mainContent: {
       paddingVertical: 10,
       paddingHorizontal: 15,
-      maxHeight: "70%",
       overflow: "hidden",
+
     },
     // --- ACTIONS (Lignes) ---
     actionRow: {
@@ -94,6 +93,7 @@ export const FictionActionsModal = ({
       borderTopColor: currentTheme.inputBorder,
       borderBottomWidth: 1,
       borderBottomColor: currentTheme.inputBorder,
+
     },
     footerButton: {
       marginLeft: 30,
