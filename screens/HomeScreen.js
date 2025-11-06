@@ -169,7 +169,7 @@ export default function HomeScreen({ navigation, route }) {
         },
         tabs: {
           flex: 1,
-          paddingVertical: 10,
+          paddingTop: 10,
         },
         searchHeader: {
           paddingHorizontal: 16,
