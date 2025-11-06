@@ -1,35 +1,41 @@
-import React, { useState, useEffect } from "react";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
 import {
+  Image,
+  ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  TextInput,
   TouchableOpacity,
-  Image,
-  Modal,
-  ImageBackground,
+  View,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { typography } from "../styles/globalStyles";
 import { useDispatch, useSelector } from "react-redux";
-import { useTheme } from '../context/ThemeContext.js';
-import { logout, updateAvatar, updateUsername, updateEmail } from "../reducers/user";
-import Input from "../components/ui/Input"
-import * as ImagePicker from 'expo-image-picker'
+import SettingsCard from "../components/SettingsCard";
+import Input from "../components/ui/Input";
+import { useTheme } from "../context/ThemeContext.js";
+import {
+  logout,
+  updateAvatar,
+  updateEmail,
+  updateUsername,
+} from "../reducers/user";
+import { typography } from "../styles/globalStyles";
+import { chipsPreview } from "../utils/chipsFormatter";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 const formatDate = (dateString) => {
-  if (!dateString) return '';
+  if (!dateString) return "";
 
   const date = new Date(dateString);
 
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
-}
+};
 
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -41,7 +47,9 @@ export default function ProfileScreen({ navigation }) {
 
   const formattedDate = formatDate(user.createdAt);
 
-  const [avatarUri, setAvatarUri] = useState(user.avatar || require('../assets/avatar-default.png'));
+  const [avatarUri, setAvatarUri] = useState(
+    user.avatar || require("../assets/avatar-default.png")
+  );
 
   const [username, setUsername] = useState(user.username);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -61,195 +69,222 @@ export default function ProfileScreen({ navigation }) {
 
   const [isModalPasswordVisible, setIsModalPasswordVisible] = useState(false);
 
+  // Tags, Fandoms, Languages
+  const [userTags, setUserTags] = useState([]);
+  const [allTags, setAllTags] = useState([]);
+  const [userFandoms, setUserFandoms] = useState([]);
+  const [allFandoms, setAllFandoms] = useState([]);
+  const [userLanguages, setUserLanguages] = useState([]);
+  const [allLanguages, setAllLanguages] = useState([]);
+  const [userAuthors, setUserAuthors] = useState([]);
+  const [isLoadingTags, setIsLoadingTags] = useState(false);
+  const [isLoadingFandoms, setIsLoadingFandoms] = useState(false);
+  const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
+  const [isLoadingAuthors, setIsLoadingAuthors] = useState(false);
+
   useEffect(() => {
     if (user.username) {
-        setAvatarUri(user.avatar || require ('../assets/avatar-default.png'));
-        setUsername(user.username);
-        setCurrentEmail(user.email);
-        setIsEditingUsername(false); 
-        setIsEditingEmail(false);
-        setIsEditingPassword(false);
+      setAvatarUri(user.avatar || require("../assets/avatar-default.png"));
+      setUsername(user.username);
+      setCurrentEmail(user.email);
+      setIsEditingUsername(false);
+      setIsEditingEmail(false);
+      setIsEditingPassword(false);
+
+      // Charger les items
+      loadUserTags();
+      loadAllTags();
+      loadUserFandoms();
+      loadAllFandoms();
+      loadAllLanguages();
+      loadUserAuthors();
     } else {
-        setUsername('');
-        setCurrentEmail('');
-        setAvatarUri(require("../assets/avatar-default.png"));
+      setUsername("");
+      setCurrentEmail("");
+      setAvatarUri(require("../assets/avatar-default.png"));
     }
-    setDisplayedPassword('••••••••');
-    setNewPassword('');
+    setDisplayedPassword("••••••••");
+    setNewPassword("");
   }, [user]);
 
   const handleEditAvatar = async () => {
     console.log("Edit Avatar clicked");
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Désolé, nous avons besoin des autorisations de la galerie pour cela !');
+    if (status !== "granted") {
+      alert(
+        "Désolé, nous avons besoin des autorisations de la galerie pour cela !"
+      );
       return;
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      const { uri, mimeType, fileName } = result.assets[0];      
+      const { uri, mimeType, fileName } = result.assets[0];
       handleUploadAvatar(uri, mimeType, fileName);
     }
-    
   };
 
   const handleUploadAvatar = (uri, mimeType, fileName) => {
     const userToken = user.token;
     if (!userToken) {
-      return console.log('Invalid or missing user token');      
-    };
+      return console.log("Invalid or missing user token");
+    }
 
     const formData = new FormData();
 
-    formData.append('avatarFromFront', {
+    formData.append("avatarFromFront", {
       uri: uri,
-      name: fileName || 'avatar.jpg',
-      type: mimeType || 'image/jpeg',
+      name: fileName || "avatar.jpg",
+      type: mimeType || "image/jpeg",
     });
 
     fetch(`${API_IP}/user/upload`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Authorization': `Bearer ${userToken}`,
+        Authorization: `Bearer ${userToken}`,
         //Pas de 'Content-Type': 'application/json' avec un 'formData'
       },
       body: formData,
     })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.result) {
-        setAvatarUri(data.avatarUrl);
-        dispatch(updateAvatar(data.avatarUrl));
-
-      } else {
-        console.error('Upload failed:', data.error);
-        alert(`Echec de l'upload: ${data.error}`);        
-      }      
-    })
-    .catch((error) => {
-      console.error('Network error during upload', error);
-      alert('Erreur réseau lors de l\'envoi de l\'avatar.');      
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          setAvatarUri(data.avatarUrl);
+          dispatch(updateAvatar(data.avatarUrl));
+        } else {
+          console.error("Upload failed:", data.error);
+          alert(`Echec de l'upload: ${data.error}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Network error during upload", error);
+        alert("Erreur réseau lors de l'envoi de l'avatar.");
+      });
   };
 
   const handleEditUsername = () => {
-    console.log("Edit Username clicked");    
+    console.log("Edit Username clicked");
 
-    const token = user.token
+    const token = user.token;
 
     if (!isEditingUsername) {
       setIsEditingUsername(true);
     } else if (isEditingUsername) {
       if (!user.token) {
-        console.error('Erreur: Token utilisateur manquant.');
-        alert('Erreur: Token manquant.');
-        return;        
-    }
-    setTempUsername(tempUsername.trim())
-
-    if (tempUsername === '' || tempUsername === username) {
-      setIsEditingUsername(false);
-      setTempUsername('');
-      return;
-    }
-
-    fetch(`${API_IP}/user/username`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ username: tempUsername})
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.result) {
-        setUsername(data.username);
-        dispatch(updateUsername(data.username));
-        setIsEditingUsername(false);
-        setTempUsername('');
-        alert('Nom d\'utilisateur mis à jour');
-      } else {
-        alert (`Echec de la mise à jour: ${data.error}`);
-        setIsEditingUsername(false);
+        console.error("Erreur: Token utilisateur manquant.");
+        alert("Erreur: Token manquant.");
+        return;
       }
-    })
-    .catch(error => {
-      console.error('Erreur réseau lors de la mise à jour du username:', error);
-      alert('Erreur réseau lors de la mise à jour.');
-      setIsEditingUsername(false);      
-    })
+      setTempUsername(tempUsername.trim());
+
+      if (tempUsername === "" || tempUsername === username) {
+        setIsEditingUsername(false);
+        setTempUsername("");
+        return;
+      }
+
+      fetch(`${API_IP}/user/username`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username: tempUsername }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.result) {
+            setUsername(data.username);
+            dispatch(updateUsername(data.username));
+            setIsEditingUsername(false);
+            setTempUsername("");
+            alert("Nom d'utilisateur mis à jour");
+          } else {
+            alert(`Echec de la mise à jour: ${data.error}`);
+            setIsEditingUsername(false);
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Erreur réseau lors de la mise à jour du username:",
+            error
+          );
+          alert("Erreur réseau lors de la mise à jour.");
+          setIsEditingUsername(false);
+        });
     }
   };
 
   const handleEditEmail = () => {
     console.log("Edit Email clicked");
 
-    const token = user.token
+    const token = user.token;
 
     if (!isEditingEmail) {
       setIsEditingEmail(true);
     } else if (isEditingEmail) {
       if (!user.token) {
-        console.error('Erreur: Token utilisateur manquant.');
-        alert('Erreur: Token manquant.');
-        return;        
-    }
-    setTempEmail(tempEmail.trim())
-
-    if (tempEmail === '' || tempEmail === currentEmail) {
-      setIsEditingEmail(false);
-      setTempEmail('');
-      return;
-    }
-
-    fetch(`${API_IP}/user/email`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ email: tempEmail})
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.result) {
-        setCurrentEmail(data.email);
-        dispatch(updateEmail(data.email));
-        setIsEditingEmail(false);
-        setTempEmail('');
-        alert('Email mis à jour');
-      } else {
-        alert (`Echec de la mise à jour: ${data.error}`);
-        setIsEditingEmail(false);
+        console.error("Erreur: Token utilisateur manquant.");
+        alert("Erreur: Token manquant.");
+        return;
       }
-    })
-    .catch(error => {
-      console.error('Erreur réseau lors de la mise à jour de l\'adresse email:', error);
-      alert('Erreur réseau lors de la mise à jour.');
-      setIsEditingEmail(false);      
-    })
+      setTempEmail(tempEmail.trim());
+
+      if (tempEmail === "" || tempEmail === currentEmail) {
+        setIsEditingEmail(false);
+        setTempEmail("");
+        return;
+      }
+
+      fetch(`${API_IP}/user/email`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: tempEmail }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.result) {
+            setCurrentEmail(data.email);
+            dispatch(updateEmail(data.email));
+            setIsEditingEmail(false);
+            setTempEmail("");
+            alert("Email mis à jour");
+          } else {
+            alert(`Echec de la mise à jour: ${data.error}`);
+            setIsEditingEmail(false);
+          }
+        })
+        .catch((error) => {
+          console.error(
+            "Erreur réseau lors de la mise à jour de l'adresse email:",
+            error
+          );
+          alert("Erreur réseau lors de la mise à jour.");
+          setIsEditingEmail(false);
+        });
     }
   };
 
   const handleEditPassword = () => {
     console.log("Edit Password clicked");
-    
+
     const token = user.token;
 
     if (!isEditingPassword) {
-      setIsEditingPassword(true)
-    } else if (isEditingPassword) {      
-      if (newPassword === '') {
+      setIsEditingPassword(true);
+    } else if (isEditingPassword) {
+      if (newPassword === "") {
         setIsEditingPassword(false);
-        setNewPassword('');
+        setNewPassword("");
         return;
       }
 
@@ -258,40 +293,301 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const fetchNewPassword = () => {
-
     const token = user.token;
 
     if (!user.token) {
-        console.error('Erreur: Token utilisateur manquant.');
-        alert('Erreur: Token manquant.');
-        return;        
-      }
+      console.error("Erreur: Token utilisateur manquant.");
+      alert("Erreur: Token manquant.");
+      return;
+    }
 
     fetch(`${API_IP}/user/password`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword})
+      body: JSON.stringify({
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      }),
     })
-    .then(res => res.json())
-    .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.result) {
+          setIsEditingPassword(false);
+          setNewPassword("");
+          alert("Changement du mot de passe effectué");
+        } else {
+          alert(`Echec de la mise à jour du mot de passe: ${data.error}`);
+          setIsEditingPassword(false);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur réseau lors de la mise à jour du mot de passe :",
+          error
+        );
+        alert("Erreur réseau lors de la mise à jour.");
+        setIsEditingPassword(false);
+      });
+  };
+
+  // ====== TAGS ======
+  const loadUserTags = async () => {
+    try {
+      const response = await fetch(`${API_IP}/tag`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
       if (data.result) {
-        setIsEditingPassword(false);
-        setNewPassword('');
-        alert('Changement du mot de passe effectué')
-      } else {
-        alert(`Echec de la mise à jour du mot de passe: ${data.error}`);
-        setIsEditingPassword(false);
+        const normalizedTags = (data.tags || []).map((tag) => ({
+          ...tag,
+          id: tag._id || tag.id,
+        }));
+        setUserTags(normalizedTags);
       }
-    })
-    .catch(error => {
-      console.error('Erreur réseau lors de la mise à jour du mot de passe :', error);
-      alert('Erreur réseau lors de la mise à jour.');
-      setIsEditingPassword(false);
-    })
-  }
+    } catch (error) {
+      console.error("Erreur chargement tags:", error);
+    }
+  };
+
+  const loadAllTags = async () => {
+    try {
+      const response = await fetch(`${API_IP}/tag/all`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      if (data.result) {
+        const normalizedTags = (data.tags || []).map((tag) => ({
+          ...tag,
+          id: tag._id || tag.id,
+        }));
+        setAllTags(normalizedTags);
+      }
+    } catch (error) {
+      console.error("Erreur chargement tous les tags:", error);
+    }
+  };
+
+  const handleAddTag = async (tag) => {
+    setIsLoadingTags(true);
+    try {
+      if (!userTags.find((t) => t.id === tag.id)) {
+        setUserTags([...userTags, tag]);
+      }
+    } catch (error) {
+      console.error("Erreur ajout tag:", error);
+    } finally {
+      setIsLoadingTags(false);
+    }
+  };
+
+  const handleRemoveTag = async (tag, action = "delete") => {
+    setIsLoadingTags(true);
+    try {
+      const deleteEndpoint = `${API_IP}/tag/${tag.id}${
+        action === "detach" ? "?detach=true" : "?force=true"
+      }`;
+
+      const response = await fetch(deleteEndpoint, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        setUserTags(userTags.filter((t) => t.id !== tag.id));
+        alert(
+          action === "detach"
+            ? `Tag retiré de ${data.detachedFromCount} fanfiction(s) et supprimé`
+            : "Tag supprimé avec succès"
+        );
+      } else {
+        alert(`Erreur: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Erreur suppression tag:", error);
+      alert("Erreur lors de la suppression du tag");
+    } finally {
+      setIsLoadingTags(false);
+    }
+  };
+
+  const getTagUsageCount = async (tagId) => {
+    try {
+      const response = await fetch(`${API_IP}/tag/${tagId}/usage-count`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      return data.usageCount || 0;
+    } catch (error) {
+      console.error("Erreur récupération usage count:", error);
+      return 0;
+    }
+  };
+
+  // ====== FANDOMS ======
+  const loadUserFandoms = async () => {
+    try {
+      const response = await fetch(`${API_IP}/fandom/user`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      if (data.result) {
+        const normalizedFandoms = (data.fandoms || []).map((fandom) => ({
+          ...fandom,
+          id: fandom._id || fandom.id,
+        }));
+        setUserFandoms(normalizedFandoms);
+      }
+    } catch (error) {
+      console.error("Erreur chargement fandoms:", error);
+    }
+  };
+
+  const loadAllFandoms = async () => {
+    try {
+      const response = await fetch(`${API_IP}/fandom`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      if (data.result) {
+        const normalizedFandoms = (data.fandoms || []).map((fandom) => ({
+          ...fandom,
+          id: fandom._id || fandom.id,
+        }));
+        setAllFandoms(normalizedFandoms);
+      }
+    } catch (error) {
+      console.error("Erreur chargement tous les fandoms:", error);
+    }
+  };
+
+  const handleAddFandom = async (fandom) => {
+    setIsLoadingFandoms(true);
+    try {
+      if (!userFandoms.find((f) => f.id === fandom.id)) {
+        setUserFandoms([...userFandoms, fandom]);
+      }
+    } catch (error) {
+      console.error("Erreur ajout fandom:", error);
+    } finally {
+      setIsLoadingFandoms(false);
+    }
+  };
+
+  const handleRemoveFandom = async (fandom, action = "delete") => {
+    setIsLoadingFandoms(true);
+    try {
+      const deleteEndpoint = `${API_IP}/fandom/${fandom.id}${
+        action === "detach" ? "?detach=true" : "?force=true"
+      }`;
+
+      const response = await fetch(deleteEndpoint, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      const data = await response.json();
+
+      if (data.result) {
+        setUserFandoms(userFandoms.filter((f) => f.id !== fandom.id));
+        alert(
+          action === "detach"
+            ? `Fandom retiré de ${data.detachedFromCount} fanfiction(s) et supprimé`
+            : "Fandom supprimé avec succès"
+        );
+      } else {
+        alert(`Erreur: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Erreur suppression fandom:", error);
+      alert("Erreur lors de la suppression du fandom");
+    } finally {
+      setIsLoadingFandoms(false);
+    }
+  };
+
+  const getFandomUsageCount = async (fandomId) => {
+    try {
+      const response = await fetch(`${API_IP}/fandom/${fandomId}/usage-count`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await response.json();
+      return data.usageCount || 0;
+    } catch (error) {
+      console.error("Erreur récupération usage count:", error);
+      return 0;
+    }
+  };
+
+  // ====== LANGUAGES ======
+  const loadAllLanguages = async () => {
+    try {
+      setAllLanguages([
+        { id: "lang-1", name: "Français" },
+        { id: "lang-2", name: "Anglais" },
+        { id: "lang-3", name: "Espagnol" },
+        { id: "lang-4", name: "Allemand" },
+        { id: "lang-5", name: "Italien" },
+      ]);
+    } catch (error) {
+      console.error("Erreur chargement langues:", error);
+    }
+  };
+
+  const handleAddLanguage = async (language) => {
+    setIsLoadingLanguages(true);
+    try {
+      if (!userLanguages.find((l) => l.id === language.id)) {
+        setUserLanguages([...userLanguages, language]);
+      }
+    } catch (error) {
+      console.error("Erreur ajout langue:", error);
+    } finally {
+      setIsLoadingLanguages(false);
+    }
+  };
+
+  const handleRemoveLanguage = async (language) => {
+    setIsLoadingLanguages(true);
+    try {
+      setUserLanguages(userLanguages.filter((l) => l.id !== language.id));
+      alert("Langue supprimée");
+    } catch (error) {
+      console.error("Erreur suppression langue:", error);
+    } finally {
+      setIsLoadingLanguages(false);
+    }
+  };
+
+  const getLanguageUsageCount = async () => {
+    return 0;
+  };
+
+  // ====== AUTHORS ======
+  const loadUserAuthors = async () => {
+    try {
+      setIsLoadingAuthors(true);
+      // TODO: Remplacer par l'appel API réel quand disponible
+      // const response = await fetch(`${API_IP}/author`, {
+      //   headers: { Authorization: `Bearer ${user.token}` },
+      // });
+      // const data = await response.json();
+      // if (data.result) {
+      //   setUserAuthors(data.authors || []);
+      // }
+
+      // Pour maintenant, on simule avec des données vides
+      setUserAuthors([]);
+    } catch (error) {
+      console.error("Erreur chargement auteurs:", error);
+    } finally {
+      setIsLoadingAuthors(false);
+    }
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -300,9 +596,9 @@ export default function ProfileScreen({ navigation }) {
 
   const handleRemoveAccount = () => {
     if (!user.token) {
-        console.error('Erreur: Token utilisateur manquant.');
-        alert('Erreur: Token manquant.');
-        return;        
+      console.error("Erreur: Token utilisateur manquant.");
+      alert("Erreur: Token manquant.");
+      return;
     }
     setIsModalVisible(true);
   };
@@ -350,278 +646,441 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-        <View style={styles.profileHeader}>
-            <ImageBackground 
-                source={currentTheme.headerBackground}
-                style={styles.backgroundImage}
-            />
-            <View style={styles.avatarContainer}>
-                <Image
-                    style={styles.avatarImage}
-                    source={typeof avatarUri === 'string' ? { uri: avatarUri} : avatarUri}
-                />
-                <TouchableOpacity onPress={handleEditAvatar} style={styles.editAvatarButton}>
-                    <Feather name='edit' size={24} color="white" /> 
-                </TouchableOpacity>
-            </View>
+      <View style={styles.profileHeader}>
+        <ImageBackground
+          source={currentTheme.headerBackground}
+          style={styles.backgroundImage}
+        />
+        <View style={styles.avatarContainer}>
+          <Image
+            style={styles.avatarImage}
+            source={
+              typeof avatarUri === "string" ? { uri: avatarUri } : avatarUri
+            }
+          />
+          <TouchableOpacity
+            onPress={handleEditAvatar}
+            style={styles.editAvatarButton}
+          >
+            <Feather name="edit" size={24} color="white" />
+          </TouchableOpacity>
         </View>
+      </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.mainContainer}>
-            <View style={styles.usernameEmailWrapper}>
-                <View style={styles.usernameContainer}>
-                    <Input
-                        style={styles.inputUsername}
-                        value={isEditingUsername ? tempUsername : username}
-                        onChangeText={setTempUsername}
-                        editable={isEditingUsername}
-                        placeholder={isEditingUsername ? username : null}
-                    />
-                    <TouchableOpacity onPress={handleEditUsername}>
-                        <Feather name={isEditingUsername ? 'check' : 'edit'} size={24} color="black" />
-                    </TouchableOpacity>
-                    {isEditingUsername && (
-                        <TouchableOpacity onPress={() => setIsEditingUsername(false)}>
-                            <Ionicons name= 'close-circle-outline' size={24} color='grey' />
-                        </TouchableOpacity>
-                    )}
-                    <Text style={styles.memberSinceText}>Membre FicVerse depuis le {formattedDate}</Text>
-                </View>
-
-                <View style={styles.sectionSeparator} /> 
-
-                <View style={styles.emailContainer}>
-                    <Text style={styles.label}>Votre mail :</Text>
-                    <Input
-                        style={styles.inputEmail}
-                        value={isEditingEmail ? tempEmail : currentEmail}
-                        onChangeText={setTempEmail}
-                        editable={isEditingEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        placeholder={isEditingEmail ? currentEmail : null}
-                    />
-                    <TouchableOpacity onPress={handleEditEmail}>
-                        <Feather name={isEditingEmail ? 'check' : 'edit'} size={24} color="black" />
-                    </TouchableOpacity>
-                    {isEditingEmail && (
-                        <TouchableOpacity onPress={() => setIsEditingEmail(false)}>
-                            <Ionicons name="close-circle-outline" size={24} color="grey" />
-                        </TouchableOpacity>
-                    )}
-                </View>
-
-                <View style={styles.sectionSeparator} /> 
-
-                <View style={styles.passwordContainer}>
-                    <Text style={styles.label}>Mot de passe :</Text>
-                    <Input
-                        style={styles.inputPassword}
-                        value={displayedPassword}
-                        onChangeText={setNewPassword}
-                        editable={isEditingPassword}
-                        secureTextEntry={isEditingPassword}
-                    />
-                    <TouchableOpacity onPress={handleEditPassword}>
-                        <Feather name="edit" size={24} color="black" />
-                    </TouchableOpacity>
-                    {isEditingPassword && (
-                        <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
-                            <Ionicons name="close-circle-outline" size={24} color="grey" />
-                        </TouchableOpacity>
-                    )}
-                </View>
+          <View style={styles.usernameEmailWrapper}>
+            <View style={styles.usernameContainer}>
+              <Input
+                style={styles.inputUsername}
+                value={isEditingUsername ? tempUsername : username}
+                onChangeText={setTempUsername}
+                editable={isEditingUsername}
+                placeholder={isEditingUsername ? username : null}
+              />
+              <TouchableOpacity onPress={handleEditUsername}>
+                <Feather
+                  name={isEditingUsername ? "check" : "edit"}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              {isEditingUsername && (
+                <TouchableOpacity onPress={() => setIsEditingUsername(false)}>
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={24}
+                    color="grey"
+                  />
+                </TouchableOpacity>
+              )}
+              <Text style={styles.memberSinceText}>
+                Membre FicVerse depuis le {formattedDate}
+              </Text>
             </View>
-            
-            <View style={styles.settingsSection}>
-                <View style={styles.themeContainer}>
-                    <Text>Thème de l'interface</Text>
-                </View>
-                <View style={styles.ttagsContainer}>
-                    <Text>Gestion des tags</Text>
-                </View>
-                <View style={styles.languageContainer}>
-                    <Text>Gestion des langue</Text>
-                </View>
-                <View style={styles.likeContainer}>
-                    <Text>Gestion de l'icone de like</Text>
-                </View>
-            </View>
-        </View>
 
-        <View style={styles.manageAccountContainer}>
-            <TouchableOpacity onPress={handleLogout}>
-                <Text style={styles.logout}>Se déconnecter</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleRemoveAccount}>
-                <Text style={styles.removeAccount}>Supprimer le compte</Text>
-            </TouchableOpacity>
+            <View style={styles.sectionSeparator} />
+
+            <View style={styles.emailContainer}>
+              <Text style={styles.label}>Votre mail :</Text>
+              <Input
+                style={styles.inputEmail}
+                value={isEditingEmail ? tempEmail : currentEmail}
+                onChangeText={setTempEmail}
+                editable={isEditingEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholder={isEditingEmail ? currentEmail : null}
+              />
+              <TouchableOpacity onPress={handleEditEmail}>
+                <Feather
+                  name={isEditingEmail ? "check" : "edit"}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              {isEditingEmail && (
+                <TouchableOpacity onPress={() => setIsEditingEmail(false)}>
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={24}
+                    color="grey"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.sectionSeparator} />
+
+            <View style={styles.passwordContainer}>
+              <Text style={styles.label}>Mot de passe :</Text>
+              <Input
+                style={styles.inputPassword}
+                value={displayedPassword}
+                onChangeText={setNewPassword}
+                editable={isEditingPassword}
+                secureTextEntry={isEditingPassword}
+              />
+              <TouchableOpacity onPress={handleEditPassword}>
+                <Feather name="edit" size={24} color="black" />
+              </TouchableOpacity>
+              {isEditingPassword && (
+                <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
+                  <Ionicons
+                    name="close-circle-outline"
+                    size={24}
+                    color="grey"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.settingsSection}>
+            {/* Thème */}
+            <SettingsCard
+              title="Thème de l'interface"
+              icon="palette-outline"
+              onPress={() => navigation.navigate("Theme")}
+              testID="settings-theme"
+              isEmpty
+            />
+
+            {/* Tags */}
+            <SettingsCard
+              title="Mes tags"
+              count={userTags.length}
+              chips={chipsPreview(
+                userTags.map((t) => t.name),
+                3
+              )}
+              onPress={() => navigation.navigate("TagsManager")}
+              testID="settings-tags"
+              isEmpty={userTags.length === 0}
+            />
+
+            {/* Fandoms */}
+            <SettingsCard
+              title="Mes fandoms"
+              count={userFandoms.length}
+              chips={chipsPreview(
+                userFandoms.map((f) => f.name),
+                3
+              )}
+              onPress={() => navigation.navigate("FandomsManager")}
+              testID="settings-fandoms"
+              isEmpty={userFandoms.length === 0}
+            />
+
+            {/* Langues */}
+            <SettingsCard
+              title="Mes langues"
+              count={userLanguages.length}
+              chips={chipsPreview(
+                userLanguages.map((l) => l.name),
+                3
+              )}
+              onPress={() => navigation.navigate("LanguagesManager")}
+              testID="settings-languages"
+              isEmpty={userLanguages.length === 0}
+            />
+
+            {/* Auteurs */}
+            <SettingsCard
+              title="Mes auteurs"
+              count={userAuthors.length}
+              chips={chipsPreview(
+                userAuthors.map((a) => a.name || a.username),
+                3
+              )}
+              onPress={() => navigation.navigate("AuthorsManager")}
+              testID="settings-authors"
+              isEmpty={userAuthors.length === 0}
+            />
+          </View>
         </View>
+      </ScrollView>
+
+      <View style={styles.manageAccountContainer}>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.logout}>Se déconnecter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleRemoveAccount}>
+          <Text style={styles.removeAccount}>Supprimer le compte</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#f4fcfff8",
-    },
-    
-    // ----------------------------------------------------
-    // --- 1. EN-TÊTE (Background 30%) ---
-    profileHeader: {
-        flex: 0.3, // 30% de la hauteur de l'écran
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'flex-end', // Aligne l'avatar en bas du conteneur
-        position: 'relative', // Point de référence pour l'avatar positionné en absolu
-        zIndex: 1, 
-    },
-    backgroundImage: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#f4fcfff8",
+  },
 
-    // --- AVATAR (Chevauchement) ---
-    avatarContainer: {
-        width: 120, // Taille de l'avatar (ajustée)
-        height: 120, 
-        borderRadius: 60,
-        borderWidth: 4,
-        borderColor: 'white', // Contour blanc pour l'effet de chevauchement
-        position: 'absolute', // Positionnement absolu dans profileHeader
-        bottom: -60, // Déplace l'avatar de la moitié de sa hauteur (120/2) vers le bas
-        zIndex: 10,
-        // Enlevez 'overflow: hidden' pour le conteneur, sinon l'Image pourrait être coupée 
-        // L'Image elle-même doit avoir le borderRadius
-    },
-    avatarImage: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 60, // Doit correspondre à la moitié de la largeur/hauteur de avatarContainer
-    },
-    editAvatarButton: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)', // Fond semi-transparent pour le bouton d'édition
-        borderRadius: 12,
-        padding: 4,
-    },
-    
-    // ----------------------------------------------------
-    // --- 2. CONTENU PRINCIPAL (70% du bas) ---
-    mainContainer: {
-        flex: 0.6, // Le reste de l'espace (70%)
-        width: '100%',
-        paddingTop: 70, // Espace pour l'avatar qui chevauche (un peu plus que 60)
-        paddingHorizontal: 20,
-        backgroundColor: '#f4fcfff8', // Couleur de fond
-    },
-    
-    // Conteneur pour grouper username/email/password
-    usernameEmailWrapper: {
-        // Optionnel : ajouter un fond blanc et une ombre pour le grouper visuellement
-        // backgroundColor: '#fff',
-        // borderRadius: 10,
-        paddingHorizontal: 5,
-        marginBottom: 20,
-    },
-    
-    // Styles pour les éléments internes
-    usernameContainer: {
-        alignItems: 'center', // Centre le nom d'utilisateur et la date
-        marginBottom: 10,
-    },
-    memberSinceText: {
-        marginTop: 5,
-        fontSize: 12,
-        color: 'grey',
-    },
-    
-    // Ligne de séparation entre les sections
-    sectionSeparator: {
-        height: 1,
-        backgroundColor: '#eee',
-        marginVertical: 10,
-    },
-    
-    // Conteneurs des champs d'édition (mis à jour pour être alignés)
-    label: {
-        fontWeight: 'bold', 
-        minWidth: 100, // Assure une largeur minimale pour les labels
-    },
-    emailContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 5,
-    },
-    passwordContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 5,
-    },
+  scrollView: {
+    flex: 1,
+  },
 
-    // Styles d'inputs (assurez-vous d'ajouter `flex: 1` pour qu'ils prennent l'espace)
-    inputUsername: { 
-        ...typography.input, 
-        textAlign: 'center',
-        borderWidth: 0, // Enlever la bordure si vous voulez juste afficher le nom
-        paddingHorizontal: 0,
-    }, 
-    inputEmail: { ...typography.input, flex: 1, marginRight: 10 },
-    inputPassword: { ...typography.input, flex: 1, marginRight: 10 },
-    
-    // Conteneurs des autres paramètres
-    settingsSection: {
-        // Ajoutez des styles ici pour vos autres sections si nécessaire
-        paddingHorizontal: 5,
-        marginBottom: 20,
-    },
+  scrollContent: {
+    paddingBottom: 120,
+  },
 
-    // ----------------------------------------------------
-    // --- 3. FOOTER ---
-    manageAccountContainer: {
-        // Supprime l'alignement centré sur l'écran et utilise un padding pour le remonter
-        width: "100%",
-        paddingVertical: 30, // Plus de padding pour remonter le bloc
-        alignItems: "center",
-        justifyContent: "space-around",
-        backgroundColor: '#f4fcfff8', // S'assurer que le fond est le même que la page
-    },
-    logout: {
-        // Styles d'origine :
-        ...typography.button,
-        backgroundColor: "#ffffff01",
-        borderColor: "#7474743d",
-        borderWidth: 2,
-        borderRadius: 10,
-        width: 250,
-        height: 35,
-        textAlign: "center",
-        lineHeight: 30,
-        color: "#333333ff",
-        marginBottom: 10, // Ajouter un petit espacement entre les deux boutons
-    },
-    removeAccount: {
-        // Styles d'origine :
-        ...typography.button,
-        backgroundColor: "#d64d48f6",
-        borderColor: "#7474743d",
-        borderWidth: 2,
-        borderRadius: 10,
-        width: 250,
-        height: 35,
-        textAlign: "center",
-        lineHeight: 30,
-        color: "white",
-    },
+  // ----------------------------------------------------
+  // --- 1. EN-TÊTE (Background 30%) ---
+  profileHeader: {
+    width: "100%",
+    height: 200, // Hauteur fixe pour le header
+    alignItems: "center",
+    justifyContent: "flex-end", // Aligne l'avatar en bas du conteneur
+    position: "relative", // Point de référence pour l'avatar positionné en absolu
+    zIndex: 1,
+  },
+  backgroundImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
 
-    // Ajoutez ici les styles pour vos Modals (isModalVisible et isModalPasswordVisible)
+  // --- AVATAR (Chevauchement) ---
+  avatarContainer: {
+    width: 120, // Taille de l'avatar (ajustée)
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: "white", // Contour blanc pour l'effet de chevauchement
+    position: "absolute", // Positionnement absolu dans profileHeader
+    bottom: -60, // Déplace l'avatar de la moitié de sa hauteur (120/2) vers le bas
+    zIndex: 10,
+    // Enlevez 'overflow: hidden' pour le conteneur, sinon l'Image pourrait être coupée
+    // L'Image elle-même doit avoir le borderRadius
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 60, // Doit correspondre à la moitié de la largeur/hauteur de avatarContainer
+  },
+  editAvatarButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.5)", // Fond semi-transparent pour le bouton d'édition
+    borderRadius: 12,
+    padding: 4,
+  },
+
+  // ----------------------------------------------------
+  // --- 2. CONTENU PRINCIPAL (70% du bas) ---
+  mainContainer: {
+    width: "100%",
+    paddingTop: 70,
+    paddingHorizontal: 16,
+    backgroundColor: "#f4fcfff8",
+  },
+
+  // Conteneur pour grouper username/email/password
+  usernameEmailWrapper: {
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(229, 231, 235, 0.5)",
+  },
+
+  // Styles pour les éléments internes
+  usernameContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+    flexDirection: "column",
+    gap: 8,
+  },
+  memberSinceText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: "#9CA3AF",
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+
+  // Ligne de séparation entre les sections
+  sectionSeparator: {
+    height: 1,
+    backgroundColor: "#E5E7EB",
+    marginVertical: 12,
+  },
+
+  // Conteneurs des champs d'édition (mis à jour pour être alignés)
+  label: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: "#1F2937",
+    minWidth: 100,
+  },
+  emailContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    gap: 8,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    gap: 8,
+  },
+
+  // Styles d'inputs (assurez-vous d'ajouter `flex: 1` pour qu'ils prennent l'espace)
+  inputUsername: {
+    ...typography.input,
+    textAlign: "center",
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  inputEmail: {
+    ...typography.input,
+    flex: 1,
+    marginRight: 8,
+    fontSize: 14,
+  },
+  inputPassword: {
+    ...typography.input,
+    flex: 1,
+    marginRight: 8,
+    fontSize: 14,
+  },
+
+  // Conteneurs des autres paramètres
+  settingsSection: {
+    paddingHorizontal: 0,
+    marginBottom: 20,
+    marginTop: 20,
+  },
+
+  themeContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  ttagsContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  fandomContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  languageContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  likeContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  // ----------------------------------------------------
+  // --- 3. FOOTER ---
+  manageAccountContainer: {
+    width: "100%",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f4fcfff8",
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    gap: 10,
+  },
+  logout: {
+    ...typography.button,
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E5E7EB",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    textAlign: "center",
+    color: "#374151",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  removeAccount: {
+    ...typography.button,
+    width: "100%",
+    backgroundColor: "#DC2626",
+    borderColor: "#DC2626",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    textAlign: "center",
+    color: "white",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  // Ajoutez ici les styles pour vos Modals (isModalVisible et isModalPasswordVisible)
 });
