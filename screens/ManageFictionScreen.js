@@ -9,7 +9,7 @@ import ChosenTitle from "../components/manageFiction/ChosenTitle";
 import ChosenLink from "../components/manageFiction/ChosenLink";
 import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
 import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
-import LastReadChapter from "../components/manageFiction/LastReadChapter"; 
+import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -51,7 +51,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           setPersonalNotes(data.fiction.personalNotes);
           setNumberOfChapters(String(data.fiction.numberOfChapters));  // Quand la réponse du back est parsée (res.json), numberOfChapters redevient un nombre. Or, dans le front numberOfChapters correspond à textInput et doit être en string
           setNumberOfWords(String(data.fiction.numberOfWords));
-          setLastChapterRead(Number(data.fiction.lastReadChapter));
+          setLastChapterRead(Number(data.fiction.lastChapterRead));
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
@@ -190,7 +190,7 @@ export default function ManageFictionScreen({ route, navigation }) {
         </View>
       </View>
 
-      <LastReadChapter value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
+      <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
 
       <ChosenTag       // Tags : tout est géré par ChosenTag, on récupère juste les ids
         fictionId={fictionId}
