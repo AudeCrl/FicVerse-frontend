@@ -1,12 +1,19 @@
-import { View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { TouchableOpacity, View } from "react-native";
 import Tag from "./Tag";
 
-export default function Tags({ tags, withCross, navigation, allFictions, pressTag }) {
-
+export default function Tags({
+  tags,
+  withCross,
+  navigation,
+  allFictions,
+  pressTag,
+  onAddTagPress,
+  theme,
+}) {
   const handleTagPress = (tag) => {
-
-    if (pressTag) { 
-       return pressTag(tag);
+    if (pressTag) {
+      return pressTag(tag);
     }
 
     if (navigation && allFictions) {
@@ -26,8 +33,9 @@ export default function Tags({ tags, withCross, navigation, allFictions, pressTa
     <View
       style={{
         flexDirection: "row",
-        alignItems: "top",
+        alignItems: "center",
         flexWrap: "wrap",
+        gap: 8,
       }}
     >
       {tags &&
@@ -42,6 +50,24 @@ export default function Tags({ tags, withCross, navigation, allFictions, pressTa
             onPress={handleTagPress}
           />
         ))}
+
+      {/* Bouton "+" pour ajouter des tags */}
+      {withCross && onAddTagPress && (
+        <TouchableOpacity
+          onPress={onAddTagPress}
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: theme?.primary || "#7C5CFF",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 4,
+          }}
+        >
+          <Ionicons name="add" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
