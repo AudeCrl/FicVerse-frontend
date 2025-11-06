@@ -28,7 +28,6 @@ export default function ChosenStatus({
     const styles = useMemo(() =>
         StyleSheet.create({
             statusSectionContainer: {
-                marginBottom: 10,
             },
             sectionLabel: {
                 ...typography.body,
@@ -44,25 +43,31 @@ export default function ChosenStatus({
 
     return (
         <View style={styles.statusSectionContainer}>
-            {!!sectionLabel && <Text style={styles.sectionLabel}>{sectionLabel}</Text>}
+            
+            {!!sectionLabel && 
+                <Text style={styles.sectionLabel}>{sectionLabel}</Text>}
+            
             <View style={styles.statusContainer}>
-            {!!readingStatus && readingStatusList.map((r) => (
-                <RoundedButton 
-                    key={r.id} 
-                    label={r.label} 
-                    active={r.id === readingStatus} 
-                    onPress={() => onPress?.(r.id)}
-                    style={{marginRight: 14}}
-                />
-            ))}
-            {!!storyStatus && storyStatusList.map((r) => (
-                <RoundedButton 
-                    key={r.id} 
-                    label={r.label} 
-                    active={r.id === storyStatus} 
-                    onPress={() => onPress?.(r.id)}
-                />
-            ))}
+            
+                {!!readingStatus && readingStatusList.map((r) => (
+                    <RoundedButton 
+                        key={r.id} 
+                        label={r.label} 
+                        active={r.id === readingStatus} 
+                        onPress={() => onPress?.(r.id)}
+                        style={{marginRight: 14}}
+                    />
+                ))}
+
+                {!!storyStatus && storyStatusList.map((r) => (
+                    <RoundedButton 
+                        key={r.id} 
+                        label={r.label} 
+                        active={r.id === storyStatus} 
+                        onPress={() => onPress?.(r.id)}
+                    />
+                ))}
+
             </View>
         </View>
     );
