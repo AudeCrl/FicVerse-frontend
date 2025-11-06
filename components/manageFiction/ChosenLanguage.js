@@ -72,7 +72,7 @@ export default function ChosenLanguage({ value, onChange }) {
           />
         ))}
 
-        <RoundedButton label="＋" onPress={() => setCreationLang(true)} />      {/* Bouton + pour ajouter une langue */}
+        <RoundedButton label="＋" onPress={() => setCreationLang(true)} />{/* Bouton + pour ajouter une langue */}
       </ScrollView>
 
       {creationLang && (      // Zone de création

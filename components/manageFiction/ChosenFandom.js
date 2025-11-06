@@ -107,7 +107,7 @@ Le fetch /fiction/:id part tout de suite au 1er render, mais il revient après (
           />
         ))}
 
-        <RoundedButton label="＋" onPress={() => setShowCreator(true)} />        {/* bouton "+" et quand j'appuie dessus, l'input en dessous apparaît pour créer le nouveau fandom */}
+        <RoundedButton label="＋" onPress={() => setShowCreator(true)} />{/* bouton "+" et quand j'appuie dessus, l'input en dessous apparaît pour créer le nouveau fandom */}
       </ScrollView>
 
       {showCreator && (     // input pour créer le nouveau fandom

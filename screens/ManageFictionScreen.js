@@ -230,7 +230,7 @@ export default function ManageFictionScreen({ route, navigation }) {
 
       <ChosenStatus sectionLabel="Avancement de votre lecture" readingStatus={readingStatus} onPress={setReadingStatus}/>
 
-      <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
+      <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />{/* Dernier chapitre lu : Input + boutons +/- */}
 
       <ChosenStatus sectionLabel="Statut de publication de la fanfiction" storyStatus={storyStatus} onPress={setStoryStatus}/>
 
@@ -239,7 +239,7 @@ export default function ManageFictionScreen({ route, navigation }) {
         idTags={setTagIds} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
       />
 
-      <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />   {/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
+      <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
 
       <View><Text>Je n'existe que pour monter le dernier bouton</Text></View>
 
