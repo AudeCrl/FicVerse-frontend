@@ -7,11 +7,12 @@ export default function ChosenLink({ value, onChange }) {
     <View style={{ gap: 6 }}>
       <Text style={{ fontWeight: "600" }}>Lien</Text>
       <Input
-        value={value}
+        value={typeof value === "string" ? value : ""}
         onChangeText={onChange}
-        placeholder="https//archiveofourown.org/..."
+        placeholder="https://archiveofourown.org/..."
         keyboardType="url"
         autoCapitalize="none"
+        autoCorrect={false}
         onBlur={() => onChange(value.trim())}
       />
     </View>
