@@ -287,7 +287,7 @@ export default function AddTagModal({
           fontWeight: "600",
         },
         addButton: {
-          backgroundColor: currentTheme.primary,
+          backgroundColor: currentTheme.primaryPlus,
           opacity: selectedTags.length === 0 ? 0.5 : 1,
         },
         addButtonText: {
@@ -302,7 +302,7 @@ export default function AddTagModal({
           paddingHorizontal: 8,
           paddingVertical: 2,
           marginLeft: 8,
-          fontSize: 12,
+          ...typography.small,
           fontWeight: "bold",
         },
         loadingContainer: {

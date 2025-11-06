@@ -99,7 +99,7 @@ export default function SearchByAuthor({ allAuthors, fictions, navigation }) {
       </Text>
 
       <Input
-        placeholder="Rechercher par auteur"
+        placeholder="Rechercher par auteur ou autrice"
         value={searchTerm}
         onChangeText={setSearchTerm}
         useThemeColors={true}

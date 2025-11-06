@@ -83,12 +83,14 @@ export default function SearchByTag({ allTags, fictions, navigation }) {
       <Text style={styles.header}>
         {showAllTags ? "Tous les tags" : "Top 10 tags"}
       </Text>
-      <Input
-        placeholder="Rechercher par tag"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        useThemeColors={true}
-      />
+      <View style={{ marginBottom: 12 }}>
+        <Input
+          placeholder="Rechercher par tag"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          useThemeColors={true}
+        />
+      </View>
       {displayedTags.length > 0 ? (
         <View style={styles.tagsContainer}>
           {displayedTags.map((tag, index) => (

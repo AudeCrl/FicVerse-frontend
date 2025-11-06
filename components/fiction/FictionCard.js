@@ -1,17 +1,12 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
 import { useMemo, useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import AddTagModal from "./AddTagModal";
+import Author from "./Author";
 import { FictionActionsModal } from "./FictionActionsModal";
 import Rate from "./Rate.js";
 import Tags from "./Tags";
@@ -211,15 +206,11 @@ export default function FictionCard({
         <View style={styles.authorRateContainer}>
           {/* Author */}
           {!!fiction.author && (
-            <Pressable
-              style={styles.authorContainer}
+            <Author
+              author={fiction.author}
               onPress={handleAuthorPress}
-            >
-              <Text style={styles.authorBy}>par </Text>
-              <View style={styles.authorChip}>
-                <Text style={styles.authorChipText}>{fiction.author}</Text>
-              </View>
-            </Pressable>
+              theme={currentTheme}
+            />
           )}
 
           {/* Rate */}
