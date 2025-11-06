@@ -22,7 +22,7 @@ export default function LastChapterRead({ value = 0, onChange, min = 0, sectionL
       color: currentTheme.text,
       marginBottom: 8,
     },
-    lastChapterReadContainer: {
+    chapterContainer: {
       flexDirection: "row", 
       justifyContent: 'flex-start', 
       alignItems: "center", 
@@ -30,13 +30,13 @@ export default function LastChapterRead({ value = 0, onChange, min = 0, sectionL
   });
 
   return (
-    <View style={styles.lastChapterReadSectionContainer}>
+    <View style={styles.chapterSectionContainer}>
 
       {!!sectionLabel && 
         <Text style={styles.sectionLabel}>{sectionLabel}</Text>
       }
 
-      <View style={styles.lastChapterReadContainer}>
+      <View style={styles.chapterContainer}>
 
         <RoundedButton label="−" onPress={decrement} style={{ width: 38}} />
 
@@ -48,7 +48,7 @@ export default function LastChapterRead({ value = 0, onChange, min = 0, sectionL
           style = {{ width: 100, marginBottom: 0, marginHorizontal: 14, textAlign: 'center', }}
         />
 
-        <RoundedButton label="＋" onPress={increment} style={{ width: 38}} />
+        <RoundedButton label="＋" onPress={increment} style={{ width: 38, marginRight: 14}} />
 
       </View>
     </View>

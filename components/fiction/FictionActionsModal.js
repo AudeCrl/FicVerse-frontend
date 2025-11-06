@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
@@ -15,6 +16,8 @@ import { typography } from "../../styles/globalStyles.js";
 import ChosenStatus from "../manageFiction/ChosenStatus.js";
 import LastChapterRead from "../manageFiction/LastChapterRead";
 import Rate from "./Rate.js";
+
+const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export const FictionActionsModal = ({
   isVisible,
@@ -25,19 +28,74 @@ export const FictionActionsModal = ({
   const { currentTheme } = useTheme();
   const user = useSelector((state) => state.user.value);
 
-  const [selectedReadingStatus, setSelectedReadingStatus] = useState(
-    fiction?.readingStatus ?? null
-  );
-  const [lastChapterRead, setLastChapterRead] = useState(
-    fiction?.lastChapterRead ?? 0
-  );
+  const [selectedReadingStatus, setSelectedReadingStatus] = useState(fiction?.readingStatus ?? null);
+  const [lastChapterRead, setLastChapterRead] = useState(fiction?.lastChapterRead ?? 0);
   const [rateValue, setRateValue] = useState(fiction?.rate?.value ?? 0);
-  const [displayRate, setDisplayRate] = useState(
-    fiction?.rate?.display ?? false
-  );
+  const [displayRate, setDisplayRate] = useState(fiction?.rate?.display ?? false);
 
+  // Display of a "tick" icon ton confirm when saved
+  const [readingSaved, setReadingSaved] = useState(false);
+  const [chapterSaved, setChapterSaved] = useState(false);
+  const [rateSaved, setRateSaved] = useState(false);
+  
+  const changeReadingStatus = (newStatus) => {
+    setSelectedReadingStatus(newStatus);
+    updateFiction({ readingStatus: newStatus });
+  }
+  const changeLastChapterRead = (newChapter) => {
+    setLastChapterRead(newChapter);
+    updateFiction({ lastChapterRead: newChapter });
+  }
+  const changeRateValue = (newRateValue) => {
+    setRateValue(newRateValue);
+    updateFiction({ rate: { value: newRateValue } });
+  }
   const handleToggleHide = () => {
     setDisplayRate(displayRate === true ? false : true);
+    updateFiction({ rate: { display: displayRate } });
+  };
+  
+  // Fast update of a fiction (readingStatus, lastChapterRead or rate)
+  const updateFiction = async (fieldToUpdate = {}) => {
+    try {
+      const res = await fetch(`${API_IP}/fiction/${fiction._id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fieldToUpdate),
+      });
+
+      const data = await res.json();
+      if (data.result) {
+        
+        const updatedField = Object.keys(fieldToUpdate)[0];
+        console.log('Fiction mise à jour !', updatedField);
+
+        switch(updatedField) {
+          case 'readingStatus':
+            setReadingSaved(true);
+            setTimeout(() => setReadingSaved(false), 1500);
+            break;
+          case 'lastChapterRead':
+            setChapterSaved(true);
+            setTimeout(() => setChapterSaved(false), 1500);
+            break;
+          case 'rate':
+            setRateSaved(true);
+            setTimeout(() => setRateSaved(false), 1500);
+            break;
+          default:
+            console.log('updatedField not recognised', updatedField);
+        }
+      } else {
+        Alert.alert("Erreur", data.error || "Mise à jour échouée");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Problème de connexion");
+    }
   };
 
   const styles = StyleSheet.create({
@@ -52,7 +110,7 @@ export const FictionActionsModal = ({
       backgroundColor: currentTheme.background,
       borderTopLeftRadius: 8,
       borderTopRightRadius: 8,
-      paddingVertical: 10,
+      paddingTop: 10,
       elevation: 10,
     },
     header: {
@@ -69,7 +127,11 @@ export const FictionActionsModal = ({
       paddingVertical: 10,
       paddingHorizontal: 15,
       overflow: "hidden",
-
+    },
+    quickEditContainer: {
+      borderBottomWidth: 1,
+      borderBottomColor: currentTheme.inputBorder,
+      marginBottom: 10,
     },
     // --- ACTIONS (Lignes) ---
     actionRow: {
@@ -77,40 +139,14 @@ export const FictionActionsModal = ({
       alignItems: "center",
       marginBottom: 14,
     },
+    savedIcon: {
+      margin: 0,
+      padding: 0,
+    },
     actionText: {
       ...typography.body,
       color: currentTheme.text,
       marginLeft: 8,
-    },
-
-    // --- FOOTER ---
-    footerContainer: {
-      flexDirection: "row",
-      justifyContent: "center", // Centrer les boutons
-      paddingVertical: 10,
-      marginVertical: 10,
-      borderTopWidth: 1,
-      borderTopColor: currentTheme.inputBorder,
-      borderBottomWidth: 1,
-      borderBottomColor: currentTheme.inputBorder,
-
-    },
-    footerButton: {
-      marginLeft: 30,
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-    },
-    applyButton: {
-      backgroundColor: currentTheme.primary,
-      borderRadius: 5,
-    },
-    buttonText: {
-      color: currentTheme.text,
-      fontSize: 16,
-    },
-    applyButtonText: {
-      color: "#fff",
-      fontWeight: "bold",
     },
   });
 
@@ -123,6 +159,7 @@ export const FictionActionsModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
+
           <View style={styles.header}>
             <Text style={styles.modalTitle}>{fiction?.title}</Text>
           </View>
@@ -132,48 +169,50 @@ export const FictionActionsModal = ({
             scrollEnabled={true}
             showsVerticalScrollIndicator={true}
           >
-            {/* ACTION 1: Update readingStatus */}
-            <View style={styles.actionRow}>
-              <ChosenStatus
-                sectionLabel="Avancement de votre lecture"
-                readingStatus={selectedReadingStatus}
-                onPress={setSelectedReadingStatus}
-              />
+            <View style={styles.quickEditContainer}>
+            
+              {/* ACTION 1: Update readingStatus */}
+              <View style={[styles.actionRow, { alignItems: 'flex-end' }]}>
+                <ChosenStatus
+                  sectionLabel="Avancement de votre lecture"
+                  readingStatus={selectedReadingStatus}
+                  onPress={changeReadingStatus}
+                />
+                {readingSaved && (
+                  <Ionicons style={styles.savedIcon} name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                )}
+              </View>
+
+              {/* ACTION 2: Update lastChapterRead */}
+              <View style={[styles.actionRow, { alignItems: 'flex-end' }]}>
+                <LastChapterRead
+                  sectionLabel="Dernier chapitre lu"
+                  value={lastChapterRead}
+                  onChange={changeLastChapterRead}
+                />
+                {chapterSaved && (
+                  <Ionicons name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                )}
+              </View>
+
+              {/* ACTION 3: Update rate (0 to 5 icons) */}
+              <View style={styles.actionRow}>
+                <Rate
+                  sectionLabel="Votre note"
+                  iconName={user.notationIcon}
+                  value={rateValue}
+                  onPress={changeRateValue}
+                  hideRate={!displayRate}
+                  onToggleHide={handleToggleHide}
+                  editable={true}
+                />
+                {rateSaved  && (
+                  <Ionicons name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                )}
+              </View>
             </View>
 
-            {/* ACTION 2: Update lastChapterRead */}
-            <View style={styles.actionRow}>
-              <LastChapterRead
-                sectionLabel="Dernier chapitre lu"
-                value={lastChapterRead}
-                onChange={setLastChapterRead}
-              />
-            </View>
-
-            {/* ACTION 3: Update rate (0 to 5 icons) */}
-            <View style={styles.actionRow}>
-              <Rate
-                sectionLabel="Votre note"
-                iconName={user.notationIcon}
-                value={rateValue}
-                onPress={setRateValue}
-                hideRate={!displayRate}
-                onToggleHide={handleToggleHide}
-                editable={true}
-              />
-            </View>
-            <View style={styles.footerContainer}>
-              <TouchableOpacity style={styles.footerButton} onPress={onClose}>
-                <Text style={styles.buttonText}>Annuler</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.footerButton, styles.applyButton]}
-              >
-                <Text style={styles.buttonText}>Appliquer</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* --- ACTION 4 : Modifier infos fanfiction --- */}
+            {/* --- ACTION 4: Modify fanfiction - Navigate to ManageFictionScreen --- */}
             <TouchableOpacity
               style={styles.actionRow}
               onPress={() =>
@@ -184,7 +223,7 @@ export const FictionActionsModal = ({
               <Text style={styles.actionText}>Modifier la fanfiction</Text>
             </TouchableOpacity>
 
-            {/* --- ACTION 5 : Dupliquer la fiction --- */}
+            {/* --- ACTION 5: Duplicate fanfiction
             <TouchableOpacity
               style={styles.actionRow}
               onPress={() => console.log("TODO duplicate")}
@@ -192,8 +231,9 @@ export const FictionActionsModal = ({
               <Ionicons name="copy" size={22} />
               <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
             </TouchableOpacity>
+             --- */}
 
-            {/* --- ACTION 6 : Supprimer la fiction --- */}
+            {/* --- ACTION 6: Delete fanfiction --- */}
             <TouchableOpacity
               style={styles.actionRow}
               onPress={() => console.log("TODO delete")}
