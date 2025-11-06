@@ -41,7 +41,7 @@ const formatDate = (dateString) => {
 export default function ProfileScreen({ navigation }) {
   const dispatch = useDispatch();
 
-  const { currentTheme, variant, toggleVariant } = useTheme();
+  const { currentTheme } = useTheme();
 
   const user = useSelector((state) => state.user.value); //Résoudre le probleme : si on se deconnecte et reconnecte avec un autre compte, les informations de l'ancien utilisateur son affiché à l'écran
   // console.log(user);
@@ -107,6 +107,220 @@ export default function ProfileScreen({ navigation }) {
     setDisplayedPassword("••••••••");
     setNewPassword("");
   }, [user]);
+
+  const styles = StyleSheet.create({
+    container: {
+    flex: 1,
+    backgroundColor: currentTheme.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      // paddingBottom: 20,
+    },
+
+    // ----------------------------------------------------
+    // --- 1. EN-TÊTE (Background 30%) ---
+    profileHeader: {
+      width: "100%",
+      height: 200, // Hauteur fixe pour le header
+      alignItems: "center",
+      justifyContent: "flex-end", // Aligne l'avatar en bas du conteneur
+      position: "relative", // Point de référence pour l'avatar positionné en absolu
+      zIndex: 1,
+    },
+    backgroundImage: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+
+    // --- AVATAR (Chevauchement) ---
+    avatarContainer: {
+      width: 120, // Taille de l'avatar (ajustée)
+      height: 120,
+      borderRadius: 60,
+      borderWidth: 4,
+      borderColor: "white", // Contour blanc pour l'effet de chevauchement
+      position: "absolute", // Positionnement absolu dans profileHeader
+      bottom: -60, // Déplace l'avatar de la moitié de sa hauteur (120/2) vers le bas
+      zIndex: 10,
+      // Enlevez 'overflow: hidden' pour le conteneur, sinon l'Image pourrait être coupée
+      // L'Image elle-même doit avoir le borderRadius
+    },
+    avatarImage: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 60, // Doit correspondre à la moitié de la largeur/hauteur de avatarContainer
+    },
+    editAvatarButton: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: "rgba(0,0,0,0.5)", // Fond semi-transparent pour le bouton d'édition
+      borderRadius: 12,
+      padding: 4,
+    },
+
+    // ----------------------------------------------------
+    // --- 2. CONTENU PRINCIPAL (70% du bas) ---
+    mainContainer: {
+      width: "100%",
+      paddingTop: 60,
+      paddingHorizontal: 16,
+      backgroundColor: currentTheme.background,
+    },
+
+    // Conteneur pour grouper username/email/password
+    usernameEmailWrapper: {
+      backgroundColor: "rgba(255, 255, 255, 0.6)",
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: "rgba(229, 231, 235, 0.5)",
+    },
+
+    // Styles pour les éléments internes
+    usernameContainer: {
+      // alignItems: "center",
+      justifyContent: 'center',
+      
+      marginVertical: 10,
+      flexDirection: "row",
+      gap: 8,
+      flex: 1,
+      // backgroundColor: 'red',
+    },
+    inputUsernameCont: {
+      // flex: 1,
+      justifyContent: 'center',
+      // alignItems: 'center',
+      alignContent: 'center',
+      minWidth: 150,
+    },
+    editButtonUsername: {
+      justifyContent: 'center',
+      // alignContent: 'flex-end',
+      // alignItems: 'flex-end',
+      // right: 5,
+    },
+    memberSince: {
+
+    },
+    memberSinceText: {
+      // ...typography.small,
+      marginTop: 8,
+      // fontSize: 12,
+      color: currentTheme.secondaryText,
+      textAlign: "center",
+      fontStyle: "italic",
+    },
+
+    // Ligne de séparation entre les sections
+    sectionSeparator: {
+      height: 1,
+      backgroundColor: "#E5E7EB",
+      marginVertical: 12,
+    },
+
+    // Conteneurs des champs d'édition (mis à jour pour être alignés)
+    emailContainer: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+      paddingVertical: 8,
+      gap: 8,
+    },
+    passwordContainer: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      justifyContent: "space-between",
+      paddingVertical: 8,
+      gap: 8,
+    },
+
+    // Styles d'inputs (assurez-vous d'ajouter `flex: 1` pour qu'ils prennent l'espace)
+    inputUsername: {
+      ...typography.input,
+      textAlign: "center",
+      fontSize: 18,
+      color: currentTheme.primaryPlus,
+      borderColor: currentTheme.inputBorder,
+    },
+    inputEmail: {
+      ...typography.input,
+      color: currentTheme.primaryPlus,
+      flex: 1,
+      marginRight: 8,
+      fontSize: 14,
+    },
+    inputPassword: {
+      ...typography.input,
+      color: currentTheme.primaryPlus,
+      flex: 1,
+      marginRight: 8,
+      fontSize: 14,
+    },
+    editButton: {
+      bottom: 10,
+    },
+
+    // Conteneurs des autres paramètres
+    settingsSection: {
+      // paddingHorizontal: 0,
+      marginBottom: 20,
+      marginTop: 20,
+    },
+    // ----------------------------------------------------
+    // --- 3. FOOTER ---
+    manageAccountContainer: {
+      width: "100%",
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      marginBottom: 30,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: currentTheme.background,
+      borderTopWidth: 1,
+      borderTopColor: "#E5E7EB",
+      gap: 10,
+    },
+    logout: {
+      ...typography.button,
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderColor: "#E5E7EB",
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      textAlign: "center",
+      color: "#374151",
+      fontSize: 15,
+      fontWeight: "600",
+    },
+    removeAccount: {
+      ...typography.button,
+      width: "100%",
+      backgroundColor: "#DC2626",
+      borderColor: "#DC2626",
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      textAlign: "center",
+      color: "white",
+      fontSize: 15,
+      fontWeight: "600",
+    },
+  })
 
   const handleEditAvatar = async () => {
     console.log("Edit Avatar clicked");
@@ -678,100 +892,116 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.mainContainer}>
           <View style={styles.usernameEmailWrapper}>
             <View style={styles.usernameContainer}>
-              <Input
-                style={styles.inputUsername}
-                value={isEditingUsername ? tempUsername : username}
-                onChangeText={setTempUsername}
-                editable={isEditingUsername}
-                placeholder={isEditingUsername ? username : null}
-              />
-              <TouchableOpacity onPress={handleEditUsername}>
-                <Feather
-                  name={isEditingUsername ? "check" : "edit"}
-                  size={24}
-                  color="black"
+              <View style={styles.inputUsernameCont}>
+                <Input
+                  style={styles.inputUsername}
+                  value={isEditingUsername ? tempUsername : username}
+                  onChangeText={setTempUsername}
+                  editable={isEditingUsername}
+                  placeholder={isEditingUsername ? username : null}
                 />
-              </TouchableOpacity>
-              {isEditingUsername && (
-                <TouchableOpacity onPress={() => setIsEditingUsername(false)}>
-                  <Ionicons
-                    name="close-circle-outline"
+              </View>
+              <View style={styles.editButtonUsername}>
+                <TouchableOpacity onPress={handleEditUsername}>
+                  <Feather
+                    name={isEditingUsername ? "check" : "edit"}
                     size={24}
-                    color="grey"
+                    color="black"
                   />
                 </TouchableOpacity>
-              )}
+                {isEditingUsername && (
+                  <TouchableOpacity onPress={() => setIsEditingUsername(false)}>
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={24}
+                      color="grey"
+                    />
+                  </TouchableOpacity>
+                )}
+
+              </View>
+            </View>
+            <View style={styles.memberSince}>
               <Text style={styles.memberSinceText}>
                 Membre FicVerse depuis le {formattedDate}
               </Text>
             </View>
-
+            
             <View style={styles.sectionSeparator} />
 
             <View style={styles.emailContainer}>
-              <Text style={styles.label}>Votre mail :</Text>
-              <Input
-                style={styles.inputEmail}
-                value={isEditingEmail ? tempEmail : currentEmail}
-                onChangeText={setTempEmail}
-                editable={isEditingEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholder={isEditingEmail ? currentEmail : null}
-              />
-              <TouchableOpacity onPress={handleEditEmail}>
-                <Feather
-                  name={isEditingEmail ? "check" : "edit"}
-                  size={24}
-                  color="black"
+              <View style={{ flex: 1 }}>
+                <Input
+                  style={styles.inputEmail}
+                  value={isEditingEmail ? tempEmail : currentEmail}
+                  onChangeText={setTempEmail}
+                  editable={isEditingEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder={isEditingEmail ? currentEmail : null}
+                  inputLabel = 'Votre mail :'
                 />
-              </TouchableOpacity>
-              {isEditingEmail && (
-                <TouchableOpacity onPress={() => setIsEditingEmail(false)}>
-                  <Ionicons
-                    name="close-circle-outline"
+              </View>
+              <View style={styles.editButton}>
+                <TouchableOpacity onPress={handleEditEmail}>
+                  <Feather
+                    name={isEditingEmail ? "check" : "edit"}
                     size={24}
-                    color="grey"
+                    color="black"
                   />
                 </TouchableOpacity>
-              )}
+                {isEditingEmail && (
+                  <TouchableOpacity onPress={() => setIsEditingEmail(false)}>
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={24}
+                      color="grey"
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
 
             <View style={styles.sectionSeparator} />
 
             <View style={styles.passwordContainer}>
-              <Text style={styles.label}>Mot de passe :</Text>
-              <Input
-                style={styles.inputPassword}
-                value={displayedPassword}
-                onChangeText={setNewPassword}
-                editable={isEditingPassword}
-                secureTextEntry={isEditingPassword}
-              />
-              <TouchableOpacity onPress={handleEditPassword}>
-                <Feather name="edit" size={24} color="black" />
-              </TouchableOpacity>
-              {isEditingPassword && (
-                <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
-                  <Ionicons
-                    name="close-circle-outline"
-                    size={24}
-                    color="grey"
-                  />
+              <View style={{ flex: 1 }}>
+                <Input
+                  style={styles.inputPassword}
+                  value={displayedPassword}
+                  onChangeText={setNewPassword}
+                  editable={isEditingPassword}
+                  secureTextEntry={isEditingPassword}
+                  inputLabel = 'Mot de passe :'
+                />
+
+              </View>
+              <View style={styles.editButton}>                
+                <TouchableOpacity onPress={handleEditPassword}>
+                  <Feather name="edit" size={24} color="black" />
                 </TouchableOpacity>
-              )}
+                {isEditingPassword && (
+                  <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={24}
+                      color="grey"
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           </View>
 
           <View style={styles.settingsSection}>
             {/* Thème */}
-            <SettingsCard
+            {/* <SettingsCard
               title="Thème de l'interface"
               icon="palette-outline"
               onPress={() => navigation.navigate("Theme")}
               testID="settings-theme"
               isEmpty
-            />
+            /> */}
 
             {/* Tags */}
             <SettingsCard
@@ -826,265 +1056,15 @@ export default function ProfileScreen({ navigation }) {
             />
           </View>
         </View>
+        <View style={styles.manageAccountContainer}>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={styles.logout}>Se déconnecter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleRemoveAccount}>
+            <Text style={styles.removeAccount}>Supprimer le compte</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-
-      <View style={styles.manageAccountContainer}>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logout}>Se déconnecter</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleRemoveAccount}>
-          <Text style={styles.removeAccount}>Supprimer le compte</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f4fcfff8",
-  },
-
-  scrollView: {
-    flex: 1,
-  },
-
-  scrollContent: {
-    paddingBottom: 120,
-  },
-
-  // ----------------------------------------------------
-  // --- 1. EN-TÊTE (Background 30%) ---
-  profileHeader: {
-    width: "100%",
-    height: 200, // Hauteur fixe pour le header
-    alignItems: "center",
-    justifyContent: "flex-end", // Aligne l'avatar en bas du conteneur
-    position: "relative", // Point de référence pour l'avatar positionné en absolu
-    zIndex: 1,
-  },
-  backgroundImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-
-  // --- AVATAR (Chevauchement) ---
-  avatarContainer: {
-    width: 120, // Taille de l'avatar (ajustée)
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: "white", // Contour blanc pour l'effet de chevauchement
-    position: "absolute", // Positionnement absolu dans profileHeader
-    bottom: -60, // Déplace l'avatar de la moitié de sa hauteur (120/2) vers le bas
-    zIndex: 10,
-    // Enlevez 'overflow: hidden' pour le conteneur, sinon l'Image pourrait être coupée
-    // L'Image elle-même doit avoir le borderRadius
-  },
-  avatarImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 60, // Doit correspondre à la moitié de la largeur/hauteur de avatarContainer
-  },
-  editAvatarButton: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "rgba(0,0,0,0.5)", // Fond semi-transparent pour le bouton d'édition
-    borderRadius: 12,
-    padding: 4,
-  },
-
-  // ----------------------------------------------------
-  // --- 2. CONTENU PRINCIPAL (70% du bas) ---
-  mainContainer: {
-    width: "100%",
-    paddingTop: 70,
-    paddingHorizontal: 16,
-    backgroundColor: "#f4fcfff8",
-  },
-
-  // Conteneur pour grouper username/email/password
-  usernameEmailWrapper: {
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: "rgba(229, 231, 235, 0.5)",
-  },
-
-  // Styles pour les éléments internes
-  usernameContainer: {
-    alignItems: "center",
-    marginBottom: 16,
-    flexDirection: "column",
-    gap: 8,
-  },
-  memberSinceText: {
-    marginTop: 8,
-    fontSize: 12,
-    color: "#9CA3AF",
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-
-  // Ligne de séparation entre les sections
-  sectionSeparator: {
-    height: 1,
-    backgroundColor: "#E5E7EB",
-    marginVertical: 12,
-  },
-
-  // Conteneurs des champs d'édition (mis à jour pour être alignés)
-  label: {
-    fontWeight: "600",
-    fontSize: 14,
-    color: "#1F2937",
-    minWidth: 100,
-  },
-  emailContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    gap: 8,
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 8,
-    gap: 8,
-  },
-
-  // Styles d'inputs (assurez-vous d'ajouter `flex: 1` pour qu'ils prennent l'espace)
-  inputUsername: {
-    ...typography.input,
-    textAlign: "center",
-    borderWidth: 0,
-    paddingHorizontal: 0,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  inputEmail: {
-    ...typography.input,
-    flex: 1,
-    marginRight: 8,
-    fontSize: 14,
-  },
-  inputPassword: {
-    ...typography.input,
-    flex: 1,
-    marginRight: 8,
-    fontSize: 14,
-  },
-
-  // Conteneurs des autres paramètres
-  settingsSection: {
-    paddingHorizontal: 0,
-    marginBottom: 20,
-    marginTop: 20,
-  },
-
-  themeContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-
-  ttagsContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-
-  fandomContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-
-  languageContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-
-  likeContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-
-  // ----------------------------------------------------
-  // --- 3. FOOTER ---
-  manageAccountContainer: {
-    width: "100%",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f4fcfff8",
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-    gap: 10,
-  },
-  logout: {
-    ...typography.button,
-    width: "100%",
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E5E7EB",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    textAlign: "center",
-    color: "#374151",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  removeAccount: {
-    ...typography.button,
-    width: "100%",
-    backgroundColor: "#DC2626",
-    borderColor: "#DC2626",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    textAlign: "center",
-    color: "white",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-
-  // Ajoutez ici les styles pour vos Modals (isModalVisible et isModalPasswordVisible)
-});
+};

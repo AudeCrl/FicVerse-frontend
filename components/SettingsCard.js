@@ -1,6 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { typography } from "../styles/globalStyles";
+import { useTheme } from "../context/ThemeContext.js";
 
 /**
  * SettingsCard - Composant réutilisable pour afficher une carte de paramètre
@@ -26,6 +28,106 @@ export default function SettingsCard({
   emptyText = "Aucun élément",
 }) {
   const [isPressed, setIsPressed] = useState(false);
+
+  const { currentTheme } = useTheme();
+
+  const styles = StyleSheet.create({
+    card: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      backgroundColor: currentTheme.background,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: currentTheme.segmentation,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      // marginHorizontal: 16,
+      marginVertical: 8,
+      minHeight: 60,
+      // iOS Shadow
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.08,
+      shadowRadius: 3,
+      // Android Elevation (remplace shadow)
+      elevation: 2,
+    },
+
+    cardPressed: {
+      backgroundColor: "#f9f9f9",
+      opacity: 0.9,
+    },
+
+    cardContent: {
+      flex: 1,
+      paddingRight: 12,
+    },
+
+    titleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 6,
+    },
+
+    title: {
+      ...typography.h3,
+      fontSize: 16,
+      // fontWeight: "600",
+      color: "#1f2937",
+      flex: 1,
+    },
+
+    countBadge: {
+      backgroundColor: "#9C27B0",
+      borderRadius: 12,
+      minWidth: 28,
+      height: 24,
+      justifyContent: "center",
+      alignItems: "center",
+      marginLeft: 8,
+    },
+
+    countText: {
+      color: "#ffffff",
+      fontSize: 12,
+      fontWeight: "700",
+    },
+
+    emptyText: {
+      fontSize: 13,
+      color: "#9CA3AF",
+      fontStyle: "italic",
+      marginTop: 2,
+    },
+
+    chipsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 6,
+      marginTop: 4,
+    },
+
+    chip: {
+      backgroundColor: "#F0E7F8",
+      borderRadius: 12,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderWidth: 0.5,
+      borderColor: "#E9D5FF",
+    },
+
+    chipText: {
+      fontSize: 12,
+      color: "#7C3AED",
+      fontWeight: "500",
+      maxWidth: 100,
+    },
+
+    chevron: {
+      marginLeft: 8,
+    },
+  });
 
   // Debounce la pression pour éviter les doubles clics
   const debouncedPress = useCallback(() => {
@@ -90,102 +192,5 @@ export default function SettingsCard({
         style={styles.chevron}
       />
     </Pressable>
-  );
+  );  
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#ffffff",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    minHeight: 60,
-    // iOS Shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    // Android Elevation (remplace shadow)
-    elevation: 2,
-  },
-
-  cardPressed: {
-    backgroundColor: "#f9f9f9",
-    opacity: 0.9,
-  },
-
-  cardContent: {
-    flex: 1,
-    paddingRight: 12,
-  },
-
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
-    flex: 1,
-  },
-
-  countBadge: {
-    backgroundColor: "#9C27B0",
-    borderRadius: 12,
-    minWidth: 28,
-    height: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
-  },
-
-  countText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  emptyText: {
-    fontSize: 13,
-    color: "#9CA3AF",
-    fontStyle: "italic",
-    marginTop: 2,
-  },
-
-  chipsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 4,
-  },
-
-  chip: {
-    backgroundColor: "#F0E7F8",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderWidth: 0.5,
-    borderColor: "#E9D5FF",
-  },
-
-  chipText: {
-    fontSize: 12,
-    color: "#7C3AED",
-    fontWeight: "500",
-    maxWidth: 100,
-  },
-
-  chevron: {
-    marginLeft: 8,
-  },
-});
