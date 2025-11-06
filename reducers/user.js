@@ -7,7 +7,7 @@ const initialState = {
         username: null,
         createdAt: null, 
         avatar: null,
-        notationIcon: null,
+        notationIcon: 'heart',
     },
 };
 

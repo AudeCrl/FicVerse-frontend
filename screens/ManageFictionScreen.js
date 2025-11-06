@@ -11,12 +11,14 @@ import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
 import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
 import ChosenStatus from "../components/manageFiction/ChosenStatus";
 import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
+import Rate from "../components/fiction/Rate";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ManageFictionScreen({ route, navigation }) {
 
   const token = useSelector((state) => state.user.value.token);
+  const user = useSelector((state) => state.user.value);
   const fictionId = route?.params?.fictionId;   // si jamais c'est undefined lorsque j'ouvre en création d'une nouvelle fiction
 
   const [fandomName, setFandomName] = useState("");
@@ -32,6 +34,8 @@ export default function ManageFictionScreen({ route, navigation }) {
   const [tagIds, setTagIds] = useState([]);   // tagIds remontés par ChosenTag
   const [readingStatus, setReadingStatus] = useState("reading");  // le back doit recevoir "reading" au lieu de "en cours"
   const [storyStatus, setStoryStatus] = useState("in-progress");
+  const [rateValue, setRateValue] = useState(0);
+  const [displayRate, setDisplayRate] = useState(false);
 
   const [titleError, setTitleError] = useState(false);
   const [fandomError, setFandomError] = useState(false);
@@ -57,6 +61,8 @@ export default function ManageFictionScreen({ route, navigation }) {
           setLastChapterRead(Number(data.fiction.lastChapterRead));
           setReadingStatus(data.fiction.readingStatus);
           setStoryStatus(data.fiction.storyStatus);
+          setRateValue(Number(data.fiction.rate.value));
+          setDisplayRate(Boolean(data.fiction.rate.display));
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
@@ -71,6 +77,10 @@ export default function ManageFictionScreen({ route, navigation }) {
       setFandomError(fandomEmpty);                                // Donc fandomError devient true si fandomName est vide cad non sélectionné
       return !(titleEmpty || fandomEmpty);                        // Retourne true si tout est OK
   }  
+  
+const toggleHideRate = () => {
+    setDisplayRate((toggle) => !toggle);
+  };
 
   const createFiction = async () => {   // création d'une nouvelle fiction
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
@@ -96,6 +106,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           tags: tagIds,    // Envoyer les tags dès la création
           readingStatus,
           storyStatus,
+          rate: { value: rateValue, display: displayRate },
         }),
       });
       const data = await res.json();
@@ -136,6 +147,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           tagIds,    // Dans req.params.id côté back, on attend "tagIds"
           readingStatus,
           storyStatus,
+          rate: { value: rateValue, display: displayRate },
         }),
       });
 
@@ -238,6 +250,15 @@ export default function ManageFictionScreen({ route, navigation }) {
         fictionId={fictionId}
         idTags={setTagIds} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
       />
+
+      <Rate
+        sectionLabel="Votre note"
+        iconName={user.notationIcon}
+        value={rateValue}
+        onPress={setRateValue}
+        hideRate={!displayRate}
+        onToggleHide={toggleHideRate}
+        editable={true} />
 
       <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
 
