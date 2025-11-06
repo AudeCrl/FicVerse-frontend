@@ -8,6 +8,7 @@ import {
   Image,
   Modal,
   ImageBackground,
+  ScrollView,
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { typography } from "../styles/globalStyles";
@@ -350,6 +351,7 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.profileHeader}>
             <ImageBackground 
                 source={currentTheme.headerBackground}
@@ -383,13 +385,14 @@ export default function ProfileScreen({ navigation }) {
                             <Ionicons name= 'close-circle-outline' size={24} color='grey' />
                         </TouchableOpacity>
                     )}
+                </View>
+                <View style={styles.memberSinceContainer}>
                     <Text style={styles.memberSinceText}>Membre FicVerse depuis le {formattedDate}</Text>
                 </View>
 
                 <View style={styles.sectionSeparator} /> 
 
                 <View style={styles.emailContainer}>
-                    <Text style={styles.label}>Votre mail :</Text>
                     <Input
                         style={styles.inputEmail}
                         value={isEditingEmail ? tempEmail : currentEmail}
@@ -398,6 +401,7 @@ export default function ProfileScreen({ navigation }) {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholder={isEditingEmail ? currentEmail : null}
+                        inputLabel='Votre mail :'
                     />
                     <TouchableOpacity onPress={handleEditEmail}>
                         <Feather name={isEditingEmail ? 'check' : 'edit'} size={24} color="black" />
@@ -412,13 +416,13 @@ export default function ProfileScreen({ navigation }) {
                 <View style={styles.sectionSeparator} /> 
 
                 <View style={styles.passwordContainer}>
-                    <Text style={styles.label}>Mot de passe :</Text>
                     <Input
                         style={styles.inputPassword}
                         value={displayedPassword}
                         onChangeText={setNewPassword}
                         editable={isEditingPassword}
                         secureTextEntry={isEditingPassword}
+                        inputLabel='Mot de passe :'
                     />
                     <TouchableOpacity onPress={handleEditPassword}>
                         <Feather name="edit" size={24} color="black" />
@@ -455,6 +459,7 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.removeAccount}>Supprimer le compte</Text>
             </TouchableOpacity>
         </View>
+      </ScrollView>
     </View>
   );
 }
@@ -462,14 +467,20 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        // height: 750,
         backgroundColor: "#f4fcfff8",
     },
-    
+    scrollView: {
+      // flex: 1,
+      // paddingVertical: 20,
+      // backgroundColor: 'red',
+    },
     // ----------------------------------------------------
     // --- 1. EN-TÊTE (Background 30%) ---
     profileHeader: {
-        flex: 0.3, // 30% de la hauteur de l'écran
-        width: '100%',
+        // flex: 0.3, // 30% de la hauteur de l'écran
+        // width: '100%',
+        height: 170,
         alignItems: 'center',
         justifyContent: 'flex-end', // Aligne l'avatar en bas du conteneur
         position: 'relative', // Point de référence pour l'avatar positionné en absolu
@@ -516,7 +527,7 @@ const styles = StyleSheet.create({
     // ----------------------------------------------------
     // --- 2. CONTENU PRINCIPAL (70% du bas) ---
     mainContainer: {
-        flex: 0.6, // Le reste de l'espace (70%)
+        // flex: 0.6, // Le reste de l'espace (70%)
         width: '100%',
         paddingTop: 70, // Espace pour l'avatar qui chevauche (un peu plus que 60)
         paddingHorizontal: 20,
@@ -534,8 +545,14 @@ const styles = StyleSheet.create({
     
     // Styles pour les éléments internes
     usernameContainer: {
-        alignItems: 'center', // Centre le nom d'utilisateur et la date
-        marginBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',        
+        // alignItems: 'center', // Centre le nom d'utilisateur
+        
+    },
+    memberSinceContainer: {
+      alignItems: 'center',
+      marginBottom: 10,
     },
     memberSinceText: {
         marginTop: 5,
@@ -551,21 +568,17 @@ const styles = StyleSheet.create({
     },
     
     // Conteneurs des champs d'édition (mis à jour pour être alignés)
-    label: {
-        fontWeight: 'bold', 
-        minWidth: 100, // Assure une largeur minimale pour les labels
-    },
     emailContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
+        // alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 5,
+        // paddingVertical: 1,
     },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 5,
+        // paddingVertical: 5,
     },
 
     // Styles d'inputs (assurez-vous d'ajouter `flex: 1` pour qu'ils prennent l'espace)
@@ -573,23 +586,36 @@ const styles = StyleSheet.create({
         ...typography.input, 
         textAlign: 'center',
         borderWidth: 0, // Enlever la bordure si vous voulez juste afficher le nom
-        paddingHorizontal: 0,
+        // paddingHorizontal: 0,
+        minWidth: 130,
+        marginRight: 10,
     }, 
-    inputEmail: { ...typography.input, flex: 1, marginRight: 10 },
-    inputPassword: { ...typography.input, flex: 1, marginRight: 10 },
+    inputEmail: { 
+      ...typography.input, 
+      // flex: 1, 
+      // textAlign: 'center',
+      // marginRight: 10,
+      width: 250,
+    },      
+    inputPassword: {
+       ...typography.input,
+      //  flex: 1,
+       marginRight: 10,
+       width: 250,
+      },
     
     // Conteneurs des autres paramètres
     settingsSection: {
         // Ajoutez des styles ici pour vos autres sections si nécessaire
         paddingHorizontal: 5,
-        marginBottom: 20,
+        // marginBottom: 20,
     },
 
     // ----------------------------------------------------
     // --- 3. FOOTER ---
     manageAccountContainer: {
         // Supprime l'alignement centré sur l'écran et utilise un padding pour le remonter
-        width: "100%",
+        // width: "100%",
         paddingVertical: 30, // Plus de padding pour remonter le bloc
         alignItems: "center",
         justifyContent: "space-around",
