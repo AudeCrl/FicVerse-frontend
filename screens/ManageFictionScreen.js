@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { Alert, ActivityIndicator, View, Text, ScrollView } from "react-native";
 import { useSelector } from "react-redux";
 import Input from "../components/ui/Input";
 import RoundedButton from "../components/ui/RoundedButton";
@@ -9,14 +9,15 @@ import ChosenTitle from "../components/manageFiction/ChosenTitle";
 import ChosenLink from "../components/manageFiction/ChosenLink";
 import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
 import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
-import LastReadChapter from "../components/manageFiction/LastReadChapter"; 
+import LastReadChapter from "../components/manageFiction/LastReadChapter";
+import ChosenStatus from "../components/manageFiction/ChosenStatus";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ManageFictionScreen({ route, navigation }) {
 
   const token = useSelector((state) => state.user.value.token);
-  const { fictionId } = route.params || {};   // si jamais c'est undefined lorsque j'ouvre en création d'une nouvelle fiction
+  const fictionId = route?.params?.fictionId;   // si jamais c'est undefined lorsque j'ouvre en création d'une nouvelle fiction
 
   const [fandomName, setFandomName] = useState("");
   const [title, setTitle] = useState("");
@@ -29,6 +30,8 @@ export default function ManageFictionScreen({ route, navigation }) {
   const [numberOfWords, setNumberOfWords] = useState("");
   const [lastChapterRead, setLastChapterRead] = useState(0);
   const [tagIds, setTagIds] = useState([]);   // tagIds remontés par ChosenTag
+  const [readingStatus, setReadingStatus] = useState("reading");  // le back doit recevoir "reading" au lieu de "en cours"
+  const [storyStatus, setStoryStatus] = useState("in-progress");
 
   const [titleError, setTitleError] = useState(false);
   const [fandomError, setFandomError] = useState(false);
@@ -46,12 +49,14 @@ export default function ManageFictionScreen({ route, navigation }) {
           setTitle(data.fiction.title);
           setLink(data.fiction.link);
           setAuthor(data.fiction.author);
-          setLang(data.fiction.lang);
+          setLang(data.fiction.lang.name);
           setSummary(data.fiction.summary);
           setPersonalNotes(data.fiction.personalNotes);
           setNumberOfChapters(String(data.fiction.numberOfChapters));  // Quand la réponse du back est parsée (res.json), numberOfChapters redevient un nombre. Or, dans le front numberOfChapters correspond à textInput et doit être en string
           setNumberOfWords(String(data.fiction.numberOfWords));
-          setLastChapterRead(Number(data.fiction.lastReadChapter));
+          setLastChapterRead(Number(data.fiction.lastChapterRead));
+          setReadingStatus(data.fiction.readingStatus);
+          setStoryStatus(data.fiction.storyStatus);
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
@@ -59,65 +64,91 @@ export default function ManageFictionScreen({ route, navigation }) {
     })();
   }, [fictionId, token]);   // Si une nouvelle fiction nous ramène sur cette page, alors on relance le fetch
 
-  const saveFiction = async () => {
-    try {
-      const titleEmpty = String(title).trim().length === 0;
+  const validationBeforeSave = () => {
+    const titleEmpty = String(title).trim().length === 0;
       const fandomEmpty = String(fandomName).trim().length === 0; // fandomName contient la valeur remontée par l'enfant via onChange. Avec le length, on vérifie que le name est vraiment vide.
       setTitleError(titleEmpty);
-      setFandomError(fandomEmpty);  // Donc fandomError devient true si fandomName est vide cad non sélectionné
-      if (titleEmpty || fandomEmpty) return;
+      setFandomError(fandomEmpty);                                // Donc fandomError devient true si fandomName est vide cad non sélectionné
+      return !(titleEmpty || fandomEmpty);                        // Retourne true si tout est OK
+  }  
 
-      let id = fictionId;
-      if (!fictionId) {   // Création d'une nouvelle fiction s'il n'y a pas de fictionId
-        const res = await fetch(`${API_IP}/fiction`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fandomName,
-            title,
-            link,
-            author,
-            lang,
-            summary,
-            personalNotes,
-            numberOfChapters: Number(numberOfChapters), // on convertit en nombre avant d'envoyer au backend, car il attend un nombre d'après notre modèle
-            numberOfWords: Number(numberOfWords),
-            lastChapterRead,
-            tags: tagIds,    // Envoyer les tags dès la création
-          }),
-        });
-        const data = await res.json();
-        id = data.fiction._id;
-        if (!id) return; 
-      } else {     // Modification d'une fiction existante s'il y a une fictionId
-        await fetch(`${API_IP}/fiction/${id}`, {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fandomName,
-            title,
-            link,
-            author,
-            lang,
-            summary,
-            personalNotes,
-            numberOfChapters: Number(numberOfChapters),
-            numberOfWords: Number(numberOfWords),
-            lastChapterRead,
-            tagIds,   // Dans req.params.id côté back, on attend "tagIds"
-          }),
-        });
+  const createFiction = async () => {   // création d'une nouvelle fiction
+    if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+
+    try {
+      const res = await fetch(`${API_IP}/fiction`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fandomName,
+          title,
+          link,
+          author,
+          langName: lang,   // Pour correspondre au back
+          summary,
+          personalNotes,
+          numberOfChapters: Number(numberOfChapters), // on convertit en nombre avant d'envoyer au backend, car il attend un nombre d'après notre modèle
+          numberOfWords: Number(numberOfWords),
+          lastChapterRead,
+          tags: tagIds,    // Envoyer les tags dès la création
+          readingStatus,
+          storyStatus,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.result) {
+        Alert.alert("Succès", "Fiction créée !");
+        navigation.navigate("Home", { screen: "HomeMain" }); 
+      } else {
+        Alert.alert("Erreur", data.error || "Création échouée");
       }
-
-      navigation.goBack();   // C'est une propriété native permettant de revenir à l'écran précédent. Retour vers HomeScreen automatiquement dès qu'on a validé les changements
     } catch (error) {
-        console.error("PUT /fiction/:id/tags failed", error);
+      console.error(error);
+      Alert.alert("Erreur", "Problème de connexion");
+    }
+  };
+
+  const updateFiction = async () => {     // Modification d'une fiction existante s'il y a une fictionId
+    if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+
+    try {
+      const res = await fetch(`${API_IP}/fiction/${fictionId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fandomName,
+          title,
+          link,
+          author,
+          langName: lang,
+          summary,
+          personalNotes,
+          numberOfChapters: Number(numberOfChapters),
+          numberOfWords: Number(numberOfWords),
+          lastChapterRead,
+          tagIds,    // Dans req.params.id côté back, on attend "tagIds"
+          readingStatus,
+          storyStatus,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.result) {
+        Alert.alert("Succès", "Fiction mise à jour !");
+        navigation.navigate("Home", { screen: "HomeMain" }); 
+      } else {
+        Alert.alert("Erreur", data.error || "Mise à jour échouée");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Problème de connexion");
     }
   };
 
@@ -136,7 +167,14 @@ export default function ManageFictionScreen({ route, navigation }) {
       isInvalid={fandomError}
       />
 
-      <ChosenTitle value={title} onChange={setTitle} />
+      <ChosenTitle 
+      value={title}
+      onChange={(value) => {
+        setTitle(value);
+        setTitleError(false);   // dès qu'on tape à nouveau dans l'input Title, l'error n'est plus true.
+      }}
+      isInvalid={titleError}
+      />
 
       <ChosenLink value={link} onChange={setLink} />
 
@@ -190,14 +228,20 @@ export default function ManageFictionScreen({ route, navigation }) {
         </View>
       </View>
 
+      <ChosenStatus sectionLabel="Avancement de votre lecture" readingStatus={readingStatus} onPress={setReadingStatus}/>
+
       <LastReadChapter value={lastChapterRead} onChange={setLastChapterRead} />   {/* Dernier chapitre lu : Input + boutons +/- */}
+
+      <ChosenStatus sectionLabel="Statut de publication de la fanfiction" storyStatus={storyStatus} onPress={setStoryStatus}/>
 
       <ChosenTag       // Tags : tout est géré par ChosenTag, on récupère juste les ids
         fictionId={fictionId}
         idTags={setTagIds} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
       />
 
-      <RoundedButton label="Créer la fanfiction" onPress={saveFiction} />
+      <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />   {/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
+
+      <View><Text>Je n'existe que pour monter le dernier bouton</Text></View>
 
     </ScrollView>
   );

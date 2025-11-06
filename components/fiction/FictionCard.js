@@ -223,6 +223,7 @@ export default function FictionCard({
           isVisible={isFictionActionsModalVisible}
           onClose={() => setIsFictionActionsModalVisible(false)}
           fiction={fiction}
+          navigation={navigation}
         />
     </View>
   );

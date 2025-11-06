@@ -4,7 +4,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
-import ChosenStatus from './ChosenStatus.js';
+import ChosenStatus from '../manageFiction/ChosenStatus.js';
 
 export const FictionActionsModal = ({ isVisible, onClose, fiction, navigation }) => {
 
@@ -109,7 +109,7 @@ export const FictionActionsModal = ({ isVisible, onClose, fiction, navigation })
     });
     
     const handleNavigate = () => {
-        //navigation.navigate("ManageFiction", { fictionId: fiction._id });
+        navigation.navigate("ManageFiction", { fictionId: fiction._id });
         console.log('Go to ManageFictionScreen');
     };
 
