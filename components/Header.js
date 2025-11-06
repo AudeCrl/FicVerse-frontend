@@ -28,6 +28,7 @@ export default function Header({
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         paddingBottom: 10,
+        paddingTop: 10,
       },
       left: {
         height: 80,
@@ -66,27 +67,27 @@ export default function Header({
   );
   
   return (
-    <ImageBackground
+    <SafeAreaView edges={['top']}>
+      <ImageBackground
         source={currentTheme.headerBackground}
         resizeMode='cover'
-        style={styles.background}>
-
-        <SafeAreaView edges={['top']}>
-            <View style={styles.container}>
-                <View style={styles.left}>
-                    <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={toggleVariant} />
-                    <Text style={styles.title}>{title}</Text>
-                </View>
-                
-                <Pressable style={styles.right} onPress={onProfilePress}>
-                    <View style={styles.profileInfos}>
-                        <Image source={avatar.uri ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
-                        <Text style={styles.username}>{username}</Text>
-                    </View>
-                </Pressable>
+        style={styles.background}
+        >
+          <View style={styles.container}>
+            <View style={styles.left}>
+                <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={toggleVariant} />
+                <Text style={styles.title}>{title}</Text>
             </View>
-        </SafeAreaView>
-    </ImageBackground>
+            
+            <Pressable style={styles.right} onPress={onProfilePress}>
+                <View style={styles.profileInfos}>
+                    <Image source={avatar.uri ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
+                    <Text style={styles.username}>{username}</Text>
+                </View>
+            </Pressable>
+          </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
 
