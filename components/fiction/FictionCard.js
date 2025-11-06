@@ -156,12 +156,7 @@ export default function FictionCard({
     }
   };
 
-  const metadata = !!(
-    fiction.lang ||
-    fiction.storyStatus ||
-    fiction.numberOfChapters ||
-    fiction.numberOfWords
-  ) ? (
+  const metadata = (fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords) ? (
     <View style={styles.metadataContainer}>
       <View style={styles.metadataLeftCol}>
         {!!fiction.lang && <Text style={styles.metadata}>{fiction.lang}</Text>}
