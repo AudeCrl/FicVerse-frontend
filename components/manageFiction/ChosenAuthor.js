@@ -81,7 +81,7 @@ export default function ChosenAuthor({ value, onChange }) {
     <View style={styles.container}>
       <Text style={styles.label}>Auteur ou autrice</Text>
 
-      <View style={styles.row}> {/* Barre d’entrée avec icônes */}
+      <View style={styles.row}>{/* Barre d’entrée avec icônes */}
         <Ionicons name="search" size={18} style={styles.icon} />
 
         <View style={styles.inputWrapper}>
@@ -104,7 +104,7 @@ export default function ChosenAuthor({ value, onChange }) {
         </Pressable>
       </View>
 
-      {open && suggestions.length > 0 && (   // Menu déroulant
+      {open && suggestions.length > 0 && (// Menu déroulant
         <View style={styles.dropdown}>
           {suggestions.map((name) => (
             <Pressable
