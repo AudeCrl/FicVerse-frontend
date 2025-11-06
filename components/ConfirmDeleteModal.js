@@ -126,11 +126,11 @@ export default function ConfirmDeleteModal({
           </View>
 
           {/* 
-            📝 CONTENU PRINCIPAL: Description + avertissements
+            CONTENU PRINCIPAL: Description + avertissements
           */}
           <View style={styles.content}>
             {/* 
-              1️⃣ DESCRIPTION PRINCIPALE:
+              1️DESCRIPTION PRINCIPALE:
               Affiche: "Êtes-vous sûr de vouloir supprimer [itemName] ?"
               itemName en gras pour bien le montrer
             */}

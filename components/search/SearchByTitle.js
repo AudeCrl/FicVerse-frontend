@@ -31,7 +31,7 @@ export default function SearchByTitle({ fictions, navigation }) {
   const getReadingStatusLabel = (status) => {
     const statusMap = {
       "to-read": "À lire",
-      reading: "En cours à lire",
+      reading: "En cours",
       finished: "Terminé",
     };
     return statusMap[status] || status;
