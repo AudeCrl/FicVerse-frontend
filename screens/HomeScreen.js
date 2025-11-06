@@ -236,7 +236,7 @@ export default function HomeScreen({ navigation, route }) {
   // >
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top, bottom"]}>
       {/* Header */}
       <Header onProfilePress={() => navigation.navigate("Profile")} />
 
