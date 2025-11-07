@@ -29,19 +29,19 @@ export default function Tags({
           flexDirection: "row",
           // alignItems: "center",
           flexWrap: "wrap",
-          gap: 8,
+          // gap: 8,
         },
         // Styles pour le bouton "+" : copie exacte du style des tags
         addButton: {
+          backgroundColor: theme.primary,
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
           height: TAG_HEIGHT,
           width: TAG_HEIGHT, // Carré (width = height)
-          paddingHorizontal: TAG_PADDING_HORIZONTAL,
-          marginRight: TAG_MARGIN_RIGHT,
+          // paddingHorizontal: TAG_PADDING_HORIZONTAL,
+          // marginRight: TAG_MARGIN_RIGHT,
           // marginBottom: TAG_MARGIN_BOTTOM,
-          backgroundColor: theme.tagPalette[0],
         },
       }),
     [theme]
@@ -92,7 +92,7 @@ export default function Tags({
           <Text
             style={{
               ...typography.body,
-              color: theme.primary,
+              color: theme.text,
               fontWeight: "700",
               fontSize: 16,
             }}
