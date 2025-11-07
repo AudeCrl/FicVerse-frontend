@@ -26,7 +26,7 @@ export default function Tags({
       StyleSheet.create({
         container: {
           flexDirection: "row",
-          alignItems: "center",
+          // alignItems: "center",
           flexWrap: "wrap",
           gap: 8,
         },
@@ -39,7 +39,7 @@ export default function Tags({
           width: TAG_HEIGHT, // Carré (width = height)
           paddingHorizontal: TAG_PADDING_HORIZONTAL,
           marginRight: TAG_MARGIN_RIGHT,
-          marginBottom: TAG_MARGIN_BOTTOM,
+          // marginBottom: TAG_MARGIN_BOTTOM,
           backgroundColor: theme.tagPalette[0],
         },
       }),
