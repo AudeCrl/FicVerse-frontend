@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext";
 import { typography } from "../../styles/globalStyles";
+import Author from "../fiction/Author";
 import Rate from "../fiction/Rate";
 import Input from "../ui/Input";
 

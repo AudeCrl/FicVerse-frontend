@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import Input from "../components/ui/Input.js";
+import RoundedButton from "../components/ui/RoundedButton.js";
 import { login } from "../reducers/user";
 import { typography } from "../styles/globalStyles.js";
 
@@ -336,12 +337,11 @@ export default function AuthScreen({ navigation, route }) {
                 {/* Après avoir appuyé sur S'inscrire ci-dessous, si la réponse du back est false : alors elle est stockée dans invalid. Ex : user already exist */}
                 {invalid && <Text style={styles.errorCenter}>{invalid}</Text>}
 
-                <TouchableOpacity
-                  style={styles.submitButton} // Si l'un des champs est mal rempli alors !validSignup (revoir useMemo)
+                <RoundedButton
+                  label="S'inscrire"
                   onPress={submitSignup}
-                >
-                  <Text style={styles.submitButtonText}>S’inscrire</Text>
-                </TouchableOpacity>
+                  active={validSignup}
+                />
               </View>
             )}
 
@@ -394,12 +394,11 @@ export default function AuthScreen({ navigation, route }) {
 
                 {invalid && <Text style={styles.errorCenter}>{invalid}</Text>}
 
-                <TouchableOpacity
-                  style={styles.submitButton}
+                <RoundedButton
+                  label="Se connecter"
                   onPress={submitLogin}
-                >
-                  <Text style={styles.submitButtonText}>Se connecter</Text>
-                </TouchableOpacity>
+                  active={validLogin}
+                />
 
                 <View style={styles.linksRow}>
                   <TouchableOpacity onPress={goToForgotPassword}>
@@ -423,7 +422,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
   },
-  
+
   card: {
     width: "85%",
     backgroundColor: "rgba(255,255,255,0.9)",
@@ -469,15 +468,6 @@ const styles = StyleSheet.create({
 
   error: { marginBottom: 6 },
   errorCenter: { textAlign: "center", marginVertical: 6 },
-
-  submitButton: {
-    backgroundColor: "#DEDAFF",
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  submitButtonText: { fontWeight: "700" },
 
   linksRow: { marginTop: 10 },
 

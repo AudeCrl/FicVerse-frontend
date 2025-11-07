@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Alert, View, Text, ScrollView, StyleSheet } from "react-native";
+import { Alert, View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { useSelector } from "react-redux";
 import Header from '../components/Header';
 import Input from "../components/ui/Input";
@@ -176,6 +176,10 @@ const toggleHideRate = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"  // permet de taper sur les suggestions sans fermer le clavier
@@ -216,7 +220,10 @@ const toggleHideRate = () => {
           </View>
 
           <View style={styles.section}>
-            <ChosenAuthor value={author} onChange={setAuthor} />
+            <ChosenAuthor
+              value={author}
+              onChange={setAuthor}
+            />
           </View>
 
           <View style={styles.section}>
@@ -311,6 +318,7 @@ const toggleHideRate = () => {
           </View>
 
         </ScrollView>
+        </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

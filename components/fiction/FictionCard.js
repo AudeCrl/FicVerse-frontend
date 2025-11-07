@@ -292,3 +292,7 @@ export default function FictionCard({
     </View>
   );
 }
+
+FictionCard.defaultProps = {
+  showReadingStatus: false,
+};
