@@ -43,12 +43,14 @@ export default function FictionCard({
         titleContainer: {
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
           marginBottom: 8,
         },
         title: {
           ...typography.h3,
           color: currentTheme.text,
+          flex: 1,
+          flexShrink: 1,
         },
         moreIcon: {
           color: currentTheme.text,

@@ -68,11 +68,11 @@ export default function FandomCard({
       <View style={styles.fandomTitleContainer}>
         <Text style={styles.fandomTitle}>{fandomName}</Text>
         <View style={styles.iconsContainer}>
-          <Ionicons
+          {/*<Ionicons
             name="chevron-collapse-sharp"
             size={24}
             style={styles.collapseIcon}
-          />
+          />*/}
           <TouchableOpacity onPress={openSortModal}>
             <MaterialIcons name="sort" size={24} style={styles.sortIcon} />
           </TouchableOpacity>
