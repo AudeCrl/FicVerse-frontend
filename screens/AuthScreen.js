@@ -208,6 +208,11 @@ export default function AuthScreen({ navigation, route }) {
               <Image style={styles.logo} source={require('../assets/logoFicVerse200.png')} width={140} height={140} />
             </View>
 
+            <View style={styles.welcomeContainer}>
+              <Text style={styles.welcomeTitle}>Bienvenue sur FicVerse !</Text>
+              <Text style={styles.welcomeSubtitle}>L'app qui vous aide à organiser vos lectures</Text>
+            </View>
+
             {/* Switch entre les 2 formulaires */}
             <View style={styles.switchRow}>
               {/* Quand on appuie sur S'inscrire, signUp devient true et on applie les styles switchBtn et switchBtnActive */}
@@ -427,7 +432,7 @@ const styles = StyleSheet.create({
     width: "85%",
     backgroundColor: "rgba(255,255,255,0.9)",
     padding: 20,
-    marginTop: 200,
+    marginTop: 180,
   },
 
   logoContainer: {
@@ -443,6 +448,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     borderWidth: 4,
     borderColor: '#FFFFFF',
+  },
+  welcomeContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  welcomeTitle: {
+    ...typography.h3,
+    fontSize: 18,
+  },
+  welcomeSubtitle: {
+    ...typography.body,
+    fontSize: 14,
+    textAlign: 'center',
   },
 
   switchRow: { flexDirection: "row", gap: 10, marginBottom: 12 },
