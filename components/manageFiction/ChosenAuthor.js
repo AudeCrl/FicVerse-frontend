@@ -95,7 +95,7 @@ export default function ChosenAuthor({ value, onChange }) {
               onChange(inputText);
               setOpen(true);
             }}
-            onFocus={() => setOpen(true)}  // on ouvre la barre déroulante dès qu'on appuie sur l'input, même s'il est vide.
+            onFocus={() => { setOpen(true) }}  // on ouvre la barre déroulante dès qu'on appuie sur l'input, même s'il est vide.
             onBlur={authorTrim}  // Dès qu'on a fini la saisie, on applique la fonction Trim aussitôt
             placeholder="Rechercher ou créer"
             autoCapitalize="words"
