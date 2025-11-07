@@ -31,7 +31,7 @@ export default function ConfirmAccountDelete({
   // Validate password before deletion
   const handleConfirm = async () => {
     if (!password) {
-      setPasswordError("Password required");
+      setPasswordError("Mot de passe requis");
       return;
     }
     await onConfirm(password);
@@ -56,9 +56,9 @@ export default function ConfirmAccountDelete({
         <View style={styles.modalContainer}>
           <View style={styles.header}>
             <Feather name="alert-circle" size={32} color="#DC2626" />
-            <Text style={styles.title}>Delete Your Account</Text>
+            <Text style={styles.title}>❗ Supprimer votre compte</Text>
             <Text style={styles.subtitle}>
-              This action is permanent and cannot be undone
+              Cette action est définitive et ne peut pas être annulée
             </Text>
           </View>
 
@@ -68,19 +68,19 @@ export default function ConfirmAccountDelete({
             <View style={styles.warningItem}>
               <Feather name="x-circle" size={18} color="#DC2626" />
               <Text style={styles.warningText}>
-                All your profiles and fanfictions will be deleted
+                ❌ Tous vos profils et fanfictions seront supprimés
               </Text>
             </View>
             <View style={styles.warningItem}>
               <Feather name="x-circle" size={18} color="#DC2626" />
               <Text style={styles.warningText}>
-                Your data cannot be recovered
+                ❌ Vos données ne pourront pas être récupérées
               </Text>
             </View>
             <View style={styles.warningItem}>
               <Feather name="x-circle" size={18} color="#DC2626" />
               <Text style={styles.warningText}>
-                This action is irreversible
+                ❌ Cette action est irréversible
               </Text>
             </View>
           </View>
@@ -103,7 +103,7 @@ export default function ConfirmAccountDelete({
               style={styles.checkboxLabel}
               onPress={() => setUnderstandsConfirm(!understandsConfirm)}
             >
-              I understand this action is permanent
+              Je comprends que cette action est définitive
             </Text>
           </View>
 
@@ -111,7 +111,7 @@ export default function ConfirmAccountDelete({
           {understandsConfirm && (
             <View style={styles.passwordSection}>
               <Text style={styles.passwordLabel}>
-                Confirm with your password:
+                Confirmez avec votre mot de passe :
               </Text>
               <View style={styles.passwordInputWrapper}>
                 <TextInput
@@ -119,7 +119,7 @@ export default function ConfirmAccountDelete({
                     styles.passwordInput,
                     passwordError && styles.passwordInputError,
                   ]}
-                  placeholder="Your password"
+                  placeholder="Votre mot de passe"
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={(text) => {
@@ -155,7 +155,7 @@ export default function ConfirmAccountDelete({
               onPress={handleCancel}
               disabled={isLoading}
             >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>Annuler</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -167,12 +167,14 @@ export default function ConfirmAccountDelete({
               disabled={!isFormValid || isLoading}
             >
               {isLoading ? (
-                <Text style={styles.deleteButtonText}>Deleting...</Text>
+                <Text style={styles.deleteButtonText}>
+                Suppression en cours...
+                </Text>
               ) : (
                 <>
                   <Feather name="trash-2" size={18} color="white" />
                   <Text style={styles.deleteButtonText}>
-                    Delete My Account
+                  Supprimer mon compte
                   </Text>
                 </>
               )}
@@ -183,7 +185,7 @@ export default function ConfirmAccountDelete({
           <View style={styles.infoFooter}>
             <Feather name="info" size={14} color="#6B7280" />
             <Text style={styles.infoText}>
-              Account to delete: <Text style={styles.bold}>{userEmail}</Text>
+              Compte à supprimer : <Text style={styles.bold}>{userEmail}</Text>
             </Text>
           </View>
         </View>
