@@ -118,6 +118,24 @@ export default function HomeScreen({ navigation, route }) {
     setGlobalSort({ sort: newSortType, order: newSortOrder });
   };
 
+  // ✅ Mettre à jour immuablement une fiction dans la liste
+  const handleFictionUpdated = (updatedFiction) => {
+    if (searchResults) {
+      const updatedResults = searchResults.map((fiction) =>
+        fiction._id === updatedFiction._id ? updatedFiction : fiction
+      );
+      setSearchResults(updatedResults);
+
+      // Mettre à jour aussi originalSearchResults
+      if (originalSearchResults) {
+        const updatedOriginal = originalSearchResults.map((fiction) =>
+          fiction._id === updatedFiction._id ? updatedFiction : fiction
+        );
+        setOriginalSearchResults(updatedOriginal);
+      }
+    }
+  };
+
   const closeSearchResults = () => {
     setOriginalSearchResults(null);
     navigation.navigate("Home", { screen: "HomeMain", params: {} });
@@ -314,6 +332,7 @@ export default function HomeScreen({ navigation, route }) {
                   allFictions={originalSearchResults}
                   onGlobalSortChange={handleGlobalSortChange}
                   currentGlobalSort={globalSort}
+                  onFictionUpdated={handleFictionUpdated}
                 />
               </View>
             ))

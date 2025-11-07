@@ -17,6 +17,7 @@ export default function FictionCard({
   showReadingStatus,
   navigation,
   allFictions,
+  onFictionUpdated,
 }) {
   const { currentTheme } = useTheme();
   const [isFictionActionsModalVisible, setIsFictionActionsModalVisible] =
@@ -25,6 +26,14 @@ export default function FictionCard({
   const [fictionData, setFictionData] = useState(fiction);
   const user = useSelector((state) => state.user.value);
   // console.log('user =>', user);
+
+  // Callback pour mettre à jour fictionData localement et remonter au parent
+  const handleFictionUpdated = (updatedFiction) => {
+    setFictionData(updatedFiction);
+    if (onFictionUpdated) {
+      onFictionUpdated(updatedFiction);
+    }
+  };
 
   // Memorize styles so they only update when the theme changes
   const styles = useMemo(
@@ -265,6 +274,7 @@ export default function FictionCard({
         onClose={() => setIsFictionActionsModalVisible(false)}
         fiction={fictionData}
         navigation={navigation}
+        onFictionUpdated={handleFictionUpdated}
       />
       <AddTagModal
         visible={showAddTagModal}

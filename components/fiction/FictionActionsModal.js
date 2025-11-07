@@ -2,13 +2,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import {
+  Alert,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
@@ -24,38 +24,45 @@ export const FictionActionsModal = ({
   onClose,
   fiction,
   navigation,
+  onFictionUpdated,
 }) => {
   const { currentTheme } = useTheme();
   const user = useSelector((state) => state.user.value);
 
-  const [selectedReadingStatus, setSelectedReadingStatus] = useState(fiction?.readingStatus ?? null);
-  const [lastChapterRead, setLastChapterRead] = useState(fiction?.lastChapterRead ?? 0);
+  const [selectedReadingStatus, setSelectedReadingStatus] = useState(
+    fiction?.readingStatus ?? null
+  );
+  const [lastChapterRead, setLastChapterRead] = useState(
+    fiction?.lastChapterRead ?? 0
+  );
   const [rateValue, setRateValue] = useState(fiction?.rate?.value ?? 0);
-  const [displayRate, setDisplayRate] = useState(fiction?.rate?.display ?? false);
+  const [displayRate, setDisplayRate] = useState(
+    fiction?.rate?.display ?? false
+  );
 
   // Display of a "tick" icon ton confirm when saved
   const [readingSaved, setReadingSaved] = useState(false);
   const [chapterSaved, setChapterSaved] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
-  
+
   const changeReadingStatus = (newStatus) => {
     setSelectedReadingStatus(newStatus);
     updateFiction({ readingStatus: newStatus });
-  }
+  };
   const changeLastChapterRead = (newChapter) => {
     setLastChapterRead(newChapter);
     updateFiction({ lastChapterRead: newChapter });
-  }
+  };
   const changeRateValue = (newRateValue) => {
     setRateValue(newRateValue);
     updateFiction({ rate: { value: newRateValue } });
-  }
+  };
   const handleToggleHide = () => {
     setDisplayRate(displayRate === true ? false : true);
     updateFiction({ rate: { display: displayRate } });
   };
-  
+
   // Fast update of a fiction (readingStatus, lastChapterRead or rate)
   const updateFiction = async (fieldToUpdate = {}) => {
     try {
@@ -70,25 +77,33 @@ export const FictionActionsModal = ({
 
       const data = await res.json();
       if (data.result) {
-        
         const updatedField = Object.keys(fieldToUpdate)[0];
-        console.log('Fiction mise à jour !', updatedField);
+        console.log("Fiction mise à jour !", updatedField);
 
-        switch(updatedField) {
-          case 'readingStatus':
+        //Remonter l'update au parent de manière immuable
+        if (onFictionUpdated) {
+          const updatedFiction = {
+            ...fiction,
+            ...fieldToUpdate,
+          };
+          onFictionUpdated(updatedFiction);
+        }
+
+        switch (updatedField) {
+          case "readingStatus":
             setReadingSaved(true);
             setTimeout(() => setReadingSaved(false), 1500);
             break;
-          case 'lastChapterRead':
+          case "lastChapterRead":
             setChapterSaved(true);
             setTimeout(() => setChapterSaved(false), 1500);
             break;
-          case 'rate':
+          case "rate":
             setRateSaved(true);
             setTimeout(() => setRateSaved(false), 1500);
             break;
           default:
-            console.log('updatedField not recognised', updatedField);
+            console.log("updatedField not recognised", updatedField);
         }
       } else {
         Alert.alert("Erreur", data.error || "Mise à jour échouée");
@@ -124,7 +139,6 @@ export const FictionActionsModal = ({
     }
   };
 
-
   const styles = StyleSheet.create({
     overlay: {
       flex: 1,
@@ -145,8 +159,8 @@ export const FictionActionsModal = ({
       paddingBottom: 10,
       borderBottomWidth: 1,
       borderBottomColor: currentTheme.inputBorder,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      justifyContent: "space-between",
     },
     modalTitle: {
       ...typography.h3,
@@ -181,7 +195,7 @@ export const FictionActionsModal = ({
     },
     editIcon: {
       color: currentTheme.text,
-    }
+    },
   });
 
   return (
@@ -191,15 +205,15 @@ export const FictionActionsModal = ({
       onRequestClose={onClose}
       animationType="slide"
     >
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.overlay}
         onPress={onClose}
         activeOpacity={1}
       >
         <View
           style={styles.modalContainer}
-          onStartShouldSetResponder={() => true}>
-
+          onStartShouldSetResponder={() => true}
+        >
           <View style={styles.header}>
             <Text style={styles.modalTitle}>{fiction?.title}</Text>
             <TouchableOpacity onPress={onClose}>
@@ -220,28 +234,36 @@ export const FictionActionsModal = ({
             showsVerticalScrollIndicator={true}
           >
             <View style={styles.quickEditContainer}>
-            
               {/* ACTION 1: Update readingStatus */}
-              <View style={[styles.actionRow, { alignItems: 'flex-end' }]}>
+              <View style={[styles.actionRow, { alignItems: "flex-end" }]}>
                 <ChosenStatus
                   sectionLabel="Avancement de votre lecture"
                   readingStatus={selectedReadingStatus}
                   onPress={changeReadingStatus}
                 />
                 {readingSaved && (
-                  <Ionicons style={styles.savedIcon} name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                  <Ionicons
+                    style={styles.savedIcon}
+                    name="checkmark-circle"
+                    size={32}
+                    color={currentTheme.primaryPlus}
+                  />
                 )}
               </View>
 
               {/* ACTION 2: Update lastChapterRead */}
-              <View style={[styles.actionRow, { alignItems: 'flex-end' }]}>
+              <View style={[styles.actionRow, { alignItems: "flex-end" }]}>
                 <LastChapterRead
                   sectionLabel="Dernier chapitre lu"
                   value={lastChapterRead}
                   onChange={changeLastChapterRead}
                 />
                 {chapterSaved && (
-                  <Ionicons name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={32}
+                    color={currentTheme.primaryPlus}
+                  />
                 )}
               </View>
 
@@ -256,8 +278,12 @@ export const FictionActionsModal = ({
                   onToggleHide={handleToggleHide}
                   editable={true}
                 />
-                {rateSaved  && (
-                  <Ionicons name="checkmark-circle" size={32} color={currentTheme.primaryPlus} />
+                {rateSaved && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={32}
+                    color={currentTheme.primaryPlus}
+                  />
                 )}
               </View>
             </View>
@@ -293,7 +319,6 @@ export const FictionActionsModal = ({
                 Supprimer la fanfiction
               </Text>
             </TouchableOpacity>
-
           </ScrollView>
         </View>
       </TouchableOpacity>
@@ -323,7 +348,13 @@ export const FictionActionsModal = ({
               alignItems: "center",
             }}
           >
-            <Text style={{ ...typography.h3, color: currentTheme.text, marginBottom: 10 }}>
+            <Text
+              style={{
+                ...typography.h3,
+                color: currentTheme.text,
+                marginBottom: 10,
+              }}
+            >
               Supprimer la fanfiction ?
             </Text>
 
@@ -366,7 +397,6 @@ export const FictionActionsModal = ({
           </View>
         </View>
       </Modal>
-
     </Modal>
   );
 };
