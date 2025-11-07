@@ -1,11 +1,16 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useMemo, useState } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import FictionCard from "./FictionCard";
-import { SortModal } from './SortModal'
+import { SortModal } from "./SortModal";
 
 export default function FandomCard({
   fandomName,
@@ -14,6 +19,7 @@ export default function FandomCard({
   allFictions,
   onGlobalSortChange,
   currentGlobalSort,
+  onFictionUpdated,
 }) {
   const { currentTheme } = useTheme();
 
@@ -55,12 +61,12 @@ export default function FandomCard({
   );
 
   const openSortModal = () => {
-      setIsSortModalVisible(true);
+    setIsSortModalVisible(true);
   };
 
   const handleSortChange = (newSortType, newSortOrder) => {
-      onGlobalSortChange(newSortType, newSortOrder);
-      setIsSortModalVisible(false);
+    onGlobalSortChange(newSortType, newSortOrder);
+    setIsSortModalVisible(false);
   };
 
   return (
@@ -89,6 +95,7 @@ export default function FandomCard({
             showReadingStatus={true}
             navigation={navigation}
             allFictions={allFictions || fictions}
+            onFictionUpdated={onFictionUpdated}
           />
         )}
         keyExtractor={(fiction) => fiction._id} // clé unique (obligatoire)

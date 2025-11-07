@@ -233,6 +233,18 @@ export default function ReadingList({ readingStatus, navigation }) {
     setGlobalSortState({ sort: newSortType, order: newSortOrder });
   };
 
+  // Mettre à jour immuablement une fiction dans la liste
+  const handleFictionUpdated = (updatedFiction) => {
+    setFandomsFetch((prevFandoms) =>
+      prevFandoms.map((fandom) => ({
+        ...fandom,
+        fictions: fandom.fictions.map((fiction) =>
+          fiction._id === updatedFiction._id ? updatedFiction : fiction
+        ),
+      }))
+    );
+  };
+
   useEffect(() => {
     const fetchFandoms = async () => {
       try {
@@ -281,6 +293,7 @@ export default function ReadingList({ readingStatus, navigation }) {
         allFictions={allFictions}
         onGlobalSortChange={handleGlobalSortChange}
         currentGlobalSort={globalSortState}
+        onFictionUpdated={handleFictionUpdated}
       />
     );
   });
