@@ -148,7 +148,7 @@ export default function SearchScreen({ navigation }) {
         },
         tabs: {
           flex: 1,
-          paddingVertical: 10,
+          paddingTop: 10,
         },
         searchHeader: {
           paddingHorizontal: 16,
@@ -159,7 +159,7 @@ export default function SearchScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top, bottom"]}>
       {/* Header */}
       <Header onProfilePress={() => navigation.navigate("Profile")} />
 
