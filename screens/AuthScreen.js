@@ -417,14 +417,15 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
-
+  
   card: {
     width: "85%",
     backgroundColor: "rgba(255,255,255,0.9)",
     padding: 20,
+    marginTop: 200,
   },
 
   logo: {
