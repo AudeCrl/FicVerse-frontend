@@ -20,6 +20,7 @@ export default function FandomCard({
   onGlobalSortChange,
   currentGlobalSort,
   onFictionUpdated,
+  showReadingStatus = false,
 }) {
   const { currentTheme } = useTheme();
 
@@ -92,7 +93,7 @@ export default function FandomCard({
           <FictionCard
             fiction={item}
             collapsingState={1}
-            showReadingStatus={true}
+            showReadingStatus={showReadingStatus}
             navigation={navigation}
             allFictions={allFictions || fictions}
             onFictionUpdated={onFictionUpdated}

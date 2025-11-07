@@ -333,6 +333,7 @@ export default function HomeScreen({ navigation, route }) {
                   onGlobalSortChange={handleGlobalSortChange}
                   currentGlobalSort={globalSort}
                   onFictionUpdated={handleFictionUpdated}
+                  showReadingStatus={true}
                 />
               </View>
             ))
