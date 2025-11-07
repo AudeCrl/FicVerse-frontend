@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Alert, ActivityIndicator, View, Text, ScrollView } from "react-native";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { Alert, View, Text, ScrollView, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
+import Header from '../components/Header';
 import Input from "../components/ui/Input";
 import RoundedButton from "../components/ui/RoundedButton";
 import ChosenTag from "../components/manageFiction/ChosenTag";
@@ -12,6 +13,9 @@ import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
 import ChosenStatus from "../components/manageFiction/ChosenStatus";
 import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
 import Rate from "../components/fiction/Rate";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../context/ThemeContext";
+import { typography } from "../styles/globalStyles";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -39,6 +43,12 @@ export default function ManageFictionScreen({ route, navigation }) {
 
   const [titleError, setTitleError] = useState(false);
   const [fandomError, setFandomError] = useState(false);
+
+  const setTagIdsStable = useCallback((ids) => setTagIds(ids), []);
+  const scrollRef = useRef(null); // ref pour scroller automatiquement
+
+  const { currentTheme } = useTheme();
+  const styles = useMemo(() => createStyles(currentTheme), [currentTheme]);
 
   useEffect(() => { // Pré-remplissage de tous les champs si fiction déjà existante
     if (!fictionId) return; // si pas de fictionId alors cela veut dire nouvelle fiction et donc pas de fetch
@@ -165,105 +175,178 @@ const toggleHideRate = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 18, fontWeight: "600" }}>
-        {fictionId ? "Modifier la fiction" : "Ajouter une fiction"}
-      </Text>
+    <SafeAreaView style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"  // permet de taper sur les suggestions sans fermer le clavier
+          keyboardDismissMode="on-drag"        // dès qu'on se met à scroller, le clavier se ferme automatiquement
+          ref={scrollRef}                      // on pourra scroller au focus
+        >
+          <Header
+         title={fictionId ? "Modifier une fanfiction" : "Ajouter une fanfiction"}
+         variantTheme="manage"     //  eader spécifique à cette page uniquement
+         showToggle={false}        // false pour masquer le switch ici
+         onProfilePress={() => navigation.navigate("Profile")}
+       />
 
-      <ChosenFandom // On passe le flag d’erreur + reset flag au changement
-      value={fandomName}
-      onChange={(value) => {
-        setFandomName(value);
-        setFandomError(false);  // dès qu'on sélectionne à nouveau un fandom ce n'est plus true l'error. Et idem dans l'enfant ChosenFandom, showError devient false dès que !selected est false
-      }}
-      isInvalid={fandomError}
-      />
+          <View style={styles.section}>
+            <ChosenFandom // On passe le flag d’erreur + reset flag au changement
+            value={fandomName}
+            onChange={(value) => {
+              setFandomName(value);
+              setFandomError(false);  // dès qu'on sélectionne à nouveau un fandom ce n'est plus true l'error. Et idem dans l'enfant ChosenFandom, showError devient false dès que !selected est false
+            }}
+            isInvalid={fandomError}
+            />
+          </View>
 
-      <ChosenTitle 
-      value={title}
-      onChange={(value) => {
-        setTitle(value);
-        setTitleError(false);   // dès qu'on tape à nouveau dans l'input Title, l'error n'est plus true.
-      }}
-      isInvalid={titleError}
-      />
+          <View style={styles.section}>
+            <ChosenTitle 
+            value={title}
+            onChange={(value) => {
+              setTitle(value);
+              setTitleError(false);   // dès qu'on tape à nouveau dans l'input Title, l'error n'est plus true.
+            }}
+            isInvalid={titleError}
+            />
+          </View>
 
-      <ChosenLink value={link} onChange={setLink} />
+          <View style={styles.section}>
+            <ChosenLink value={link} onChange={setLink} />
+          </View>
 
-      <ChosenAuthor value={author} onChange={setAuthor} />
+          <View style={styles.section}>
+            <ChosenAuthor value={author} onChange={setAuthor} />
+          </View>
 
-      <ChosenLanguage value={lang} onChange={setLang} /> 
-      
-      <Text style={{ fontWeight: "600" }}>Résumé</Text>
-      <Input
-        value={summary}
-        onChangeText={setSummary}
-        onBlur={() => setSummary(summary.trim())} // trim dès qu'on finit la saisie
-        placeholder="Copier/coller le résumé d’origine, ou écrire le vôtre !"
-        multiline
-        numberOfLines={5}
-        style={{ minHeight: 100, textAlignVertical: "top" }}
-        autoCapitalize="sentences"
-      />
+          <View style={styles.section}>
+            <ChosenLanguage value={lang} onChange={setLang} />
+          </View>
+          
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Résumé</Text>
+            <Input
+              value={summary}
+              onChangeText={setSummary}
+              onBlur={() => setSummary(summary.trim())} // trim dès qu'on finit la saisie
+              placeholder="Copier/coller le résumé d’origine, ou écrire le vôtre !"
+              multiline
+              numberOfLines={5}
+              style={{ minHeight: 100, textAlignVertical: "top" }}
+              autoCapitalize="sentences"
+            />
+          </View>
 
-      <Text style={{ fontWeight: "600", marginTop: 8 }}>Notes personnelles</Text>
-      <Input
-        value={personalNotes}
-        onChangeText={setPersonalNotes}
-        onBlur={() => setPersonalNotes(personalNotes.trim())}
-        placeholder="Vos impressions"
-        multiline   // au début j'allais mettre <Input multiline={true} /> mais c'est la même chose
-        numberOfLines={5}
-        style={{ minHeight: 100, textAlignVertical: "top" }}
-        autoCapitalize="sentences"
-      />
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Notes personnelles</Text>
+            <Input
+              value={personalNotes}
+              onChangeText={setPersonalNotes}
+              onBlur={() => setPersonalNotes(personalNotes.trim())}
+              placeholder="Vos impressions"
+              multiline   // au début j'allais mettre <Input multiline={true} /> mais c'est la même chose
+              numberOfLines={5}
+              style={{ minHeight: 100, textAlignVertical: "top" }}
+              autoCapitalize="sentences"
+            />
+          </View>
 
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: "600" }}>Nombre de chapitres</Text>
-          <Input
-            value={String(numberOfChapters)}       // TextInput n'accepte que des strings donc on transforme les chiffres de String
-            onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))} // tout ce qui n'est pas un chiffre est supprimé par replace (en vérité, remplacé par "")
-            keyboardType="numeric"
-            placeholder="21"
-          />
-        </View>
+          <View style={[styles.section, styles.numbersRow]}>
+            <View style={styles.numberCol}>
+              <Text style={styles.sectionLabel}>Nombre de chapitres</Text>
+              <Input
+                value={String(numberOfChapters)}       // TextInput n'accepte que des strings donc on transforme les chiffres de String
+                onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))} // tout ce qui n'est pas un chiffre est supprimé par replace (en vérité, remplacé par "")
+                keyboardType="numeric"
+                placeholder="21"
+              />
+            </View>
 
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: "600" }}>Nombre de mots</Text>
-          <Input
-            value={String(numberOfWords)}
-            onChangeText={(value) => setNumberOfWords(value.replace(/[^0-9]/g, ""))}
-            keyboardType="numeric"
-            placeholder="97 012"
-          />
-        </View>
-      </View>
+            <View style={styles.numberCol}>
+              <Text style={styles.sectionLabel}>Nombre de mots</Text>
+              <Input
+                value={String(numberOfWords)}
+                onChangeText={(value) => setNumberOfWords(value.replace(/[^0-9]/g, ""))}
+                keyboardType="numeric"
+                placeholder="97 012"
+              />
+            </View>
+          </View>
 
-      <ChosenStatus sectionLabel="Avancement de votre lecture" readingStatus={readingStatus} onPress={setReadingStatus}/>
+          <View style={styles.section}>
+            <ChosenStatus sectionLabel="Avancement de votre lecture" readingStatus={readingStatus} onPress={setReadingStatus}/>
+          </View>
 
-      <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />{/* Dernier chapitre lu : Input + boutons +/- */}
+          <View style={styles.section}>
+            <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />{/* Dernier chapitre lu : Input + boutons +/- */}
+          </View>
 
-      <ChosenStatus sectionLabel="Statut de publication de la fanfiction" storyStatus={storyStatus} onPress={setStoryStatus}/>
+          <View style={styles.section}>
+            <ChosenStatus sectionLabel="Statut de publication de la fanfiction" storyStatus={storyStatus} onPress={setStoryStatus}/>
+          </View>
 
-      <ChosenTag       // Tags : tout est géré par ChosenTag, on récupère juste les ids
-        fictionId={fictionId}
-        idTags={setTagIds} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
-      />
+          <View style={styles.section}>
+            <ChosenTag       // Tags : tout est géré par ChosenTag, on récupère juste les ids
+              fictionId={fictionId}
+              idTags={setTagIdsStable} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
+              onTagInputFocus={() => scrollRef.current?.scrollToEnd({ animated: true })} // focus input => scroll en bas
+              onTagTyping={() => scrollRef.current?.scrollToEnd({ animated: true })}     // chaque frappe => scroll en bas
+            />
+          </View>
 
-      <Rate
-        sectionLabel="Votre note"
-        iconName={user.notationIcon}
-        value={rateValue}
-        onPress={setRateValue}
-        hideRate={!displayRate}
-        onToggleHide={toggleHideRate}
-        editable={true} />
+          <View style={styles.section}>
+            <Rate
+              sectionLabel="Votre note"
+              iconName={user.notationIcon}
+              value={rateValue}
+              onPress={setRateValue}
+              hideRate={!displayRate}
+              onToggleHide={toggleHideRate}
+              editable={true}
+            />
+          </View>
 
-      <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
+          <View style={styles.section}>
+            <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
+          </View>
 
-      <View><Text>Je n'existe que pour monter le dernier bouton</Text></View>
-
-    </ScrollView>
+        </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const createStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    content: {
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 28,
+      rowGap: 12,
+    },
+    section: {
+      marginTop: 6,
+      marginBottom: 8,
+    },
+    sectionLabel: {
+      ...typography.label,
+      color: theme.text,
+      marginBottom: 6,
+      marginTop: 4,
+    },
+    numbersRow: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    numberCol: {
+      flex: 1,
+    },
+    submitButton: {
+      backgroundColor: theme.primary,
+      borderRadius: 14,
+      paddingVertical: 12,
+    },
+  });

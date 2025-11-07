@@ -3,11 +3,14 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Input from "../ui/Input";
+import { useTheme } from "../../context/ThemeContext.js";
+import { typography } from "../../styles/globalStyles.js";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenAuthor({ value, onChange }) {
   const token = useSelector((state) => state.user.value.token);
+  const { currentTheme } = useTheme();
 
   const [input, setInput] = useState(value || "");
   const [totalAuthors, setTotalAuthors] = useState([]);   // tous les auteurs (distincts)
@@ -79,10 +82,10 @@ export default function ChosenAuthor({ value, onChange }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Auteur ou autrice</Text>
+      <Text style={[ styles.label, { color: currentTheme.text } ]}>Auteur ou autrice</Text>
 
       <View style={styles.row}>{/* Barre d’entrée avec icônes */}
-        <Ionicons name="search" size={18} style={styles.icon} />
+        <Ionicons name="search" size={18} style={[ styles.icon, { color: currentTheme.text } ]} />
 
         <View style={styles.inputWrapper}>
           <Input
@@ -100,7 +103,7 @@ export default function ChosenAuthor({ value, onChange }) {
         </View>
 
         <Pressable onPress={() => setOpen((toggle) => !toggle)}>
-          <Ionicons name={open ? "chevron-up" : "chevron-down"} size={18} style={styles.icon} />
+          <Ionicons name={open ? "chevron-up" : "chevron-down"} size={18} style={[ styles.icon, { color: currentTheme.text } ]} />
         </Pressable>
       </View>
 
@@ -124,7 +127,7 @@ export default function ChosenAuthor({ value, onChange }) {
 const styles = StyleSheet.create({
   container: { gap: 6 },
 
-  label: { fontWeight: "600" },
+  label: { ...typography.label, marginBottom: 0 },
 
   row: {
     flexDirection: "row",

@@ -3,11 +3,14 @@ import { View, Text, ScrollView } from "react-native";
 import { useSelector } from "react-redux";
 import Input from "../ui/Input";
 import RoundedButton from "../ui/RoundedButton";
+import { useTheme } from "../../context/ThemeContext.js";
+import { typography } from "../../styles/globalStyles.js";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenFandom({ value, onChange, isInvalid = false }) {
   const token = useSelector((state) => state.user.value.token);
+  const { currentTheme } = useTheme();
 
   const [fandoms, setFandoms] = useState([]);        // { avec chaque fandom qui possède son _id, name, position }
   const [selected, setSelected] = useState(value || "");
@@ -91,7 +94,7 @@ Le fetch /fiction/:id part tout de suite au 1er render, mais il revient après (
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ fontWeight: "600", color: showError ? "#E03131" : undefined }}>Fandom *</Text>
+      <Text style={{ ...typography.label, color: showError ? "#E03131" : currentTheme.text }}>Fandom *</Text>
 
       <ScrollView   // Scroll horizontal
         horizontal

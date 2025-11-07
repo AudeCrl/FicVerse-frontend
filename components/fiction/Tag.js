@@ -23,9 +23,8 @@ export default function Tag({ label, colorIndex, withCross, onPress, tag }) {
           paddingHorizontal: 6,
           marginRight: 14,
           marginBottom: 14,
-          backgroundColor:
-            currentTheme.tagPalette[colorIndex - 1] ||
-            currentTheme.tagPalette[0],
+          backgroundColor: currentTheme.tagPalette[colorIndex - 1] || currentTheme.tagPalette[0],
+          alignSelf: "flex-start", // empêche de prendre toute la largeur dans un conteneur en colonne
         }}
       >
         <Text style={{ ...typography.body, color: currentTheme.text }}>

@@ -3,11 +3,14 @@ import { View, Text, ScrollView } from "react-native";
 import { useSelector } from "react-redux";
 import Input from "../ui/Input";
 import RoundedButton from "../ui/RoundedButton";
+import { useTheme } from "../../context/ThemeContext.js";
+import { typography } from "../../styles/globalStyles.js";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenLanguage({ value, onChange }) {
   const token = useSelector((state) => state.user.value.token);
+  const { currentTheme } = useTheme();
 
   const [languages, setLanguages] = useState([]); // [{ name, position }]
   const [chosenLang, setChosenLang] = useState(value || "");
@@ -56,7 +59,7 @@ export default function ChosenLanguage({ value, onChange }) {
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ fontWeight: "600" }}>Langue</Text>
+      <Text style={{ ...typography.label, color: currentTheme.text }}>Langue</Text>
 
       <ScrollView     // Barre de boutons de langues
         horizontal

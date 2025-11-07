@@ -10,6 +10,8 @@ export default function Header({
   title='Mes histoires',
   avatarSource=require('../assets/avatar-default.png'),
   onProfilePress,
+  variantTheme = 'default', // 'default' puour les pages existantes, et 'manage' pour ManageFictionScreen uniquement
+  showToggle = true,        // masque/affiche le bouton de bascule dark/light
 }) {
   const username = useSelector((state) => state.user.value.username); // on récupère le username du store reducers
   const avatar = {uri: useSelector((state) => state.user.value.avatar)}; // on récupère l'avatar du store reducers
@@ -22,6 +24,7 @@ export default function Header({
       background: {
         paddingHorizontal: 16,
         margin: 0,
+        paddingBottom: variantTheme === 'manage' ? 6 : 0, // légère marge pour le header de ManageFictionScreen
       },
       container: {
         flexDirection: 'row',
@@ -31,7 +34,7 @@ export default function Header({
         paddingTop: 10,
       },
       left: {
-        height: 80,
+        height: variantTheme === 'manage' ? 72 : 80, // on ajuste la hauteur sans impacter les autres pages
         justifyContent: 'space-between',
       },
       toggleIcon: {
@@ -40,6 +43,7 @@ export default function Header({
       title: {
         ...typography.h1,
         color: currentTheme.text,
+        marginTop: 15,
       },
       right: {
         justifyContent: 'center',
@@ -63,7 +67,7 @@ export default function Header({
         backgroundColor: '#FFFFFF',
       },
     }),
-    [currentTheme] // Regenerate styles only when theme or variant changes
+    [currentTheme, variant] // Regenerate styles only when theme or variant changes
   );
   
   return (
@@ -75,7 +79,9 @@ export default function Header({
         >
           <View style={styles.container}>
             <View style={styles.left}>
-                <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={toggleVariant} />
+                 {showToggle && ( // On n'affiche pas le toggle que si demandé. Par défaut c'est true
+              <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={toggleVariant} />
+            )}
                 <Text style={styles.title}>{title}</Text>
             </View>
             

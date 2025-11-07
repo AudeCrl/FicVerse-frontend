@@ -22,8 +22,7 @@ export default function Input({
   // Créer les styles dynamiques si useThemeColors est true
   const dynamicStyle = useThemeColors
     ? {
-        backgroundColor: currentTheme.cardBackground,
-        borderColor: currentTheme.primary,
+        borderColor: currentTheme.inputBorder,
         color: currentTheme.text,
       }
     : {};

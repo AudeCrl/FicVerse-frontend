@@ -5,12 +5,15 @@ import { useSelector } from "react-redux";
 import Input from "../ui/Input";
 import Tags from "../fiction/Tags";
 import Tag from "../fiction/Tag";
+import { useTheme } from "../../context/ThemeContext.js";
+import { typography } from "../../styles/globalStyles.js";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
-export default function ChosenTag({ fictionId, idTags }) {
+export default function ChosenTag({ fictionId, idTags, onTagInputFocus, onTagTyping }) {
 
   const token = useSelector((state) => state.user.value.token);
+  const { currentTheme } = useTheme();
 
   const [input, setInput] = useState("");
   const [totalTags, setTotalTags] = useState([]);       // tous les tags du user
@@ -42,13 +45,17 @@ export default function ChosenTag({ fictionId, idTags }) {
         const data = await res.json();
         if (data.result && data.fiction.tags) {
           setSelectedTags(data.fiction.tags);  // tous les tags d'une fiction sont ajoutés dans la ligne selectedTags
-          idTags(data.fiction.tags.map(tag => tag._id)); // on ne récupère que les ids et ce sont les ids de tous les tags liés à la fiction concernée. Ils seront transmis à ManageFictionScreen
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
       }
     })();
-  }, [fictionId, token, idTags]);
+  }, [fictionId, token]); // Pas idTags dans la liste de dépendances pour éviter des variations inutiles
+
+  useEffect(() => { // synchroniser le parent UNIQUEMENT après rendu, une fois que selectedTags change
+    if (!idTags) return;    
+    idTags(selectedTags.map(tag => tag._id)); // on ne récupère que les ids et ce sont les ids de tous les tags liés à la fiction concernée. Ils seront transmis à ManageFictionScreen
+  }, [selectedTags, idTags]); // idTags correspond à l'ensemble des tags de selectedTags, cad tous les tags de la fiction. On refait cette props ici car on actualise selectedTags.
 
   const suggestions = useMemo(() => {   // Grâce à useMemo, la liste des suggestions est enregistrée et ne change que si on modifie input (texte dans la barre recherche), totalTags (tous les tags du user) ou selectedTags (les tags sélectionnés)
   const inputTrim = input.trim().toLowerCase();
@@ -76,8 +83,7 @@ export default function ChosenTag({ fictionId, idTags }) {
   // Ajouter un tag
   const addTag = (tag) => {
     setSelectedTags(prev => {                                                           // prev = la valeur actuelle du tableau selectedTags
-      const next = prev.some(item => item._id === tag._id) ? prev : [...prev, tag];     // si aucun tag de selectedTags (cad item ici) ne correspond à tag._id alors on ajoute tag via [...prev, tag]. En revanche, s'il existe déjà alors on garde prev inchangé.
-      idTags(next.map(tag => tag._id));   // idTags correspond à l'ensemble des tags de selectedTags, cad tous les tags de la fiction. On refait cette props ici car on actualise selectedTags.
+      const next = prev.some(item => item._id === tag._id) ? prev : [...prev, tag];     // si aucun tag de selectedTags (cad item ici) ne correspond à tag._id alors on ajoute tag via [...prev, tag]. En revanche, s'il existe déjà alors on garde prev inchangé. 
       return next;
     });
     setInput("");
@@ -86,7 +92,6 @@ export default function ChosenTag({ fictionId, idTags }) {
   const removeTag = (id) => {
     setSelectedTags(prev => {
       const next = prev.filter(tag => tag._id !== id);  // on filtre pour garder tous les tags qui ne correspondent pas au tag qu'on veut delete
-      idTags(next.map(tag => tag._id));                 // on actualise idTags
       return next;
     });
   };
@@ -131,14 +136,18 @@ export default function ChosenTag({ fictionId, idTags }) {
   return (
     <View style={{ gap: 10 }}>
 
-      <Text>Tags</Text>
+      <Text style={{ ...typography.label, color: currentTheme.text }}>Tags</Text>
 
       {/* Barre de recherche */}
       <Input
         value={input}
-        onChangeText={setInput}
+        onChangeText={(inputText) => { // scroller à chaque frappe
+          setInput(inputText);
+          onTagTyping?.();
+        }}
         placeholder="Rechercher ou créer"
         leftIcon={<Ionicons name="search" size={18} />}
+        onFocus={onTagInputFocus} // au focus, on scrolle tout en bas pour dégager les suggestions
       />
 
       {/* Tags sélectionnés */}

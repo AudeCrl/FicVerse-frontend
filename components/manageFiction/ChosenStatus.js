@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { StyleSheet, TextInput, View, Text } from "react-native";
+import { StyleSheet, View, Text, ScrollView } from "react-native";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 import RoundedButton from "../ui/RoundedButton.js";
@@ -36,6 +36,8 @@ export default function ChosenStatus({
             },
             statusContainer: {
                 flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12, // même espacement pour les 2 composants
             },
         }),
         [currentTheme] // Regenerate styles only when theme or variant changes
@@ -47,28 +49,34 @@ export default function ChosenStatus({
             {!!sectionLabel && 
                 <Text style={styles.sectionLabel}>{sectionLabel}</Text>}
             
-            <View style={styles.statusContainer}>
+            <ScrollView
+                horizontal // ScrollView horizontal pour les boutons
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.statusContainer}
+            >
             
-                {!!readingStatus && readingStatusList.map((r) => (
-                    <RoundedButton 
-                        key={r.id} 
-                        label={r.label} 
-                        active={r.id === readingStatus} 
-                        onPress={() => onPress?.(r.id)}
-                        style={{marginRight: 14}}
-                    />
-                ))}
+                <View style={styles.statusContainer}>
+                
+                    {!!readingStatus && readingStatusList.map((r) => (
+                        <RoundedButton 
+                            key={r.id} 
+                            label={r.label} 
+                            active={r.id === readingStatus} 
+                            onPress={() => onPress?.(r.id)}
+                        />
+                    ))}
 
-                {!!storyStatus && storyStatusList.map((r) => (
-                    <RoundedButton 
-                        key={r.id} 
-                        label={r.label} 
-                        active={r.id === storyStatus} 
-                        onPress={() => onPress?.(r.id)}
-                    />
-                ))}
+                    {!!storyStatus && storyStatusList.map((r) => (
+                        <RoundedButton 
+                            key={r.id} 
+                            label={r.label} 
+                            active={r.id === storyStatus} 
+                            onPress={() => onPress?.(r.id)}
+                        />
+                    ))}
 
-            </View>
+                </View>
+            </ScrollView>
         </View>
     );
 }
