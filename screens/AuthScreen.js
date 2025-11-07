@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import Input from "../components/ui/Input.js";
@@ -202,7 +203,9 @@ export default function AuthScreen({ navigation, route }) {
       >
         <View style={styles.container}>
           <View style={styles.card}>
-            <Text style={styles.logo}>LOGO</Text>
+            <View style={styles.logoContainer}>
+              <Image style={styles.logo} source={require('../assets/logoFicVerse200.png')} width={140} height={140} />
+            </View>
 
             {/* Switch entre les 2 formulaires */}
             <View style={styles.switchRow}>
@@ -239,7 +242,7 @@ export default function AuthScreen({ navigation, route }) {
 
             {/* FORMULAIRE INSCRIPTION */}
             {signUp && ( // signUp = true => affichage du formulaire Inscription
-              <View>
+              <View style={styles.signUpContainer}>
                 <Input
                   inputLabel="Identifiant"
                   placeholder="LunaLvgd"
@@ -344,7 +347,7 @@ export default function AuthScreen({ navigation, route }) {
 
             {/* FORMULAIRE CONNEXION */}
             {!signUp && ( // signUp = false => affichage du formulaire Connexion
-              <View>
+              <View style={styles.signInContainer}>
                 <Input
                   inputLabel="Adresse mail"
                   placeholder="lunalvgd@hogwarts.school"
@@ -428,11 +431,20 @@ const styles = StyleSheet.create({
     marginTop: 200,
   },
 
+  logoContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
+    marginTop: -90,
+    
+  },
   logo: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
     textAlign: "center",
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
   },
 
   switchRow: { flexDirection: "row", gap: 10, marginBottom: 12 },
@@ -445,6 +457,13 @@ const styles = StyleSheet.create({
   switchBtnActive: { backgroundColor: "#DEDAFF" },
   switchBtnInactive: { backgroundColor: "#E6E6E6" },
   switchText: { fontWeight: "600" },
+
+  signUpContainer: {
+
+  },
+  signInContainer: {
+
+  },
 
   label: { ...typography.label, fontWeight: "600", marginBottom: 4 },
 
