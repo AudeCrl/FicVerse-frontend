@@ -184,7 +184,7 @@ const toggleHideRate = () => {
         >
           <Header
          title={fictionId ? "Modifier une fanfiction" : "Ajouter une fanfiction"}
-         variantTheme="manage"     //  eader spécifique à cette page uniquement
+         screenName="manage"     //  eader spécifique à cette page uniquement
          showToggle={false}        // false pour masquer le switch ici
          onProfilePress={() => navigation.navigate("Profile")}
        />
@@ -322,7 +322,7 @@ const createStyles = (theme) =>
       backgroundColor: theme.background,
     },
     content: {
-      paddingHorizontal: 16,
+      // paddingHorizontal: 16,
       paddingTop: 12,
       paddingBottom: 28,
       rowGap: 12,
@@ -330,6 +330,7 @@ const createStyles = (theme) =>
     section: {
       marginTop: 6,
       marginBottom: 8,
+      paddingHorizontal: 16,
     },
     sectionLabel: {
       ...typography.label,

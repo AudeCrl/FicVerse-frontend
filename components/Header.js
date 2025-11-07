@@ -10,7 +10,7 @@ export default function Header({
   title='Mes histoires',
   avatarSource=require('../assets/avatar-default.png'),
   onProfilePress,
-  variantTheme = 'default', // 'default' puour les pages existantes, et 'manage' pour ManageFictionScreen uniquement
+  screenName = 'default', // 'default' puour les pages existantes, et 'manage' pour ManageFictionScreen uniquement
   showToggle = true,        // masque/affiche le bouton de bascule dark/light
 }) {
   const username = useSelector((state) => state.user.value.username); // on récupère le username du store reducers
@@ -24,26 +24,28 @@ export default function Header({
       background: {
         paddingHorizontal: 16,
         margin: 0,
-        paddingBottom: variantTheme === 'manage' ? 6 : 0, // légère marge pour le header de ManageFictionScreen
+        // paddingBottom: screenName === 'manage' ? 6 : 0, // légère marge pour le header de ManageFictionScreen
       },
       container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
+        // alignItems: 'flex-end',
         paddingBottom: 10,
         paddingTop: 10,
+        height: screenName === 'manage' ? 68 : 'auto',
       },
       left: {
-        height: variantTheme === 'manage' ? 72 : 80, // on ajuste la hauteur sans impacter les autres pages
-        justifyContent: 'space-between',
+        height: screenName === 'manage' ? '100%' : 80, // on ajuste la hauteur sans impacter les autres pages
+        justifyContent: screenName === 'manage' ? 'center' : 'space-between',
       },
       toggleIcon: {
         color: currentTheme.text,
+        width: 34,
       },
       title: {
         ...typography.h1,
         color: currentTheme.text,
-        marginTop: 15,
+        // marginTop: 15,
       },
       right: {
         justifyContent: 'center',
@@ -60,9 +62,9 @@ export default function Header({
         maxWidth: 140,
       },
       avatar: {
-        width: 65,
-        height: 65,
-        marginBottom: 2,
+        width: screenName === 'manage' ? 45 : 65,
+        height: screenName === 'manage' ? 45 : 65, 
+        marginBottom: screenName === 'manage' ? 0 : 2,
         borderRadius: 50,
         backgroundColor: '#FFFFFF',
       },
@@ -88,7 +90,7 @@ export default function Header({
             <Pressable style={styles.right} onPress={onProfilePress}>
                 <View style={styles.profileInfos}>
                     <Image source={avatar.uri ? avatar : avatarSource} style={styles.avatar} resizeMode="cover" />
-                    <Text style={styles.username}>{username}</Text>
+                    {(screenName !== 'manage') && <Text style={styles.username}>{username}</Text>}
                 </View>
             </Pressable>
           </View>
