@@ -456,6 +456,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     ...typography.h3,
     fontSize: 18,
+    color: '#8071F4',
   },
   welcomeSubtitle: {
     ...typography.body,
