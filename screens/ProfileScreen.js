@@ -12,7 +12,9 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmAccountDelete from "../components/ConfirmAccountDelete";
+import AddTagModal from "../components/fiction/AddTagModal";
 import SettingsCard from "../components/SettingsCard";
+import TagsCard from "../components/TagsCard";
 import Input from "../components/ui/Input";
 import { useTheme } from "../context/ThemeContext.js";
 import {
@@ -82,6 +84,7 @@ export default function ProfileScreen({ navigation }) {
   const [isLoadingFandoms, setIsLoadingFandoms] = useState(false);
   const [isLoadingLanguages, setIsLoadingLanguages] = useState(false);
   const [isLoadingAuthors, setIsLoadingAuthors] = useState(false);
+  const [showAddTagModal, setShowAddTagModal] = useState(false);
 
   useEffect(() => {
     if (user.username) {
@@ -110,8 +113,8 @@ export default function ProfileScreen({ navigation }) {
 
   const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    backgroundColor: currentTheme.background,
+      flex: 1,
+      backgroundColor: currentTheme.background,
     },
     scrollView: {
       flex: 1,
@@ -190,7 +193,7 @@ export default function ProfileScreen({ navigation }) {
     // Styles pour les éléments internes
     usernameContainer: {
       // alignItems: "center",
-      justifyContent: 'center',
+      justifyContent: "center",
       marginVertical: 10,
       flexDirection: "row",
       gap: 8,
@@ -199,22 +202,20 @@ export default function ProfileScreen({ navigation }) {
     },
     inputUsernameCont: {
       // flex: 1,
-      justifyContent: 'center',
+      justifyContent: "center",
       // alignItems: 'center',
-      alignContent: 'center',
+      alignContent: "center",
       minWidth: 150,
       marginLeft: 24,
     },
     editButtonUsername: {
-      justifyContent: 'center',
+      justifyContent: "center",
       bottom: 3,
       // alignContent: 'flex-end',
       // alignItems: 'flex-end',
       // right: 5,
     },
-    memberSince: {
-
-    },
+    memberSince: {},
     memberSinceText: {
       // ...typography.small,
       marginTop: 8,
@@ -321,7 +322,7 @@ export default function ProfileScreen({ navigation }) {
       fontSize: 15,
       fontWeight: "600",
     },
-  })
+  });
 
   const handleEditAvatar = async () => {
     console.log("Edit Avatar clicked");
@@ -919,7 +920,6 @@ export default function ProfileScreen({ navigation }) {
                     />
                   </TouchableOpacity>
                 )}
-
               </View>
             </View>
             <View style={styles.memberSince}>
@@ -927,7 +927,7 @@ export default function ProfileScreen({ navigation }) {
                 Membre FicVerse depuis le {formattedDate}
               </Text>
             </View>
-            
+
             <View style={styles.sectionSeparator} />
 
             <View style={styles.emailContainer}>
@@ -940,7 +940,7 @@ export default function ProfileScreen({ navigation }) {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   placeholder={isEditingEmail ? currentEmail : null}
-                  inputLabel = 'Votre mail :'
+                  inputLabel="Votre mail :"
                 />
               </View>
               <View style={styles.editButton}>
@@ -973,11 +973,10 @@ export default function ProfileScreen({ navigation }) {
                   onChangeText={setNewPassword}
                   editable={isEditingPassword}
                   secureTextEntry={isEditingPassword}
-                  inputLabel = 'Mot de passe :'
+                  inputLabel="Mot de passe :"
                 />
-
               </View>
-              <View style={styles.editButton}>                
+              <View style={styles.editButton}>
                 <TouchableOpacity onPress={handleEditPassword}>
                   <Feather name="edit" size={24} color="black" />
                 </TouchableOpacity>
@@ -1005,16 +1004,12 @@ export default function ProfileScreen({ navigation }) {
             /> */}
 
             {/* Tags */}
-            <SettingsCard
+            <TagsCard
               title="Mes tags"
-              count={userTags.length}
-              chips={chipsPreview(
-                userTags.map((t) => t.name),
-                3
-              )}
+              tags={userTags}
+              onAddTagPress={() => setShowAddTagModal(true)}
               onPress={() => navigation.navigate("TagsManager")}
-              testID="settings-tags"
-              isEmpty={userTags.length === 0}
+              emptyText="Aucun tag ajouté"
             />
 
             {/* Fandoms */}
@@ -1066,6 +1061,18 @@ export default function ProfileScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {/* Modal pour ajouter des tags au profil */}
+      <AddTagModal
+        visible={showAddTagModal}
+        onClose={() => setShowAddTagModal(false)}
+        fictionId={null}
+        currentTags={userTags}
+        onTagsAdded={(newTags) => {
+          // Ajouter les nouveaux tags à la liste
+          setUserTags([...userTags, ...newTags]);
+          setShowAddTagModal(false);
+        }}
+      />
     </View>
   );
-};
+}

@@ -2,7 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -117,29 +119,40 @@ export default function AddTagModal({
     try {
       setIsAdding(true);
 
-      // Préparer les IDs des tags à ajouter
-      const tagIdsToAdd = selectedTags.map((t) => t._id);
-      const currentTagIds = currentTags.map((t) => t._id);
-      const allTagIds = [...currentTagIds, ...tagIdsToAdd];
+      // Si c'est pour une fiction (fictionId existe)
+      if (fictionId) {
+        // Préparer les IDs des tags à ajouter
+        const tagIdsToAdd = selectedTags.map((t) => t._id);
+        const currentTagIds = currentTags.map((t) => t._id);
+        const allTagIds = [...currentTagIds, ...tagIdsToAdd];
 
-      // Mettre à jour la fiction avec les nouveaux tags
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/fiction/${fictionId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            tagIds: allTagIds,
-          }),
+        // Mettre à jour la fiction avec les nouveaux tags
+        const res = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/fiction/${fictionId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              tagIds: allTagIds,
+            }),
+          }
+        );
+
+        const data = await res.json();
+        if (data.result) {
+          // Appeler le callback pour informer le parent
+          if (onTagsAdded) {
+            onTagsAdded(selectedTags);
+          }
+          // Fermer la modale
+          handleClose();
         }
-      );
-
-      const data = await res.json();
-      if (data.result) {
-        // Appeler le callback pour informer le parent
+      } else {
+        // Pour les tags du profil (pas de fictionId)
+        // Simplement appeler le callback avec les tags sélectionnés
         if (onTagsAdded) {
           onTagsAdded(selectedTags);
         }
@@ -322,113 +335,124 @@ export default function AddTagModal({
       animationType="slide"
     >
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          {/* HEADER */}
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>Ajouter des tags</Text>
-              {selectedTags.length > 0 && (
-                <Text style={styles.selectedCount}>
-                  {selectedTags.length} sélectionné
-                  {selectedTags.length > 1 ? "s" : ""}
-                </Text>
-              )}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
+          style={{ flex: 1, justifyContent: "flex-end" }}
+        >
+          <View style={styles.modalContainer}>
+            {/* HEADER */}
+            <View style={styles.header}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title}>Ajouter des tags</Text>
+                {selectedTags.length > 0 && (
+                  <Text style={styles.selectedCount}>
+                    {selectedTags.length} sélectionné
+                    {selectedTags.length > 1 ? "s" : ""}
+                  </Text>
+                )}
+              </View>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleClose}
+              >
+                <Feather name="x" size={24} color={currentTheme.text} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-              <Feather name="x" size={24} color={currentTheme.text} />
-            </TouchableOpacity>
-          </View>
 
-          {/* SEARCH INPUT */}
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Rechercher un tag..."
-              placeholderTextColor={currentTheme.secondaryText}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              editable={!isAdding}
-            />
-          </View>
-
-          {/* TAGS LIST */}
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={currentTheme.primary} />
+            {/* SEARCH INPUT */}
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Rechercher un tag..."
+                placeholderTextColor={currentTheme.secondaryText}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                editable={!isAdding}
+              />
             </View>
-          ) : availableTags.length === 0 ? (
-            <Text style={styles.emptyText}>
-              {searchQuery
-                ? "Aucun tag trouvé"
-                : "Tous les tags sont déjà utilisés"}
-            </Text>
-          ) : (
-            <ScrollView
-              style={styles.tagsList}
-              showsVerticalScrollIndicator={true}
-            >
-              {availableTags.map((tag) => {
-                const isSelected = selectedTags.some((t) => t._id === tag._id);
-                return (
-                  <TouchableOpacity
-                    key={tag._id}
-                    style={[
-                      styles.tagItem,
-                      isSelected && styles.tagItemSelected,
-                    ]}
-                    onPress={() => toggleTagSelection(tag)}
-                    disabled={isAdding}
-                  >
-                    <View
-                      style={[
-                        styles.checkbox,
-                        isSelected && styles.checkboxSelected,
-                      ]}
-                    >
-                      {isSelected && <Text style={styles.checkmark}>✓</Text>}
-                    </View>
-                    <Text
-                      style={[
-                        styles.tagLabel,
-                        isSelected && styles.tagLabelSelected,
-                      ]}
-                    >
-                      {tag.name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          )}
 
-          {/* FOOTER BUTTONS */}
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={handleClose}
-              disabled={isAdding}
-            >
-              <Text style={styles.cancelButtonText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                styles.addButton,
-                selectedTags.length === 0 && { opacity: 0.5 },
-              ]}
-              onPress={handleAddTags}
-              disabled={selectedTags.length === 0 || isAdding}
-            >
-              {isAdding ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.addButtonText}>
-                  Ajouter ({selectedTags.length})
-                </Text>
-              )}
-            </TouchableOpacity>
+            {/* TAGS LIST */}
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={currentTheme.primary} />
+              </View>
+            ) : availableTags.length === 0 ? (
+              <Text style={styles.emptyText}>
+                {searchQuery
+                  ? "Aucun tag trouvé"
+                  : "Tous les tags sont déjà utilisés"}
+              </Text>
+            ) : (
+              <ScrollView
+                style={styles.tagsList}
+                showsVerticalScrollIndicator={true}
+              >
+                {availableTags.map((tag) => {
+                  const isSelected = selectedTags.some(
+                    (t) => t._id === tag._id
+                  );
+                  return (
+                    <TouchableOpacity
+                      key={tag._id}
+                      style={[
+                        styles.tagItem,
+                        isSelected && styles.tagItemSelected,
+                      ]}
+                      onPress={() => toggleTagSelection(tag)}
+                      disabled={isAdding}
+                    >
+                      <View
+                        style={[
+                          styles.checkbox,
+                          isSelected && styles.checkboxSelected,
+                        ]}
+                      >
+                        {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                      </View>
+                      <Text
+                        style={[
+                          styles.tagLabel,
+                          isSelected && styles.tagLabelSelected,
+                        ]}
+                      >
+                        {tag.name}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            )}
+
+            {/* FOOTER BUTTONS */}
+            <View style={styles.footer}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={handleClose}
+                disabled={isAdding}
+              >
+                <Text style={styles.cancelButtonText}>Annuler</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.addButton,
+                  selectedTags.length === 0 && { opacity: 0.5 },
+                ]}
+                onPress={handleAddTags}
+                disabled={selectedTags.length === 0 || isAdding}
+              >
+                {isAdding ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.addButtonText}>
+                    Ajouter ({selectedTags.length})
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );

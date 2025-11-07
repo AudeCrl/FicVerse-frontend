@@ -156,28 +156,34 @@ export default function FictionCard({
     }
   };
 
-  const metadata = (fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords) ? (
-    <View style={styles.metadataContainer}>
-      <View style={styles.metadataLeftCol}>
-        {!!fiction.lang && <Text style={styles.metadata}>{fiction.lang}</Text>}
-        {!!fiction.storyStatus && (
-          <Text style={styles.metadata}>
-            {storyStatusLabels[fiction.storyStatus]}
-          </Text>
-        )}
+  const metadata =
+    fiction.lang ||
+    fiction.storyStatus ||
+    fiction.numberOfChapters ||
+    fiction.numberOfWords ? (
+      <View style={styles.metadataContainer}>
+        <View style={styles.metadataLeftCol}>
+          {!!fiction.lang && (
+            <Text style={styles.metadata}>{fiction.lang}</Text>
+          )}
+          {!!fiction.storyStatus && (
+            <Text style={styles.metadata}>
+              {storyStatusLabels[fiction.storyStatus]}
+            </Text>
+          )}
+        </View>
+        <View style={styles.metadataRightCol}>
+          {fiction.numberOfChapters > 0 && (
+            <Text style={styles.metadata}>
+              {fiction.numberOfChapters} chapitres
+            </Text>
+          )}
+          {fiction.numberOfWords > 0 && (
+            <Text style={styles.metadata}>{fiction.numberOfWords} mots</Text>
+          )}
+        </View>
       </View>
-      <View style={styles.metadataRightCol}>
-        {fiction.numberOfChapters > 0 && (
-          <Text style={styles.metadata}>
-            {fiction.numberOfChapters} chapitres
-          </Text>
-        )}
-        {fiction.numberOfWords > 0 && (
-          <Text style={styles.metadata}>{fiction.numberOfWords} mots</Text>
-        )}
-      </View>
-    </View>
-  ) : null;
+    ) : null;
 
   return (
     <View style={styles.fictionCard}>
@@ -231,9 +237,11 @@ export default function FictionCard({
           Dernier chapitre lu : {fiction.lastChapterRead}
         </Text>
       )}
-      {fictionData.tags &&
+      {/* Tags section - Always show if component can add tags */}
+      <View style={{ marginBottom: 8 }}>
+        {fictionData.tags &&
         Array.isArray(fictionData.tags) &&
-        fictionData.tags.length > 0 && (
+        fictionData.tags.length > 0 ? (
           <Tags
             tags={fictionData.tags}
             withCross={false}
@@ -242,7 +250,16 @@ export default function FictionCard({
             onAddTagPress={() => setShowAddTagModal(true)}
             theme={currentTheme}
           />
+        ) : (
+          /* Afficher le bouton "+" même s'il n'y a pas de tags */
+          <Tags
+            tags={[]}
+            withCross={false}
+            onAddTagPress={() => setShowAddTagModal(true)}
+            theme={currentTheme}
+          />
         )}
+      </View>
       <FictionActionsModal
         isVisible={isFictionActionsModalVisible}
         onClose={() => setIsFictionActionsModalVisible(false)}

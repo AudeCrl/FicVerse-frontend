@@ -1,15 +1,13 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMemo } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import { typography } from "../../styles/globalStyles";
 import Tag from "./Tag";
 
-const TAG_BUTTON_SIZE = 32;
-const TAG_BUTTON_ICON_SIZE = 20;
-const SPACING_SM = 4;
 const TAG_HEIGHT = 27;
 const TAG_MARGIN_BOTTOM = 14;
-const VERTICAL_ALIGN_OFFSET = 2; // Remonte le bouton pour l'aligner avec les tags
+const TAG_MARGIN_RIGHT = 14;
+const TAG_PADDING_HORIZONTAL = 6;
 
 export default function Tags({
   tags,
@@ -32,15 +30,17 @@ export default function Tags({
           flexWrap: "wrap",
           gap: 8,
         },
+        // Styles pour le bouton "+" : copie exacte du style des tags
         addButton: {
-          width: TAG_BUTTON_SIZE,
-          height: TAG_BUTTON_SIZE,
-          borderRadius: TAG_BUTTON_SIZE / 2,
-          backgroundColor: theme.primaryPlus,
+          flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
+          height: TAG_HEIGHT,
+          width: TAG_HEIGHT, // Carré (width = height)
+          paddingHorizontal: TAG_PADDING_HORIZONTAL,
+          marginRight: TAG_MARGIN_RIGHT,
           marginBottom: TAG_MARGIN_BOTTOM,
-          marginTop: -VERTICAL_ALIGN_OFFSET,
+          backgroundColor: theme.tagPalette[0],
         },
       }),
     [theme]
@@ -79,11 +79,26 @@ export default function Tags({
           />
         ))}
 
-      {/* Bouton "+" pour ajouter des tags */}
+      {/* Bouton "+" pour ajouter des tags - styles identiques aux tags */}
       {onAddTagPress && (
-        <TouchableOpacity onPress={onAddTagPress} style={styles.addButton}>
-          <Ionicons name="add" size={TAG_BUTTON_ICON_SIZE} color="#fff" />
-        </TouchableOpacity>
+        <Pressable
+          onPress={onAddTagPress}
+          style={({ pressed }) => [
+            styles.addButton,
+            { opacity: pressed ? 0.8 : 1 },
+          ]}
+        >
+          <Text
+            style={{
+              ...typography.body,
+              color: theme.primary,
+              fontWeight: "700",
+              fontSize: 16,
+            }}
+          >
+            +
+          </Text>
+        </Pressable>
       )}
     </View>
   );
