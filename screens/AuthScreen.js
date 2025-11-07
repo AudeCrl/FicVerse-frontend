@@ -1,6 +1,6 @@
-import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import {
+  Image,
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
@@ -8,7 +8,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import Input from "../components/ui/Input.js";
@@ -43,14 +42,8 @@ export default function AuthScreen({ navigation, route }) {
   // useState pour stocker le message d'erreur
   const [invalid, setInvalid] = useState("");
 
-  // États pour afficher/masquer les mots de passe
-  const [showPasswordSignup, setShowPasswordSignup] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
-
   const dispatch = useDispatch();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // Cette regex est une méthode de vérification pour s'assurer que le champ email contient des emails
 
   //  Explication de UseMemo en 3 lignes !
   //  On attribue une constante pour appliquer le useMemo. Ex : checkUsername.
@@ -277,67 +270,37 @@ export default function AuthScreen({ navigation, route }) {
                   <Text style={styles.error}>Adresse e-mail invalide</Text>
                 )}
 
-                {/* Mot de passe avec icône œil */}
-                <View style={styles.passwordContainer}>
-                  <Input
-                    inputLabel="Mot de passe"
-                    placeholder="6d-A83!r#7erVk5_"
-                    secureTextEntry={!showPasswordSignup}
-                    autoCapitalize="none"
-                    value={passwordSignup}
-                    onChangeText={setPasswordSignup}
-                    isInvalid={submittedSignup && !checkPasswordSignup}
-                    numberOfLines={1}
-                    multiline={false}
-                    style={{ paddingRight: 40 }}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPasswordSignup(!showPasswordSignup)}
-                  >
-                    <Feather
-                      name={showPasswordSignup ? "eye" : "eye-off"}
-                      size={20}
-                      color="#717171"
-                    />
-                  </TouchableOpacity>
-                </View>
+                {/* Mot de passe */}
+                <Input
+                  inputLabel="Mot de passe"
+                  placeholder="6d-A83!r#7erVk5_"
+                  secureTextEntry={true}
+                  autoCapitalize="none"
+                  value={passwordSignup}
+                  onChangeText={setPasswordSignup}
+                  isInvalid={submittedSignup && !checkPasswordSignup}
+                  numberOfLines={1}
+                  multiline={false}
+                  style={{ marginVertical: 8 }}
+                />
 
                 {!checkPasswordSignup && passwordSignup.length > 0 && (
                   <Text style={styles.error}>Mot de passe requis</Text>
                 )}
 
-                {/* Confirmer le mot de passe avec icône œil */}
-                <View style={styles.passwordContainer}>
-                  <Input
-                    inputLabel="Confirmer le mot de passe"
-                    placeholder="6d-A83!r#7erVk5_"
-                    secureTextEntry={!showConfirmPassword}
-                    autoCapitalize="none"
-                    value={confirmPassword}
-                    onChangeText={setconfirmPassword}
-                    isInvalid={submittedSignup && !checkConfirmPassword}
-                    numberOfLines={1}
-                    multiline={false}
-                    style={{ paddingRight: 40 }}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    <Feather
-                      name={showConfirmPassword ? "eye" : "eye-off"}
-                      size={20}
-                      color="#717171"
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                {!checkConfirmPassword && confirmPassword.length > 0 && (
-                  <Text style={styles.error}>
-                    Les mots de passe ne correspondent pas
-                  </Text>
-                )}
+                {/* Confirmer le mot de passe */}
+                <Input
+                  inputLabel="Confirmer le mot de passe"
+                  placeholder="6d-A83!r#7erVk5_"
+                  secureTextEntry={true}
+                  autoCapitalize="none"
+                  value={confirmPassword}
+                  onChangeText={setconfirmPassword}
+                  isInvalid={submittedSignup && !checkConfirmPassword}
+                  numberOfLines={1}
+                  multiline={false}
+                  style={{ marginVertical: 8 }}
+                />
 
                 {/* Après avoir appuyé sur S'inscrire ci-dessous, si la réponse du back est false : alors elle est stockée dans invalid. Ex : user already exist */}
                 {invalid && <Text style={styles.errorCenter}>{invalid}</Text>}
@@ -367,31 +330,19 @@ export default function AuthScreen({ navigation, route }) {
                   <Text style={styles.error}>Adresse e-mail invalide</Text>
                 )}
 
-                {/* Mot de passe avec icône œil */}
-                <View style={styles.passwordContainer}>
-                  <Input
-                    inputLabel="Mot de passe"
-                    placeholder="6d-A83!r#7erVk5_"
-                    secureTextEntry={!showPasswordLogin}
-                    autoCapitalize="none"
-                    value={passwordLogin}
-                    onChangeText={setPasswordLogin}
-                    isInvalid={submittedLogin && !checkPasswordLogin}
-                    numberOfLines={1}
-                    multiline={false}
-                    style={{ paddingRight: 40 }}
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPasswordLogin(!showPasswordLogin)}
-                  >
-                    <Feather
-                      name={showPasswordLogin ? "eye" : "eye-off"}
-                      size={20}
-                      color="#717171"
-                    />
-                  </TouchableOpacity>
-                </View>
+                {/* Mot de passe */}
+                <Input
+                  inputLabel="Mot de passe"
+                  placeholder="6d-A83!r#7erVk5_"
+                  secureTextEntry={true}
+                  autoCapitalize="none"
+                  value={passwordLogin}
+                  onChangeText={setPasswordLogin}
+                  isInvalid={submittedLogin && !checkPasswordLogin}
+                  numberOfLines={1}
+                  multiline={false}
+                  style={{ marginVertical: 8 }}
+                />
 
                 {!checkPasswordLogin && passwordLogin.length > 0 && (
                   <Text style={styles.error}>Mot de passe requis</Text>
@@ -488,18 +439,4 @@ const styles = StyleSheet.create({
   errorCenter: { textAlign: "center", marginVertical: 6 },
 
   linksRow: { marginTop: 10 },
-
-  passwordContainer: {
-    position: "relative",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  eyeIcon: {
-    position: "absolute",
-    right: 12,
-    padding: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 });
