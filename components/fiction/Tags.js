@@ -17,6 +17,7 @@ export default function Tags({
   pressTag,
   onAddTagPress,
   theme: themeProp,
+  showAdd = true,
 }) {
   const { currentTheme } = useTheme();
   const theme = themeProp || currentTheme;
@@ -80,7 +81,7 @@ export default function Tags({
         ))}
 
       {/* Bouton "+" pour ajouter des tags - styles identiques aux tags */}
-      {onAddTagPress && (
+      {onAddTagPress && showAdd && (
         <Pressable
           onPress={onAddTagPress}
           style={({ pressed }) => [

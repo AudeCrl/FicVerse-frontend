@@ -159,6 +159,7 @@ export default function TagsCard({
                 withCross={false}
                 onAddTagPress={onAddTagPress}
                 theme={currentTheme}
+                showAdd={false}
               />
             </View>
           )}

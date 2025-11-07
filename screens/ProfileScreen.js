@@ -322,6 +322,55 @@ export default function ProfileScreen({ navigation }) {
       fontSize: 15,
       fontWeight: "600",
     },
+
+    // --- FANDOMS CARD ---
+    fandomsCard: {
+      backgroundColor: currentTheme.background,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: currentTheme.segmentation,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      marginVertical: 8,
+    },
+    fandomsTitle: {
+      ...typography.h4,
+      color: currentTheme.text,
+      marginBottom: 8,
+    },
+    fandomsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      marginBottom: 8,
+    },
+    fandomChip: {
+      backgroundColor: "#E0E0E0",
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+    },
+    fandomText: {
+      ...typography.body,
+      color: "#2E2E2E",
+      fontWeight: "500",
+    },
+    emptyFandomsText: {
+      ...typography.body,
+      color: currentTheme.secondaryText,
+      fontStyle: "italic",
+    },
+    fandomsNavButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 8,
+      gap: 8,
+    },
+    fandomsNavText: {
+      ...typography.body,
+      color: currentTheme.primary,
+      fontWeight: "600",
+    },
   });
 
   const handleEditAvatar = async () => {
@@ -1012,18 +1061,37 @@ export default function ProfileScreen({ navigation }) {
               emptyText="Aucun tag ajouté"
             />
 
-            {/* Fandoms */}
-            <SettingsCard
-              title="Mes fandoms"
-              count={userFandoms.length}
-              chips={chipsPreview(
-                userFandoms.map((f) => f.name),
-                3
+            {/* Fandoms - En lecture seule avec chips gris */}
+            <View style={styles.fandomsCard}>
+              <Text style={styles.fandomsTitle}>Mes fandoms</Text>
+              {userFandoms.length > 0 ? (
+                <View style={styles.fandomsRow}>
+                  {userFandoms.map((fandom) => (
+                    <View
+                      key={fandom._id || fandom.id}
+                      style={styles.fandomChip}
+                    >
+                      <Text style={styles.fandomText}>{fandom.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text style={styles.emptyFandomsText}>Aucun fandom ajouté</Text>
               )}
-              onPress={() => navigation.navigate("FandomsManager")}
-              testID="settings-fandoms"
-              isEmpty={userFandoms.length === 0}
-            />
+              {userFandoms.length > 0 && (
+                <TouchableOpacity
+                  style={styles.fandomsNavButton}
+                  onPress={() => navigation.navigate("FandomsManager")}
+                >
+                  <Text style={styles.fandomsNavText}>Gérer les fandoms</Text>
+                  <Feather
+                    name="chevron-right"
+                    size={18}
+                    color={currentTheme.primary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
 
             {/* Langues */}
             <SettingsCard
