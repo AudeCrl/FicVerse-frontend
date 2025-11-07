@@ -37,6 +37,7 @@ export const FictionActionsModal = ({
   const [readingSaved, setReadingSaved] = useState(false);
   const [chapterSaved, setChapterSaved] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   
   const changeReadingStatus = (newStatus) => {
     setSelectedReadingStatus(newStatus);
@@ -98,6 +99,32 @@ export const FictionActionsModal = ({
     }
   };
 
+  // Delete a fiction
+  const handleDeleteFiction = async () => {
+    try {
+      const res = await fetch(`${API_IP}/fiction/${fiction._id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.result) {
+        setConfirmDeleteVisible(false);
+        onClose();
+        navigation.navigate("Home");
+      } else {
+        Alert.alert("Erreur", data.error || "Suppression impossible");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Problème de connexion");
+    }
+  };
+
+
   const styles = StyleSheet.create({
     overlay: {
       flex: 1,
@@ -152,6 +179,9 @@ export const FictionActionsModal = ({
       color: currentTheme.text,
       marginLeft: 8,
     },
+    editIcon: {
+      color: currentTheme.text,
+    }
   });
 
   return (
@@ -239,7 +269,7 @@ export const FictionActionsModal = ({
                 navigation.navigate("ManageFiction", { fictionId: fiction._id })
               }
             >
-              <MaterialIcons name="edit" size={22} />
+              <MaterialIcons style={styles.editIcon} name="edit" size={22} />
               <Text style={styles.actionText}>Modifier la fanfiction</Text>
             </TouchableOpacity>
 
@@ -256,34 +286,87 @@ export const FictionActionsModal = ({
             {/* --- ACTION 6: Delete fanfiction --- */}
             <TouchableOpacity
               style={styles.actionRow}
-              onPress={() => console.log("TODO delete")}
+              onPress={() => setConfirmDeleteVisible(true)}
             >
               <MaterialIcons name="delete" size={22} color="red" />
               <Text style={[styles.actionText, { color: "red" }]}>
                 Supprimer la fanfiction
               </Text>
             </TouchableOpacity>
+
           </ScrollView>
         </View>
       </TouchableOpacity>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        visible={confirmDeleteVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setConfirmDeleteVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 300,
+          }}
+        >
+          <View
+            style={{
+              width: "80%",
+              backgroundColor: currentTheme.background,
+              padding: 20,
+              borderRadius: 10,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ ...typography.h3, color: currentTheme.text, marginBottom: 10 }}>
+              Supprimer la fanfiction ?
+            </Text>
+
+            <Text
+              style={{
+                ...typography.body,
+                color: currentTheme.secondaryText,
+                textAlign: "center",
+                marginBottom: 20,
+              }}
+            >
+              Cette action est définitive.
+            </Text>
+
+            <View style={{ flexDirection: "row", gap: 14 }}>
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  borderRadius: 6,
+                  backgroundColor: currentTheme.inactive,
+                }}
+                onPress={() => setConfirmDeleteVisible(false)}
+              >
+                <Text style={{ color: currentTheme.text }}>Annuler</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  borderRadius: 6,
+                  backgroundColor: "red",
+                }}
+                onPress={handleDeleteFiction}
+              >
+                <Text style={{ color: "white" }}>Supprimer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </Modal>
   );
 };
-
-// {/* --- ACTION 4 : Modifier infos fanfiction --- */}
-// <Pressable style={styles.actionRow} onPress={() => console.log("TODO modify info")}>
-//     <MaterialIcons name="edit" size={22} />
-//     <Text style={styles.actionText}>Modifier les informations</Text>
-// </Pressable>
-
-// {/* --- ACTION 5 : Dupliquer la fiction --- */}
-// <Pressable style={styles.actionRow} onPress={() => console.log("TODO duplicate")}>
-//     <Ionicons name="copy" size={22} />
-//     <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
-// </Pressable>
-
-// {/* --- ACTION 6 : Supprimer la fiction --- */}
-// <Pressable style={styles.actionRow} onPress={() => console.log("TODO delete")}>
-//     <MaterialIcons name="delete" size={22} color="red" />
-//     <Text style={[styles.actionText, { color: "red" }]}>Supprimer la fanfiction</Text>
-// </Pressable>
