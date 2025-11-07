@@ -281,7 +281,7 @@ export default function AuthScreen({ navigation, route }) {
                   isInvalid={submittedSignup && !checkPasswordSignup}
                   numberOfLines={1}
                   multiline={false}
-                  style={{ marginVertical: 8 }}
+                  style={{ marginBottom: 8 }}
                 />
 
                 {!checkPasswordSignup && passwordSignup.length > 0 && (
@@ -299,7 +299,7 @@ export default function AuthScreen({ navigation, route }) {
                   isInvalid={submittedSignup && !checkConfirmPassword}
                   numberOfLines={1}
                   multiline={false}
-                  style={{ marginVertical: 8 }}
+                  style={{ marginTop: 8 }}
                 />
 
                 {/* Après avoir appuyé sur S'inscrire ci-dessous, si la réponse du back est false : alors elle est stockée dans invalid. Ex : user already exist */}
