@@ -176,6 +176,10 @@ const toggleHideRate = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"  // permet de taper sur les suggestions sans fermer le clavier
