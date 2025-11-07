@@ -124,6 +124,8 @@ export const FictionActionsModal = ({
     modalTitle: {
       ...typography.h3,
       color: currentTheme.text,
+      flex: 1,
+      flexShrink: 1,
     },
     mainContent: {
       paddingVertical: 10,
