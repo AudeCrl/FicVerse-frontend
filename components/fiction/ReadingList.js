@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useEffect, useState, useMemo } from "react";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { useSelector } from "react-redux";
+import { useTheme } from "../../context/ThemeContext.js";
+import { typography } from "../../styles/globalStyles.js";
 import FandomCard from "./FandomCard";
+import RoundedButton from "../ui/RoundedButton";
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -9,6 +12,7 @@ const defaultSort = { sort: "lastReadAt", order: "desc" };
 
 // readingStatus sera l'une des valeurs suivantes : ["reading","to-read","finished"]
 export default function ReadingList({ readingStatus, navigation }) {
+  const { currentTheme } = useTheme();
   const user = useSelector((state) => state.user.value);
   const [fandomsFetch, setFandomsFetch] = useState([]);
   const [globalSortState, setGlobalSortState] = useState(defaultSort);
@@ -233,6 +237,26 @@ export default function ReadingList({ readingStatus, navigation }) {
     setGlobalSortState({ sort: newSortType, order: newSortOrder });
   };
 
+  // Memorize styles so they only update when the theme changes
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          paddingHorizontal: 14,
+        },
+        nothingToShowContainer: {
+          paddingTop: 200,
+          alignItems: 'center',
+        },
+        nothingToShowMsg: {
+          ...typography.body,
+          color: currentTheme.text,
+          marginBottom: 20,
+        }
+      }),
+    [currentTheme] // Regenerate styles only when theme or variant changes
+  );
+
   // Mettre à jour immuablement une fiction dans la liste
   const handleFictionUpdated = (updatedFiction) => {
     setFandomsFetch((prevFandoms) =>
@@ -298,15 +322,34 @@ export default function ReadingList({ readingStatus, navigation }) {
     );
   });
 
+  let readingStatusText;
+  if (fandomsFetch.length === 0) {
+    switch(readingStatus) {
+      case 'reading': readingStatusText = ' en cours'; break;
+      case 'to-read': readingStatusText = ' à lire'; break;
+      case 'finished': readingStatusText = ' terminée'; break;
+      default: readingStatusText = '';
+    }
+  }
+
   return (
     <View style={styles.container}>
+      {fandomsFetch.length === 0 ? (
+      // Aucun fandom/fiction à afficher
+      <View style={styles.nothingToShowContainer}>
+        <Text style={styles.nothingToShowMsg}>
+          Aucune fiction{readingStatusText} pour le moment.
+        </Text>
+        <RoundedButton
+          label="+ Ajouter une fiction"
+          active={true}
+          onPress={() => navigation.navigate("ManageFiction")}
+          style={{ paddingVertical: 8, paddingHorizontal: 16 }}
+        />
+      </View>
+    ) : (
       <ScrollView showsVerticalScrollIndicator={false}>{fandoms}</ScrollView>
+    )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 14,
-  },
-});

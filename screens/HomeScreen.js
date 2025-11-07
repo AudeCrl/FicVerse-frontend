@@ -118,7 +118,7 @@ export default function HomeScreen({ navigation, route }) {
     setGlobalSort({ sort: newSortType, order: newSortOrder });
   };
 
-  // ✅ Mettre à jour immuablement une fiction dans la liste
+  // Mettre à jour immuablement une fiction dans la liste
   const handleFictionUpdated = (updatedFiction) => {
     if (searchResults) {
       const updatedResults = searchResults.map((fiction) =>
@@ -270,7 +270,7 @@ export default function HomeScreen({ navigation, route }) {
                   : searchType === "tag"
                   ? "Résultats pour le tag"
                   : searchType === "author"
-                  ? "Résultats pour l'auteur"
+                  ? "Résultats pour l'auteur ou l'autrice"
                   : searchType === "summary"
                   ? "Résultats pour résumé/notes"
                   : "Résultats de recherche"}
@@ -333,6 +333,7 @@ export default function HomeScreen({ navigation, route }) {
                   onGlobalSortChange={handleGlobalSortChange}
                   currentGlobalSort={globalSort}
                   onFictionUpdated={handleFictionUpdated}
+                  showReadingStatus={true}
                 />
               </View>
             ))
