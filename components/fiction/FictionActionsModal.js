@@ -118,6 +118,8 @@ export const FictionActionsModal = ({
       paddingBottom: 10,
       borderBottomWidth: 1,
       borderBottomColor: currentTheme.inputBorder,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
     },
     modalTitle: {
       ...typography.h3,
@@ -157,11 +159,27 @@ export const FictionActionsModal = ({
       onRequestClose={onClose}
       animationType="slide"
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
+      <TouchableOpacity 
+        style={styles.overlay}
+        onPress={onClose}
+        activeOpacity={1}
+      >
+        <View
+          style={styles.modalContainer}
+          onStartShouldSetResponder={() => true}>
 
           <View style={styles.header}>
             <Text style={styles.modalTitle}>{fiction?.title}</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons
+                name="close-sharp"
+                size={23}
+                style={{
+                  color: currentTheme.text,
+                  paddingLeft: 6,
+                }}
+              />
+            </TouchableOpacity>
           </View>
 
           <ScrollView
@@ -245,7 +263,7 @@ export const FictionActionsModal = ({
             </TouchableOpacity>
           </ScrollView>
         </View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
