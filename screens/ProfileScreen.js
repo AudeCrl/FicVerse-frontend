@@ -25,6 +25,7 @@ import {
 } from "../reducers/user";
 import { typography } from "../styles/globalStyles";
 import { chipsPreview } from "../utils/chipsFormatter";
+import RoundedButton from "../components/ui/RoundedButton"
 
 const API_IP = process.env.EXPO_PUBLIC_API_URL;
 
@@ -150,7 +151,7 @@ export default function ProfileScreen({ navigation }) {
       height: 120,
       borderRadius: 60,
       borderWidth: 4,
-      borderColor: "white", // Contour blanc pour l'effet de chevauchement
+      borderColor: currentTheme.background, // Contour blanc pour l'effet de chevauchement
       position: "absolute", // Positionnement absolu dans profileHeader
       bottom: -60, // Déplace l'avatar de la moitié de sa hauteur (120/2) vers le bas
       zIndex: 10,
@@ -182,12 +183,12 @@ export default function ProfileScreen({ navigation }) {
 
     // Conteneur pour grouper username/email/password
     usernameEmailWrapper: {
-      backgroundColor: "rgba(255, 255, 255, 0.6)",
+      backgroundColor: currentTheme.background,
       borderRadius: 12,
       padding: 16,
       marginBottom: 24,
       borderWidth: 1,
-      borderColor: "rgba(229, 231, 235, 0.5)",
+      borderColor: currentTheme.segmentation,
     },
 
     // Styles pour les éléments internes
@@ -206,7 +207,7 @@ export default function ProfileScreen({ navigation }) {
       // alignItems: 'center',
       alignContent: "center",
       minWidth: 150,
-      marginLeft: 24,
+      marginLeft: 24,      
     },
     editButtonUsername: {
       justifyContent: "center",
@@ -228,7 +229,7 @@ export default function ProfileScreen({ navigation }) {
     // Ligne de séparation entre les sections
     sectionSeparator: {
       height: 1,
-      backgroundColor: "#E5E7EB",
+      backgroundColor: currentTheme.segmentation,
       marginVertical: 12,
     },
 
@@ -254,11 +255,14 @@ export default function ProfileScreen({ navigation }) {
       textAlign: "center",
       fontSize: 18,
       color: currentTheme.primaryPlus,
+      backgroundColor: currentTheme.background,
       borderColor: currentTheme.inputBorder,
     },
     inputEmail: {
       ...typography.input,
       color: currentTheme.primaryPlus,
+      backgroundColor: currentTheme.background,
+      borderColor: currentTheme.inputBorder,
       flex: 1,
       marginRight: 8,
       fontSize: 14,
@@ -266,6 +270,8 @@ export default function ProfileScreen({ navigation }) {
     inputPassword: {
       ...typography.input,
       color: currentTheme.primaryPlus,
+      backgroundColor: currentTheme.background,
+      borderColor: currentTheme.inputBorder,
       flex: 1,
       marginRight: 8,
       fontSize: 14,
@@ -285,42 +291,33 @@ export default function ProfileScreen({ navigation }) {
     manageAccountContainer: {
       width: "100%",
       paddingVertical: 16,
-      paddingHorizontal: 16,
-      marginBottom: 30,
+      // paddingHorizontal: 30,
+      marginBottom: 40,
       alignItems: "center",
-      justifyContent: "center",
       backgroundColor: currentTheme.background,
       borderTopWidth: 1,
       borderTopColor: "#E5E7EB",
       gap: 10,
+      flex: 1,
     },
     logout: {
       ...typography.button,
-      width: "100%",
-      backgroundColor: "#FFFFFF",
-      borderColor: "#E5E7EB",
-      borderWidth: 1,
+      width: 250,
+      // backgroundColor: "#FFFFFF",
+      // borderColor: "#E5E7EB",
+      // borderWidth: 1,
       borderRadius: 10,
       paddingVertical: 12,
-      paddingHorizontal: 16,
-      textAlign: "center",
-      color: "#374151",
-      fontSize: 15,
-      fontWeight: "600",
+      // paddingHorizontal: 2,
     },
     removeAccount: {
       ...typography.button,
-      width: "100%",
-      backgroundColor: "#DC2626",
-      borderColor: "#DC2626",
-      borderWidth: 1,
+      width: 250,
+      backgroundColor: "#df2727ff",
+      // borderWidth: 1,
       borderRadius: 10,
       paddingVertical: 12,
       paddingHorizontal: 16,
-      textAlign: "center",
-      color: "white",
-      fontSize: 15,
-      fontWeight: "600",
     },
 
     // --- FANDOMS CARD ---
@@ -931,7 +928,7 @@ export default function ProfileScreen({ navigation }) {
             onPress={handleEditAvatar}
             style={styles.editAvatarButton}
           >
-            <Feather name="edit" size={24} color="white" />
+            <Feather name="edit" size={24} color={currentTheme.primaryPlus} />
           </TouchableOpacity>
         </View>
       </View>
@@ -957,7 +954,7 @@ export default function ProfileScreen({ navigation }) {
                   <Feather
                     name={isEditingUsername ? "check" : "edit"}
                     size={24}
-                    color="black"
+                    color={currentTheme.primaryPlus}
                   />
                 </TouchableOpacity>
                 {isEditingUsername && (
@@ -997,7 +994,7 @@ export default function ProfileScreen({ navigation }) {
                   <Feather
                     name={isEditingEmail ? "check" : "edit"}
                     size={24}
-                    color="black"
+                    color={currentTheme.primaryPlus}
                   />
                 </TouchableOpacity>
                 {isEditingEmail && (
@@ -1027,7 +1024,7 @@ export default function ProfileScreen({ navigation }) {
               </View>
               <View style={styles.editButton}>
                 <TouchableOpacity onPress={handleEditPassword}>
-                  <Feather name="edit" size={24} color="black" />
+                  <Feather name="edit" size={24} color={currentTheme.primaryPlus} />
                 </TouchableOpacity>
                 {isEditingPassword && (
                   <TouchableOpacity onPress={() => setIsEditingPassword(false)}>
@@ -1121,12 +1118,25 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.manageAccountContainer}>
-          <TouchableOpacity onPress={handleLogout}>
+          {/* <TouchableOpacity onPress={handleLogout}>
             <Text style={styles.logout}>Se déconnecter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleRemoveAccount}>
+          </TouchableOpacity> */}
+          <RoundedButton
+            label='Se déconnecter'
+            onPress={handleLogout}
+            style={styles.logout}
+            active={true}
+          />
+          {/* <TouchableOpacity onPress={handleRemoveAccount}>
             <Text style={styles.removeAccount}>Supprimer le compte</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <RoundedButton
+            label='Supprimer le compte'
+            onPress={handleRemoveAccount}
+            style={styles.removeAccount}
+            active={true}
+            textColor='white'
+          />
         </View>
       </ScrollView>
       {/* Modal pour ajouter des tags au profil */}

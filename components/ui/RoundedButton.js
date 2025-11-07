@@ -8,6 +8,7 @@ export default function RoundedButton({
   active = false,
   onPress,
   style = {},
+  textColor,
 }) {
   const { currentTheme } = useTheme();
   
@@ -28,7 +29,7 @@ export default function RoundedButton({
         style={{
           ...typography.body,
           fontWeight: '600',
-          color: currentTheme.text,
+          color: textColor || currentTheme.text,
         }}
       >
         {label}
