@@ -191,7 +191,6 @@ export default function ProfileScreen({ navigation }) {
     usernameContainer: {
       // alignItems: "center",
       justifyContent: 'center',
-      
       marginVertical: 10,
       flexDirection: "row",
       gap: 8,
@@ -204,9 +203,11 @@ export default function ProfileScreen({ navigation }) {
       // alignItems: 'center',
       alignContent: 'center',
       minWidth: 150,
+      marginLeft: 24,
     },
     editButtonUsername: {
       justifyContent: 'center',
+      bottom: 3,
       // alignContent: 'flex-end',
       // alignItems: 'flex-end',
       // right: 5,
