@@ -26,7 +26,8 @@ export default function FandomCard({
 
   const [isSortModalVisible, setIsSortModalVisible] = useState(false);
 
-  // Memorize styles so they only update when the theme changes
+  // Memorize styles so they only update when the theme changes. More on :
+  //LINK - ../../docs-frontend/components/fiction/FandomCard.md
   const styles = useMemo(
     () =>
       StyleSheet.create({
