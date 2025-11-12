@@ -175,7 +175,7 @@ const toggleHideRate = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top, bottom"]}>
       <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
@@ -331,7 +331,7 @@ const createStyles = (theme) =>
     },
     content: {
       // paddingHorizontal: 16,
-      paddingTop: 12,
+      // paddingTop: 12,
       paddingBottom: 28,
       rowGap: 12,
     },
