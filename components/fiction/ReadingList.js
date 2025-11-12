@@ -269,36 +269,42 @@ export default function ReadingList({ readingStatus, navigation }) {
     );
   };
 
-  useEffect(() => {
-    const fetchFandoms = async () => {
-      try {
-        const url = `${API_IP}/fiction/status/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
+  const fetchFandoms = async () => {
+    try {
+      const url = `${API_IP}/fiction/status/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
 
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
 
-        if (!response.ok) {
-          const errorBody = await response.json();
-          throw new Error(
-            errorBody.error || `Erreur HTTP ${response.status} lors du fetch.`
-          );
-        }
-
-        const data = await response.json();
-
-        setFandomsFetch(data.fandoms);
-      } catch (e) {
-        console.error("Fetch Error:", e);
+      if (!response.ok) {
+        const errorBody = await response.json();
+        throw new Error(
+          errorBody.error || `Erreur HTTP ${response.status} lors du fetch.`
+        );
       }
-    };
 
+      const data = await response.json();
+
+      setFandomsFetch(data.fandoms);
+    } catch (e) {
+      console.error("Fetch Error:", e);
+    }
+  };
+
+  useEffect(() => {
     fetchFandoms();
-  }, [readingStatus, globalSortState]);
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchFandoms();
+    });
+
+    return unsubscribe;
+  }, [readingStatus, globalSortState, navigation]);
 
   const fandoms = (
     fandomsFetch && Array.isArray(fandomsFetch) ? fandomsFetch : []
