@@ -369,12 +369,12 @@ export default function AuthScreen({ navigation, route }) {
               </View>
             )}
           </View>
-        </View>
-
-        <Pressable onPress={goToRGPD} style={styles.pressableRGPD}>
-          <Text style={styles.textRGPD}>RGPD</Text>
-        </Pressable>        
+        </View>      
       </KeyboardAvoidingView>
+
+      <Pressable onPress={goToRGPD} style={styles.pressableRGPD}>
+        <Text style={styles.textRGPD}>RGPD</Text>
+      </Pressable>        
     </ImageBackground>
   );
 }
