@@ -4,6 +4,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  Pressable, 
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -93,6 +94,10 @@ export default function AuthScreen({ navigation, route }) {
   );
 
   const validLogin = checkEmailLogin && checkPasswordLogin;
+
+  const goToRGPD = () => {
+    navigation.navigate("RGPD"); // pour aller vers la page RGPD
+  };
 
   const goToForgotPassword = () => {
     navigation.navigate("ForgotPassword"); // on utilise navigate car on veut pouvoir revenir en arrière de mdp oublié à AuthScreen
@@ -365,6 +370,10 @@ export default function AuthScreen({ navigation, route }) {
             )}
           </View>
         </View>
+
+        <Pressable onPress={goToRGPD} style={styles.pressableRGPD}>
+          <Text style={styles.textRGPD}>RGPD</Text>
+        </Pressable>        
       </KeyboardAvoidingView>
     </ImageBackground>
   );
@@ -439,4 +448,7 @@ const styles = StyleSheet.create({
   errorCenter: { textAlign: "center", marginVertical: 6 },
 
   linksRow: { marginTop: 10 },
+
+  pressableRGPD: {justifyContent: 'flex-end', bottom: 80},
+  textRGPD: {textAlign: 'center', ...typography.body},
 });

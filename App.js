@@ -29,6 +29,7 @@ import ManageFictionScreen from "./screens/ManageFictionScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
 import TagsManagerScreen from "./screens/TagsManagerScreen";
+import RGPD from "./screens/RGPD";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,6 +112,7 @@ const RootNavigation = () => {
     >
       <Stack.Screen name="Auth" component={AuthScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="RGPD" component={RGPD} />
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="TagsManager" component={TagsManagerScreen} />
