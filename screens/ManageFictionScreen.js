@@ -85,8 +85,20 @@ export default function ManageFictionScreen({ route, navigation }) {
       const fandomEmpty = String(fandomName).trim().length === 0; // fandomName contient la valeur remontée par l'enfant via onChange. Avec le length, on vérifie que le name est vraiment vide.
       setTitleError(titleEmpty);
       setFandomError(fandomEmpty);                                // Donc fandomError devient true si fandomName est vide cad non sélectionné
-      return !(titleEmpty || fandomEmpty);                        // Retourne true si tout est OK
-  }  
+      return !(titleEmpty || fandomEmpty);  // Retourne true si tout est OK
+  }
+
+   // Validation : lastChapterRead ne doit pas dépasser numberOfChapters
+  const validationChapter = () => {
+      const totalChapters = Number(numberOfChapters) || 0;
+      if (lastChapterRead > totalChapters && totalChapters > 0) {
+        Alert.alert(
+          "Erreur de validation",
+          `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`
+        );
+        return false;
+      }
+  };
   
 const toggleHideRate = () => {
     setDisplayRate((toggle) => !toggle);
@@ -94,6 +106,7 @@ const toggleHideRate = () => {
 
   const createFiction = async () => {   // création d'une nouvelle fiction
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+    if (!validationChapter()) return Alert.alert("Erreur de validation", `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`);
 
     try {
       const res = await fetch(`${API_IP}/fiction`, {

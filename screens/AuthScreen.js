@@ -449,6 +449,13 @@ const styles = StyleSheet.create({
 
   linksRow: { marginTop: 10 },
 
-  pressableRGPD: {justifyContent: 'flex-end', bottom: 80},
+  pressableRGPD: {
+    position: 'absolute',
+    bottom: 70,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   textRGPD: {textAlign: 'center', ...typography.body},
 });

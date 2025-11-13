@@ -24,16 +24,16 @@ export default function RGPD() {
           >
             {/* Intro */}
             <Text style={[typography.body, styles.paragraph]}>
-              Nous sommes un groupe de développeurs réalisant le projet [Nom de l’application] dans le cadre d’un projet pédagogique.{"\n\n"}
+              Nous sommes un groupe de développeurs réalisant le projet FicVerse dans le cadre d’un projet pédagogique.{"\n\n"}
               Nous nous engageons à respecter la confidentialité des données personnelles de nos utilisateurs conformément au Règlement Général sur la Protection des Données (RGPD – UE 2016/679).
             </Text>
 
             {/* Section 1 */}
             <Text style={[typography.h3, styles.sectionTitle]}>1. Responsable du traitement</Text>
             <Text style={[typography.body, styles.paragraph]}>
-              Les données sont traitées par l’équipe de développement du projet [Nom de l’application], composée de 4 étudiants/développeurs.{"\n\n"}
+              Les données sont traitées par l’équipe de développement du projet FicVerse, composée de 4 étudiants/développeurs.{"\n\n"}
               Pour toute question ou demande concernant vos données, vous pouvez nous contacter à :{"\n"}
-              [adresse e-mail de contact du groupe ou du référent]
+              ficverse@gmail.com
             </Text>
 
             {/* Section 2 */}
@@ -50,7 +50,7 @@ export default function RGPD() {
               </Text>
             </View>
             <Text style={[typography.body, styles.paragraph]}>
-              Aucune autre donnée personnelle n’est collectée ni demandée.
+              Aucune autre donnée personnelle n’est collectée, ni demandée.
             </Text>
 
             {/* Section 3 */}
@@ -63,7 +63,7 @@ export default function RGPD() {
                 • permettre la création et l’accès à votre compte;
               </Text>
               <Text style={[typography.body, styles.listItem]}>
-                • afficher votre photo de profil dans l’application ;
+                • afficher votre photo de profil dans l’application;
               </Text>
               <Text style={[typography.body, styles.listItem]}>
                 • assurer un service utilisateur basique (authentification, affichage du profil).
@@ -129,9 +129,8 @@ export default function RGPD() {
             <Text style={[typography.h3, styles.sectionTitle]}>10. Contact</Text>
             <Text style={[typography.body, styles.paragraph]}>
               Pour toute question relative à la confidentialité de vos données :{"\n"}
-              [Nom du contact principal]– Équipe du projet
-              [Nom de l’application]{"\n"}
-              [adresse e-mail du groupe]
+              Équipe FicVerse{"\n"}
+              ficverse@gmail.com
             </Text>
           </ScrollView>
         </View>
