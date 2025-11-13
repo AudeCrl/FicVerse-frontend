@@ -11,12 +11,12 @@ export default function RGPD() {
     >
       <View style={styles.container}>
         <View style={styles.card}>
+
           {/* Titre principal */}
           <Text style={[typography.h1, styles.title]}>
             Politique de confidentialité (RGPD)
           </Text>
 
-          {/* Contenu scrollable */}
           <ScrollView
             style={styles.scroll}
             contentContainerStyle={styles.scrollContent}
@@ -149,31 +149,26 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.95)",
     borderRadius: 20,
     padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
   },
   title: {
     textAlign: "center",
     marginBottom: 14,
-    color: "#111",
+    color: "#000000",
   },
   sectionTitle: {
     marginTop: 16,
     marginBottom: 8,
-    color: "#0f172a",
+    color: "#000000",
   },
   paragraph: {
     lineHeight: 22,
-    color: "#1f2937",
+    color: "#000000",
     marginBottom: 8,
   },
   list: { marginBottom: 8, paddingLeft: 6 },
   listItem: {
     lineHeight: 22,
-    color: "#1f2937",
+    color: "#000000",
     marginBottom: 4,
   },
   scroll: {
