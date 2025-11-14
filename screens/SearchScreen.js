@@ -11,7 +11,7 @@ import SearchByTitle from "../components/search/SearchByTitle";
 import RoundedButton from "../components/ui/RoundedButton.js";
 import { useTheme } from "../context/ThemeContext.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const Tab = createMaterialTopTabNavigator();
 
 function TopTabs({ state, descriptors, navigation }) {
@@ -67,7 +67,7 @@ export default function SearchScreen({ navigation }) {
       let fictions = [];
 
       for (const status of statuses) {
-        const url = `${API_IP}/fiction/status/${status}`;
+        const url = `${API_URL}/fiction/status/${status}`;
         const response = await fetch(url, {
           method: "GET",
           headers: {
@@ -91,7 +91,7 @@ export default function SearchScreen({ navigation }) {
       setAllFictions(fictions);
 
       // Fetch tags directly from backend
-      const tagsResponse = await fetch(`${API_IP}/tag`, {
+      const tagsResponse = await fetch(`${API_URL}/tag`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

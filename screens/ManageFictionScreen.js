@@ -17,7 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
 import { typography } from "../styles/globalStyles";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ManageFictionScreen({ route, navigation }) {
 
@@ -54,7 +54,7 @@ export default function ManageFictionScreen({ route, navigation }) {
     if (!fictionId) return; // si pas de fictionId alors cela veut dire nouvelle fiction et donc pas de fetch
     (async () => {
       try {
-        const res = await fetch(`${API_IP}/fiction/${fictionId}`, {
+        const res = await fetch(`${API_URL}/fiction/${fictionId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -109,7 +109,7 @@ const toggleHideRate = () => {
     if (!validationChapter()) return Alert.alert("Erreur de validation", `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`);
 
     try {
-      const res = await fetch(`${API_IP}/fiction`, {
+      const res = await fetch(`${API_URL}/fiction`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -150,7 +150,7 @@ const toggleHideRate = () => {
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
 
     try {
-      const res = await fetch(`${API_IP}/fiction/${fictionId}`, {
+      const res = await fetch(`${API_URL}/fiction/${fictionId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

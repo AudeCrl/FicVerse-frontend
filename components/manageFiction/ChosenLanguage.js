@@ -6,7 +6,7 @@ import RoundedButton from "../ui/RoundedButton";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenLanguage({ value, onChange }) {
   const token = useSelector((state) => state.user.value.token);
@@ -20,7 +20,7 @@ export default function ChosenLanguage({ value, onChange }) {
   useEffect(() => {     // Charger les langues triées par position depuis le back
     (async () => {
       try {
-        const res = await fetch(`${API_IP}/fiction/lang`, {
+        const res = await fetch(`${API_URL}/fiction/lang`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

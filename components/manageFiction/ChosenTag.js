@@ -8,7 +8,7 @@ import Tag from "../fiction/Tag";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenTag({ fictionId, idTags, onTagInputFocus, onTagTyping }) {
 
@@ -23,7 +23,7 @@ export default function ChosenTag({ fictionId, idTags, onTagInputFocus, onTagTyp
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API_IP}/tag`, {
+        const res = await fetch(`${API_URL}/tag`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -39,7 +39,7 @@ export default function ChosenTag({ fictionId, idTags, onTagInputFocus, onTagTyp
     if (!fictionId) return;
     (async () => {
       try {
-        const res = await fetch(`${API_IP}/fiction/${fictionId}`, {
+        const res = await fetch(`${API_URL}/fiction/${fictionId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -102,7 +102,7 @@ export default function ChosenTag({ fictionId, idTags, onTagInputFocus, onTagTyp
     if (!name) return;
 
     try {
-      const res = await fetch(`${API_IP}/tag`, {
+      const res = await fetch(`${API_URL}/tag`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

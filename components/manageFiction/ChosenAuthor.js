@@ -6,7 +6,7 @@ import Input from "../ui/Input";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenAuthor({ value, onChange }) {
   const token = useSelector((state) => state.user.value.token);
@@ -30,7 +30,7 @@ export default function ChosenAuthor({ value, onChange }) {
 
         for (const status of statusList) {    // Pour "reading" etc, on applique le fetch de GET fiction/status/:readingStatus
           try {
-            const res = await fetch(`${API_IP}/fiction/status/${status}`, { headers });
+            const res = await fetch(`${API_URL}/fiction/status/${status}`, { headers });
             const data = await res.json();
             results.push(data);   // Donc ici on a un tableau results = [data de reading, data de to-read, data de finished];
             } catch (error) {

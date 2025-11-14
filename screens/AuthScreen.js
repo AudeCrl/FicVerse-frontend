@@ -16,8 +16,8 @@ import RoundedButton from "../components/ui/RoundedButton.js";
 import { login } from "../reducers/user";
 import { typography } from "../styles/globalStyles.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
-console.log(API_IP);
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+console.log(API_URL);
 
 export default function AuthScreen({ navigation, route }) {
   // provient de ProfileScreen avec la fonction handleLogout. Depuis ProfileScreen, un initialForm login est envoyé vers Auth et si cela arrive, alors initialSignUp = false et signUp = false et donc on arrive direct à la connexion
@@ -114,7 +114,7 @@ export default function AuthScreen({ navigation, route }) {
     if (!validSignup) return; // si l'un des champs est mal rempli, on ne lance même pas la route
 
     try {
-      const res = await fetch(`${API_IP}/user/signup`, {
+      const res = await fetch(`${API_URL}/user/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -157,7 +157,7 @@ export default function AuthScreen({ navigation, route }) {
     if (!validLogin) return;
 
     try {
-      const res = await fetch(`${API_IP}/user/signin`, {
+      const res = await fetch(`${API_URL}/user/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

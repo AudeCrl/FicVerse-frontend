@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function TagsManagerScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
@@ -35,7 +35,7 @@ export default function TagsManagerScreen({ navigation }) {
     try {
       setIsLoading(true);
       // Charger les tags de l'utilisateur
-      const userResponse = await fetch(`${API_IP}/tag`, {
+      const userResponse = await fetch(`${API_URL}/tag`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const userData = await userResponse.json();
@@ -48,7 +48,7 @@ export default function TagsManagerScreen({ navigation }) {
       }
 
       // Charger tous les tags disponibles
-      const allResponse = await fetch(`${API_IP}/tag/all`, {
+      const allResponse = await fetch(`${API_URL}/tag/all`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const allData = await allResponse.json();
@@ -76,7 +76,7 @@ export default function TagsManagerScreen({ navigation }) {
   const handleRemoveTag = async (tag) => {
     try {
       // Récupérer le nombre d'utilisations du tag
-      const response = await fetch(`${API_IP}/tag/${tag.id}/usage-count`, {
+      const response = await fetch(`${API_URL}/tag/${tag.id}/usage-count`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -97,7 +97,7 @@ export default function TagsManagerScreen({ navigation }) {
       // Essayer soft delete d'abord, puis hard delete si utilisé
       const queryParam = usageCount > 0 ? "?detach=true" : "";
       const response = await fetch(
-        `${API_IP}/tag/${tagToDelete.id}${queryParam}`,
+        `${API_URL}/tag/${tagToDelete.id}${queryParam}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user.token}` },

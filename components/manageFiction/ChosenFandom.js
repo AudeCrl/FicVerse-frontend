@@ -6,7 +6,7 @@ import RoundedButton from "../ui/RoundedButton";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ChosenFandom({ value, onChange, isInvalid = false }) {
   const token = useSelector((state) => state.user.value.token);
@@ -20,7 +20,7 @@ export default function ChosenFandom({ value, onChange, isInvalid = false }) {
   useEffect(() => {  // Charger tous les fandoms du user (triés par position côté back)
     (async () => {
       try {
-        const res = await fetch(`${API_IP}/fandom`, {
+        const res = await fetch(`${API_URL}/fandom`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -66,7 +66,7 @@ Le fetch /fiction/:id part tout de suite au 1er render, mais il revient après (
     if (!name) return;
 
     try {
-      const res = await fetch(`${API_IP}/fandom`, {
+      const res = await fetch(`${API_URL}/fandom`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

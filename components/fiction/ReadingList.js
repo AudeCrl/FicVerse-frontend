@@ -6,7 +6,7 @@ import { typography } from "../../styles/globalStyles.js";
 import FandomCard from "./FandomCard";
 import RoundedButton from "../ui/RoundedButton";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const defaultSort = { sort: "lastReadAt", order: "desc" };
 
@@ -271,7 +271,7 @@ export default function ReadingList({ readingStatus, navigation }) {
 
   const fetchFandoms = async () => {
     try {
-      const url = `${API_IP}/fiction/status/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
+      const url = `${API_URL}/fiction/status/${readingStatus}?srt=${globalSortState.sort}&order=${globalSortState.order}`;
 
       const response = await fetch(url, {
         method: "GET",

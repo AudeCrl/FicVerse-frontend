@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { typography } from "../styles/globalStyles";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function FandomsManagerScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
@@ -35,7 +35,7 @@ export default function FandomsManagerScreen({ navigation }) {
     try {
       setIsLoading(true);
       // Charger les fandoms de l'utilisateur
-      const userResponse = await fetch(`${API_IP}/fandom/user`, {
+      const userResponse = await fetch(`${API_URL}/fandom/user`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const userData = await userResponse.json();
@@ -48,7 +48,7 @@ export default function FandomsManagerScreen({ navigation }) {
       }
 
       // Charger tous les fandoms disponibles
-      const allResponse = await fetch(`${API_IP}/fandom`, {
+      const allResponse = await fetch(`${API_URL}/fandom`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const allData = await allResponse.json();
@@ -77,7 +77,7 @@ export default function FandomsManagerScreen({ navigation }) {
     try {
       // Récupérer le nombre d'utilisations du fandom
       const response = await fetch(
-        `${API_IP}/fandom/${fandom.id}/usage-count`,
+        `${API_URL}/fandom/${fandom.id}/usage-count`,
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }
@@ -100,7 +100,7 @@ export default function FandomsManagerScreen({ navigation }) {
       // Essayer suppression avec detach si utilisé
       const queryParam = usageCount > 0 ? "?detach=true" : "";
       const response = await fetch(
-        `${API_IP}/fandom/${fandomToDelete.id}${queryParam}`,
+        `${API_URL}/fandom/${fandomToDelete.id}${queryParam}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user.token}` },

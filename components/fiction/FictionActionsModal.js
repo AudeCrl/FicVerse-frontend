@@ -17,7 +17,7 @@ import ChosenStatus from "../manageFiction/ChosenStatus.js";
 import LastChapterRead from "../manageFiction/LastChapterRead";
 import Rate from "./Rate.js";
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const FictionActionsModal = ({
   isVisible,
@@ -66,7 +66,7 @@ export const FictionActionsModal = ({
   // Fast update of a fiction (readingStatus, lastChapterRead or rate)
   const updateFiction = async (fieldToUpdate = {}) => {
     try {
-      const res = await fetch(`${API_IP}/fiction/${fiction._id}`, {
+      const res = await fetch(`${API_URL}/fiction/${fiction._id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -117,7 +117,7 @@ export const FictionActionsModal = ({
   // Delete a fiction
   const handleDeleteFiction = async () => {
     try {
-      const res = await fetch(`${API_IP}/fiction/${fiction._id}`, {
+      const res = await fetch(`${API_URL}/fiction/${fiction._id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${user.token}`,

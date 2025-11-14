@@ -27,7 +27,7 @@ import { typography } from "../styles/globalStyles";
 import { chipsPreview } from "../utils/chipsFormatter";
 import RoundedButton from "../components/ui/RoundedButton"
 
-const API_IP = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -407,7 +407,7 @@ export default function ProfileScreen({ navigation }) {
       type: mimeType || "image/jpeg",
     });
 
-    fetch(`${API_IP}/user/upload`, {
+    fetch(`${API_URL}/user/upload`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${userToken}`,
@@ -452,7 +452,7 @@ export default function ProfileScreen({ navigation }) {
         return;
       }
 
-      fetch(`${API_IP}/user/username`, {
+      fetch(`${API_URL}/user/username`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -505,7 +505,7 @@ export default function ProfileScreen({ navigation }) {
         return;
       }
 
-      fetch(`${API_IP}/user/email`, {
+      fetch(`${API_URL}/user/email`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -564,7 +564,7 @@ export default function ProfileScreen({ navigation }) {
       return;
     }
 
-    fetch(`${API_IP}/user/password`, {
+    fetch(`${API_URL}/user/password`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -599,7 +599,7 @@ export default function ProfileScreen({ navigation }) {
   // ====== TAGS ======
   const loadUserTags = async () => {
     try {
-      const response = await fetch(`${API_IP}/tag`, {
+      const response = await fetch(`${API_URL}/tag`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -617,7 +617,7 @@ export default function ProfileScreen({ navigation }) {
 
   const loadAllTags = async () => {
     try {
-      const response = await fetch(`${API_IP}/tag/all`, {
+      const response = await fetch(`${API_URL}/tag/all`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -649,7 +649,7 @@ export default function ProfileScreen({ navigation }) {
   const handleRemoveTag = async (tag, action = "delete") => {
     setIsLoadingTags(true);
     try {
-      const deleteEndpoint = `${API_IP}/tag/${tag.id}${
+      const deleteEndpoint = `${API_URL}/tag/${tag.id}${
         action === "detach" ? "?detach=true" : "?force=true"
       }`;
 
@@ -680,7 +680,7 @@ export default function ProfileScreen({ navigation }) {
 
   const getTagUsageCount = async (tagId) => {
     try {
-      const response = await fetch(`${API_IP}/tag/${tagId}/usage-count`, {
+      const response = await fetch(`${API_URL}/tag/${tagId}/usage-count`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -694,7 +694,7 @@ export default function ProfileScreen({ navigation }) {
   // ====== FANDOMS ======
   const loadUserFandoms = async () => {
     try {
-      const response = await fetch(`${API_IP}/fandom/user`, {
+      const response = await fetch(`${API_URL}/fandom/user`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -712,7 +712,7 @@ export default function ProfileScreen({ navigation }) {
 
   const loadAllFandoms = async () => {
     try {
-      const response = await fetch(`${API_IP}/fandom`, {
+      const response = await fetch(`${API_URL}/fandom`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -744,7 +744,7 @@ export default function ProfileScreen({ navigation }) {
   const handleRemoveFandom = async (fandom, action = "delete") => {
     setIsLoadingFandoms(true);
     try {
-      const deleteEndpoint = `${API_IP}/fandom/${fandom.id}${
+      const deleteEndpoint = `${API_URL}/fandom/${fandom.id}${
         action === "detach" ? "?detach=true" : "?force=true"
       }`;
 
@@ -775,7 +775,7 @@ export default function ProfileScreen({ navigation }) {
 
   const getFandomUsageCount = async (fandomId) => {
     try {
-      const response = await fetch(`${API_IP}/fandom/${fandomId}/usage-count`, {
+      const response = await fetch(`${API_URL}/fandom/${fandomId}/usage-count`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -835,7 +835,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       setIsLoadingAuthors(true);
       // TODO: Remplacer par l'appel API réel quand disponible
-      // const response = await fetch(`${API_IP}/author`, {
+      // const response = await fetch(`${API_URL}/author`, {
       //   headers: { Authorization: `Bearer ${user.token}` },
       // });
       // const data = await response.json();
@@ -872,7 +872,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       setIsModalPasswordVisible(true);
 
-      const response = await fetch(`${API_IP}/user/delete-account`, {
+      const response = await fetch(`${API_URL}/user/delete-account`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
