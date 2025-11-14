@@ -98,6 +98,7 @@ export default function ManageFictionScreen({ route, navigation }) {
         );
         return false;
       }
+      return true;  // Retourne true si la validation passe
   };
   
 const toggleHideRate = () => {
@@ -106,7 +107,7 @@ const toggleHideRate = () => {
 
   const createFiction = async () => {   // création d'une nouvelle fiction
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
-    if (!validationChapter()) return Alert.alert("Erreur de validation", `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`);
+    if (!validationChapter()) return;  // L'alerte est déjà affichée dans validationChapter()
 
     try {
       const res = await fetch(`${API_URL}/fiction`, {
