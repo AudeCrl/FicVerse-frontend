@@ -11,6 +11,7 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
     const dispatch = useDispatch();
     const { themeName, variant } = useSelector((state) => state.theme);
+    console.log(themeName);
 
     // Get the currently active theme object (ex: themes.watercolor.light)
     const currentTheme = themes[themeName][variant];

@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import Input from "../components/ui/Input.js";
 import RoundedButton from "../components/ui/RoundedButton.js";
 import { login } from "../reducers/user";
+import { setThemeName, setVariant } from "../reducers/theme";
 import { typography } from "../styles/globalStyles.js";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -107,7 +108,7 @@ export default function AuthScreen({ navigation, route }) {
     navigation.replace("TabNavigator"); // on utilise replace car on veut bloquer le retour en arrière revenir en arrière de HomeScreen à AuthScreen
   };
 
-  // Lorsqu'on appuiera sur le boutton S'inscrire, on déclenche cette fonction
+  // Lorsqu'on appuiera sur le bouton S'inscrire, on déclenche cette fonction
   const submitSignup = async () => {
     setInvalid("");
     setSubmittedSignup(true);
@@ -138,8 +139,15 @@ export default function AuthScreen({ navigation, route }) {
             createdAt: data.user.createdAt,
             avatarURL: data.user.avatarURL,
             notationIcon: data.user.notationIcon,
+            theme: data.user.theme,
+            appearanceMode: data.user.appearanceMode,
           })
         );
+        // On stocke le nom du thème dans le store
+        dispatch(setThemeName(data.user.theme));
+        // Idem variant dark/light
+        dispatch(setVariant(data.user.appearanceMode));
+        
         goToTabNavigator(); // go vers HomeScreen result: true
       } else {
         setInvalid(data.error); // dans le return en dessous, on affichera le message d'erreur à l'utilisateur
@@ -392,7 +400,7 @@ const styles = StyleSheet.create({
     width: "85%",
     backgroundColor: "rgba(255,255,255,0.9)",
     padding: 20,
-    marginTop: 180,
+    marginTop: 150,
   },
 
   logoContainer: {

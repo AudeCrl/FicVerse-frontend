@@ -11,13 +11,13 @@ export const themeSlice = createSlice({
     initialState,
     reducers: {
         setThemeName: (state, action) => {
-            state.themeName = action.payload
+            state.themeName = action.payload;
         },
         toggleVariant: (state) => {
             state.variant = state.variant === 'light' ? 'dark' : 'light';
         },
         setVariant: (state, action) => {
-            state.variant = action.payload
+            state.variant = action.payload;
         },
     },
 });
