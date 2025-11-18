@@ -48,7 +48,7 @@ export default function TagsManagerScreen({ navigation }) {
       }
 
       // Charger tous les tags disponibles
-      const allResponse = await fetch(`${API_URL}/tag/all`, {
+      const allResponse = await fetch(`${API_URL}/tag`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const allData = await allResponse.json();

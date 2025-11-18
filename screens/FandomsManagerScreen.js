@@ -35,7 +35,7 @@ export default function FandomsManagerScreen({ navigation }) {
     try {
       setIsLoading(true);
       // Charger les fandoms de l'utilisateur
-      const userResponse = await fetch(`${API_URL}/fandom/user`, {
+      const userResponse = await fetch(`${API_URL}/fandom`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const userData = await userResponse.json();

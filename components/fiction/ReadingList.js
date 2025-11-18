@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
@@ -289,22 +290,18 @@ export default function ReadingList({ readingStatus, navigation }) {
       }
 
       const data = await response.json();
-
       setFandomsFetch(data.fandoms);
     } catch (e) {
       console.error("Fetch Error:", e);
     }
   };
 
-  useEffect(() => {
-    fetchFandoms();
-
-    const unsubscribe = navigation.addListener('focus', () => {
+  // Refetch à chaque fois que l'écran reprend le focus (retour de ManageFictionScreen, etc.)
+  useFocusEffect(
+    useCallback(() => {
       fetchFandoms();
-    });
-
-    return unsubscribe;
-  }, [readingStatus, globalSortState, navigation]);
+    }, [readingStatus, globalSortState])
+  );
 
   const fandoms = (
     fandomsFetch && Array.isArray(fandomsFetch) ? fandomsFetch : []

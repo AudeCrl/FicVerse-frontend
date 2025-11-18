@@ -617,7 +617,7 @@ export default function ProfileScreen({ navigation }) {
 
   const loadAllTags = async () => {
     try {
-      const response = await fetch(`${API_URL}/tag/all`, {
+      const response = await fetch(`${API_URL}/tag`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();
@@ -694,7 +694,7 @@ export default function ProfileScreen({ navigation }) {
   // ====== FANDOMS ======
   const loadUserFandoms = async () => {
     try {
-      const response = await fetch(`${API_URL}/fandom/user`, {
+      const response = await fetch(`${API_URL}/fandom`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await response.json();

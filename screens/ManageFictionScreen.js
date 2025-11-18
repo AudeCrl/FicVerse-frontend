@@ -1,17 +1,16 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Alert, View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { useSelector } from "react-redux";
 import Header from '../components/Header';
 import Input from "../components/ui/Input";
 import RoundedButton from "../components/ui/RoundedButton";
-import ChosenTag from "../components/manageFiction/ChosenTag";
-import ChosenFandom from "../components/manageFiction/ChosenFandom";
+import TagSelector from "../components/manageFiction/TagSelector";
+import ItemSelector from "../components/manageFiction/ItemSelector";
+import AuthorAutocomplete from "../components/manageFiction/AuthorAutocomplete";
 import ChosenTitle from "../components/manageFiction/ChosenTitle";
 import ChosenLink from "../components/manageFiction/ChosenLink";
-import ChosenAuthor from "../components/manageFiction/ChosenAuthor";
-import ChosenLanguage from "../components/manageFiction/ChosenLanguage";
 import ChosenStatus from "../components/manageFiction/ChosenStatus";
-import LastChapterRead from "../components/manageFiction/LastChapterRead"; 
+import LastChapterRead from "../components/manageFiction/LastChapterRead";
 import Rate from "../components/fiction/Rate";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
@@ -21,10 +20,17 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function ManageFictionScreen({ route, navigation }) {
 
-  const token = useSelector((state) => state.user.value.token);
   const user = useSelector((state) => state.user.value);
-  const fictionId = route?.params?.fictionId;   // si jamais c'est undefined lorsque j'ouvre en création d'une nouvelle fiction
+  const token = user.token;
+  const fictionId = route.params?.fictionId;  // ? après params dans le cas où on ne transmet pas de fictionId et donc go sur création de fiction
 
+  // États pour les données fetchées
+  const [fandoms, setFandoms] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [authors, setAuthors] = useState([]);
+
+  // LINK - ../docs-frontend/screens/ManageFictionScreen.md#1
   const [fandomName, setFandomName] = useState("");
   const [title, setTitle] = useState("");
   const [link, setLink] = useState("");
@@ -35,7 +41,7 @@ export default function ManageFictionScreen({ route, navigation }) {
   const [numberOfChapters, setNumberOfChapters] = useState("");
   const [numberOfWords, setNumberOfWords] = useState("");
   const [lastChapterRead, setLastChapterRead] = useState(0);
-  const [tagIds, setTagIds] = useState([]);   // tagIds remontés par ChosenTag
+  const [selectedTags, setSelectedTags] = useState([]);
   const [readingStatus, setReadingStatus] = useState("reading");  // le back doit recevoir "reading" au lieu de "en cours"
   const [storyStatus, setStoryStatus] = useState("in-progress");
   const [rateValue, setRateValue] = useState(0);
@@ -44,13 +50,43 @@ export default function ManageFictionScreen({ route, navigation }) {
   const [titleError, setTitleError] = useState(false);
   const [fandomError, setFandomError] = useState(false);
 
-  const setTagIdsStable = useCallback((ids) => setTagIds(ids), []);
   const scrollRef = useRef(null); // ref pour scroller automatiquement
 
   const { currentTheme } = useTheme();
   const styles = useMemo(() => createStyles(currentTheme), [currentTheme]);
 
-  useEffect(() => { // Pré-remplissage de tous les champs si fiction déjà existante
+  // Fetch initial : 4 requêtes en parallèle pour chargement des fandoms, tags, langues et auteurs en parallèle
+  useEffect(() => {
+    const baseData = async () => {
+      try {
+        const [fandomsResponse, tagsResponse, languagesResponse, authorsResponse] = await Promise.all([ // LINK - ../docs-frontend/screens/ManageFictionScreen.md#2
+          fetch(`${API_URL}/fandom`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/tag`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/fiction/lang`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/fiction/author`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+
+        const [fandomsData, tagsData, languagesData, authorsData] = await Promise.all([
+          fandomsResponse.json(),
+          tagsResponse.json(),
+          languagesResponse.json(),
+          authorsResponse.json(),
+        ]);
+
+        // LINK - ../docs-frontend/screens/ManageFictionScreen.md#3
+        if (fandomsData.result) setFandoms(fandomsData.fandoms);
+        if (tagsData.result) setTags(tagsData.tags);
+        if (languagesData.result) setLanguages(languagesData.languages);
+        if (authorsData.result) setAuthors(authorsData.authors);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    baseData();
+  }, [token]);
+
+  // Pré-remplissage si modification d'une fiction existante
+  useEffect(() => {
     if (!fictionId) return; // si pas de fictionId alors cela veut dire nouvelle fiction et donc pas de fetch
     (async () => {
       try {
@@ -58,7 +94,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (data.result && data.fiction) {    // Les champs pré-remplis apparaissent ici. Sauf les tags, qui sont pré-remplis par leur composant ChosenTag via GET /fiction/:id
+        if (data.result && data.fiction) {        // Ci-dessous les champs pré-remplis
           setFandomName(data.fiction.fandomName);
           setTitle(data.fiction.title);
           setLink(data.fiction.link);
@@ -66,48 +102,119 @@ export default function ManageFictionScreen({ route, navigation }) {
           setLang(data.fiction.lang.name);
           setSummary(data.fiction.summary);
           setPersonalNotes(data.fiction.personalNotes);
-          setNumberOfChapters(String(data.fiction.numberOfChapters));  // Quand la réponse du back est parsée (res.json), numberOfChapters redevient un nombre. Or, dans le front numberOfChapters correspond à textInput et doit être en string
+          setNumberOfChapters(String(data.fiction.numberOfChapters)); // Quand la réponse du back est parsée (res.json), numberOfChapters redevient un nombre. Or, dans le front numberOfChapters correspond à textInput et doit être reçu dans le front en string
           setNumberOfWords(String(data.fiction.numberOfWords));
           setLastChapterRead(Number(data.fiction.lastChapterRead));
           setReadingStatus(data.fiction.readingStatus);
           setStoryStatus(data.fiction.storyStatus);
           setRateValue(Number(data.fiction.rate.value));
           setDisplayRate(Boolean(data.fiction.rate.display));
+          if (data.fiction.tags) setSelectedTags(data.fiction.tags);
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
       }
     })();
-  }, [fictionId, token]);   // Si une nouvelle fiction nous ramène sur cette page, alors on relance le fetch
+  }, [fictionId, token]);   // Avec fictionId en dépendance, si une nouvelle fiction nous ramène sur cette page, alors on relance le fetch
+
+  // Handlers pour TagSelector // LINK - ../docs-frontend/screens/ManageFictionScreen.md#4
+  const handleAddTag = (tag) => {
+    setSelectedTags(prev => {
+      if (prev.some(t => t._id === tag._id)) return prev;
+      return [...prev, tag];
+    });
+  };
+
+  const handleRemoveTag = (tagId) => {
+    setSelectedTags(prev => prev.filter(tag => tag._id !== tagId));
+  };
+
+  const handleCreateTag = async (tagName) => {  // Création d’un tag puis ajout à la sélection
+    try {
+      const res = await fetch(`${API_URL}/tag`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: tagName }),
+      });
+      const data = await res.json();
+      if (data.result && data.tag) {
+        // Ajouter aux tags disponibles : le useState tags qui contient tous les tags fecthées se voit ajouté ce nouveau tag supplémentaire
+        setTags(prev => {
+          if (prev.some(t => t._id === data.tag._id)) return prev;
+          return [...prev, data.tag];
+        });
+        // Ajouter aux tags sélectionnés
+        handleAddTag(data.tag);
+      }
+    } catch (error) {
+      console.error("POST /tag failed", error);
+    }
+  };
+
+  // Handler pour créer un fandom
+  const handleCreateFandom = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/fandom`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      if (data.result && data.fandom) {
+        setFandoms(prev => {
+          if (prev.some(f => f._id === data.fandom._id)) return prev;
+          return [...prev, data.fandom].sort((a, b) => a.position - b.position);
+        });
+        setFandomName(data.fandom.name);
+        setFandomError(false);
+      }
+    } catch (error) {
+      console.error("POST /fandom failed", error);
+    }
+  };
+
+  // Handler pour créer une langue (locale seulement)
+  const handleCreateLanguage = (name) => {
+    setLanguages(prev => {
+      if (prev.some(l => l.name.toLowerCase() === name.toLowerCase())) return prev;
+      return [...prev, { name, position: prev.length + 1 }];
+    });
+    setLang(name);
+  };
 
   const validationBeforeSave = () => {
     const titleEmpty = String(title).trim().length === 0;
-      const fandomEmpty = String(fandomName).trim().length === 0; // fandomName contient la valeur remontée par l'enfant via onChange. Avec le length, on vérifie que le name est vraiment vide.
-      setTitleError(titleEmpty);
-      setFandomError(fandomEmpty);                                // Donc fandomError devient true si fandomName est vide cad non sélectionné
-      return !(titleEmpty || fandomEmpty);  // Retourne true si tout est OK
-  }
-
-   // Validation : lastChapterRead ne doit pas dépasser numberOfChapters
-  const validationChapter = () => {
-      const totalChapters = Number(numberOfChapters) || 0;
-      if (lastChapterRead > totalChapters && totalChapters > 0) {
-        Alert.alert(
-          "Erreur de validation",
-          `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`
-        );
-        return false;
-      }
-      return true;  // Retourne true si la validation passe
+    const fandomEmpty = String(fandomName).trim().length === 0;
+    setTitleError(titleEmpty);
+    setFandomError(fandomEmpty);
+    return !(titleEmpty || fandomEmpty);
   };
-  
-const toggleHideRate = () => {
+
+  const validationChapter = () => {
+    const totalChapters = Number(numberOfChapters) || 0;
+    if (lastChapterRead > totalChapters && totalChapters > 0) {
+      Alert.alert(
+        "Erreur de validation",
+        `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const toggleHideRate = () => {
     setDisplayRate((toggle) => !toggle);
   };
 
-  const createFiction = async () => {   // création d'une nouvelle fiction
+  const createFiction = async () => {
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
-    if (!validationChapter()) return;  // L'alerte est déjà affichée dans validationChapter()
+    if (!validationChapter()) return;
 
     try {
       const res = await fetch(`${API_URL}/fiction`, {
@@ -121,13 +228,13 @@ const toggleHideRate = () => {
           title,
           link,
           author,
-          langName: lang,   // Pour correspondre au back
+          langName: lang,
           summary,
           personalNotes,
-          numberOfChapters: Number(numberOfChapters), // on convertit en nombre avant d'envoyer au backend, car il attend un nombre d'après notre modèle
+          numberOfChapters: Number(numberOfChapters),
           numberOfWords: Number(numberOfWords),
           lastChapterRead,
-          tags: tagIds,    // Envoyer les tags dès la création
+          tags: selectedTags.map(tag => tag._id),
           readingStatus,
           storyStatus,
           rate: { value: rateValue, display: displayRate },
@@ -137,7 +244,7 @@ const toggleHideRate = () => {
 
       if (data.result) {
         Alert.alert("Succès", "Fiction créée !");
-        navigation.navigate("Home", { screen: "HomeMain" }); 
+        navigation.navigate("Home", { screen: "HomeMain" });
       } else {
         Alert.alert("Erreur", data.error || "Création échouée");
       }
@@ -147,7 +254,7 @@ const toggleHideRate = () => {
     }
   };
 
-  const updateFiction = async () => {     // Modification d'une fiction existante s'il y a une fictionId
+  const updateFiction = async () => {
     if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
 
     try {
@@ -168,7 +275,7 @@ const toggleHideRate = () => {
           numberOfChapters: Number(numberOfChapters),
           numberOfWords: Number(numberOfWords),
           lastChapterRead,
-          tagIds,    // Dans req.params.id côté back, on attend "tagIds"
+          tagIds: selectedTags.map(tag => tag._id),
           readingStatus,
           storyStatus,
           rate: { value: rateValue, display: displayRate },
@@ -178,7 +285,7 @@ const toggleHideRate = () => {
       const data = await res.json();
       if (data.result) {
         Alert.alert("Succès", "Fiction mise à jour !");
-        navigation.navigate("Home", { screen: "HomeMain" }); 
+        navigation.navigate("Home", { screen: "HomeMain" });
       } else {
         Alert.alert("Erreur", data.error || "Mise à jour échouée");
       }
@@ -191,41 +298,48 @@ const toggleHideRate = () => {
   return (
     <SafeAreaView style={styles.container} edges={["top, bottom"]}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
         <ScrollView
           contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"  // permet de taper sur les suggestions sans fermer le clavier
-          keyboardDismissMode="on-drag"        // dès qu'on se met à scroller, le clavier se ferme automatiquement
-          ref={scrollRef}                      // on pourra scroller au focus
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          ref={scrollRef}
         >
           <Header
-         title={fictionId ? "Modifier une fanfiction" : "Ajouter une fanfiction"}
-         screenName="manage"     //  eader spécifique à cette page uniquement
-         showToggle={false}        // false pour masquer le switch ici
-         onProfilePress={() => navigation.navigate("Profile")}
-       />
+            title={fictionId ? "Modifier une fanfiction" : "Ajouter une fanfiction"}
+            screenName="manage"
+            showToggle={false}
+            onProfilePress={() => navigation.navigate("Profile")}
+          />
 
           <View style={styles.section}>
-            <ChosenFandom // On passe le flag d’erreur + reset flag au changement
-            value={fandomName}
-            onChange={(value) => {
-              setFandomName(value);
-              setFandomError(false);  // dès qu'on sélectionne à nouveau un fandom ce n'est plus true l'error. Et idem dans l'enfant ChosenFandom, showError devient false dès que !selected est false
-            }}
-            isInvalid={fandomError}
+            <ItemSelector
+              items={fandoms}
+              selectedValue={fandomName}
+              onSelect={(name) => {
+                setFandomName(name);
+                setFandomError(false);
+              }}
+              onCreate={handleCreateFandom}
+              label="Fandom *"
+              getItemLabel={(f) => f.name}
+              getItemKey={(f) => f._id}
+              placeholder="Nouveau fandom"
+              isRequired={true}
+              isInvalid={fandomError}
             />
           </View>
 
           <View style={styles.section}>
-            <ChosenTitle 
-            value={title}
-            onChange={(value) => {
-              setTitle(value);
-              setTitleError(false);   // dès qu'on tape à nouveau dans l'input Title, l'error n'est plus true.
-            }}
-            isInvalid={titleError}
+            <ChosenTitle
+              value={title}
+              onChange={(value) => {
+                setTitle(value);
+                setTitleError(false);
+              }}
+              isInvalid={titleError}
             />
           </View>
 
@@ -234,23 +348,33 @@ const toggleHideRate = () => {
           </View>
 
           <View style={styles.section}>
-            <ChosenAuthor
+            <AuthorAutocomplete
               value={author}
+              suggestions={authors}
               onChange={setAuthor}
             />
           </View>
 
           <View style={styles.section}>
-            <ChosenLanguage value={lang} onChange={setLang} />
+            <ItemSelector
+              items={languages}
+              selectedValue={lang}
+              onSelect={setLang}
+              onCreate={handleCreateLanguage}
+              label="Langue"
+              getItemLabel={(l) => l.name}
+              getItemKey={(l) => l.name}
+              placeholder="Nouvelle langue"
+            />
           </View>
-          
+
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Résumé</Text>
             <Input
               value={summary}
               onChangeText={setSummary}
-              onBlur={() => setSummary(summary.trim())} // trim dès qu'on finit la saisie
-              placeholder="Copier/coller le résumé d’origine, ou écrire le vôtre !"
+              onBlur={() => setSummary(summary.trim())}
+              placeholder="Copier/coller le résumé d'origine, ou écrire le vôtre !"
               multiline
               numberOfLines={5}
               style={{ minHeight: 100, textAlignVertical: "top" }}
@@ -265,7 +389,7 @@ const toggleHideRate = () => {
               onChangeText={setPersonalNotes}
               onBlur={() => setPersonalNotes(personalNotes.trim())}
               placeholder="Vos impressions"
-              multiline   // au début j'allais mettre <Input multiline={true} /> mais c'est la même chose
+              multiline
               numberOfLines={5}
               style={{ minHeight: 100, textAlignVertical: "top" }}
               autoCapitalize="sentences"
@@ -276,8 +400,8 @@ const toggleHideRate = () => {
             <View style={styles.numberCol}>
               <Text style={styles.sectionLabel}>Nombre de chapitres</Text>
               <Input
-                value={String(numberOfChapters)}       // TextInput n'accepte que des strings donc on transforme les chiffres de String
-                onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))} // tout ce qui n'est pas un chiffre est supprimé par replace (en vérité, remplacé par "")
+                value={String(numberOfChapters)}
+                onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))}
                 keyboardType="numeric"
                 placeholder="21"
               />
@@ -299,7 +423,7 @@ const toggleHideRate = () => {
           </View>
 
           <View style={styles.section}>
-            <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />{/* Dernier chapitre lu : Input + boutons +/- */}
+            <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />
           </View>
 
           <View style={styles.section}>
@@ -307,11 +431,14 @@ const toggleHideRate = () => {
           </View>
 
           <View style={styles.section}>
-            <ChosenTag       // Tags : tout est géré par ChosenTag, on récupère juste les ids
-              fictionId={fictionId}
-              idTags={setTagIdsStable} // on récupère les id des tags de la fiction suite à idTags dans le fetch dans ChosenTag
-              onTagInputFocus={() => scrollRef.current?.scrollToEnd({ animated: true })} // focus input => scroll en bas
-              onTagTyping={() => scrollRef.current?.scrollToEnd({ animated: true })}     // chaque frappe => scroll en bas
+            <TagSelector
+              availableTags={tags}
+              selectedTags={selectedTags}
+              onAdd={handleAddTag}
+              onRemove={handleRemoveTag}
+              onCreate={handleCreateTag}
+              onInputFocus={() => scrollRef.current?.scrollToEnd({ animated: true })}
+              onInputChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
             />
           </View>
 
@@ -328,11 +455,14 @@ const toggleHideRate = () => {
           </View>
 
           <View style={styles.section}>
-            <RoundedButton label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"} onPress={fictionId ? updateFiction : createFiction} />{/* Création d'une nouvelle fiction s'il n'y a pas de fictionId */}
+            <RoundedButton
+              label={fictionId ? "Modifier la fanfiction" : "Créer la fanfiction"}
+              onPress={fictionId ? updateFiction : createFiction}
+            />
           </View>
 
         </ScrollView>
-        </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -344,8 +474,6 @@ const createStyles = (theme) =>
       backgroundColor: theme.background,
     },
     content: {
-      // paddingHorizontal: 16,
-      // paddingTop: 12,
       paddingBottom: 28,
       rowGap: 12,
     },
