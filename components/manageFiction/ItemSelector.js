@@ -5,52 +5,36 @@ import RoundedButton from "../ui/RoundedButton";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-/**
- * ItemSelector - Composant DUMB pour sélectionner un item parmi une liste
- * Utilisé pour Fandom et Language
- *
- * Props:
- * - items: Array - Liste des items disponibles (fetchés par le parent)
- * - selectedValue: String - Valeur actuellement sélectionnée
- * - onSelect: Function(name) - Callback quand un item est sélectionné
- * - onCreate: Function(name) - Callback quand un nouvel item est créé
- * - label: String - Label du champ (ex: "Fandom *", "Langue")
- * - getItemLabel: Function(item) - Fonction pour extraire le label d'un item
- * - getItemKey: Function(item) - Fonction pour extraire la clé d'un item
- * - placeholder: String - Placeholder de l'input de création
- * - isRequired: Boolean - Si true, affiche en rouge si vide
- * - isInvalid: Boolean - Si true et vide, affiche l'erreur
- */
 export default function ItemSelector({
-  items = [],
-  selectedValue = "",
-  onSelect,
-  onCreate,
-  label = "Item",
-  getItemLabel = (item) => item.name,
-  getItemKey = (item) => item._id || item.name,
-  placeholder = "Nouveau",
-  isRequired = false,
-  isInvalid = false,
+  items = [],                                       // Liste des items disponibles (fetchés par le parent)
+  selectedValue = "",                               // Valeur actuellement sélectionnée
+  onSelect,                                         // Fonction pour sélectionner un item
+  onCreate,                                         // Fonction pour créer un nouvel item
+  label = "Item",                                   // Label du champ (ex: "Fandom *", "Langue")
+  getItemLabel = (item) => item.name,               // Fonction pour extraire le label d'un item
+  getItemKey = (item) => item._id || item.name,     // Fonction pour extraire la clé d'un item
+  placeholder = "Nouveau",                          // Placeholder de l'input de création
+  isRequired = false,                               // Si true, affiche en rouge si selectedValue est vide
+  isInvalid = false,                                // Si true et selectedValue est vide, affiche l'erreur
 }) {
   const { currentTheme } = useTheme();
-  const [showCreator, setShowCreator] = useState(false);
+  const [itemCreation, setItemCreation] = useState(false);
   const [newItemValue, setNewItemValue] = useState("");
 
+  const showError = isRequired && isInvalid && !selectedValue;
+
   const handleSelect = (name) => {
-    onSelect?.(name);
+    onSelect(name);
   };
 
   const handleCreate = () => {
-    const name = String(newItemValue).trim();
+    const name = newItemValue.trim();
     if (!name) return;
 
-    onCreate?.(name);
+    onCreate(name);
     setNewItemValue("");
-    setShowCreator(false);
+    setItemCreation(false);
   };
-
-  const showError = isRequired && isInvalid && !selectedValue;
 
   return (
     <View style={{ gap: 8 }}>
@@ -72,10 +56,10 @@ export default function ItemSelector({
           />
         ))}
 
-        <RoundedButton label="＋" onPress={() => setShowCreator(true)} />
+        <RoundedButton label="＋" onPress={() => setItemCreation(true)} />
       </ScrollView>
 
-      {showCreator && (
+      {itemCreation && (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Input
             value={newItemValue}

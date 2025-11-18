@@ -109,7 +109,8 @@ export default function ManageFictionScreen({ route, navigation }) {
           setStoryStatus(data.fiction.storyStatus);
           setRateValue(Number(data.fiction.rate.value));
           setDisplayRate(Boolean(data.fiction.rate.display));
-          if (data.fiction.tags) setSelectedTags(data.fiction.tags);
+
+          if (data.fiction.tags) setSelectedTags(data.fiction.tags); // Pré-remplissage des tags déjà sélectionnés liés à la fiction
         }
       } catch (error) {
         console.error("GET /fiction/:id failed", error);
@@ -171,7 +172,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           if (prev.some(f => f._id === data.fandom._id)) return prev;
           return [...prev, data.fandom].sort((a, b) => a.position - b.position);
         });
-        setFandomName(data.fandom.name);
+        setFandomName(data.fandom.name);  // Nom du nouveau fandom et qui a été sélectionné
         setFandomError(false);
       }
     } catch (error) {
@@ -189,15 +190,15 @@ export default function ManageFictionScreen({ route, navigation }) {
   };
 
   const validationBeforeSave = () => {
-    const titleEmpty = String(title).trim().length === 0;
-    const fandomEmpty = String(fandomName).trim().length === 0;
+    const titleEmpty = title.trim().length === 0;
+    const fandomEmpty = fandomName.trim().length === 0;
     setTitleError(titleEmpty);
     setFandomError(fandomEmpty);
     return !(titleEmpty || fandomEmpty);
   };
 
-  const validationChapter = () => {
-    const totalChapters = Number(numberOfChapters) || 0;
+  const validationChapter = () => { // Validation : lastChapterRead ne doit pas dépasser numberOfChapters
+    const totalChapters = Number(numberOfChapters) || 0;  // en dessous on compare on fait une comparaison de nombres donc conversion au préalable
     if (lastChapterRead > totalChapters && totalChapters > 0) {
       Alert.alert(
         "Erreur de validation",
@@ -228,13 +229,13 @@ export default function ManageFictionScreen({ route, navigation }) {
           title,
           link,
           author,
-          langName: lang,
+          langName: lang,   // Pour correspondre au back
           summary,
           personalNotes,
-          numberOfChapters: Number(numberOfChapters),
+          numberOfChapters: Number(numberOfChapters), // on convertit en nombre avant d'envoyer au backend, car il attend un nombre d'après notre modèle
           numberOfWords: Number(numberOfWords),
           lastChapterRead,
-          tags: selectedTags.map(tag => tag._id),
+          tags: selectedTags.map(tag => tag._id),    // Envoyer les tags dès la création
           readingStatus,
           storyStatus,
           rate: { value: rateValue, display: displayRate },
@@ -275,7 +276,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           numberOfChapters: Number(numberOfChapters),
           numberOfWords: Number(numberOfWords),
           lastChapterRead,
-          tagIds: selectedTags.map(tag => tag._id),
+          tagIds: selectedTags.map(tag => tag._id),    // Dans req.params.id côté back, on attend "tagIds"
           readingStatus,
           storyStatus,
           rate: { value: rateValue, display: displayRate },
@@ -303,14 +304,14 @@ export default function ManageFictionScreen({ route, navigation }) {
       >
         <ScrollView
           contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          ref={scrollRef}
+          keyboardShouldPersistTaps="handled"  // permet de taper sur les suggestions sans fermer le clavier
+          keyboardDismissMode="on-drag"        // dès qu'on se met à scroller, le clavier se ferme automatiquement
+          ref={scrollRef}                      // on pourra scroller au focus avec scrollRef.current?.scrollToEnd
         >
           <Header
             title={fictionId ? "Modifier une fanfiction" : "Ajouter une fanfiction"}
-            screenName="manage"
-            showToggle={false}
+            screenName="manage"       // header spécifique à cette page uniquement
+            showToggle={false}        // false pour masquer le switch ici
             onProfilePress={() => navigation.navigate("Profile")}
           />
 
@@ -320,7 +321,7 @@ export default function ManageFictionScreen({ route, navigation }) {
               selectedValue={fandomName}
               onSelect={(name) => {
                 setFandomName(name);
-                setFandomError(false);
+                setFandomError(false);  // s'il y avait la case en rouge car l'user avait oublié un fandom, elle redeviendra normale grâce à cette ligne quand il va sélectionner un fandom
               }}
               onCreate={handleCreateFandom}
               label="Fandom *"
@@ -337,7 +338,7 @@ export default function ManageFictionScreen({ route, navigation }) {
               value={title}
               onChange={(value) => {
                 setTitle(value);
-                setTitleError(false);
+                setTitleError(false);   // dès qu'on tape à nouveau dans l'input Title, l'error n'est plus true.
               }}
               isInvalid={titleError}
             />
@@ -373,9 +374,9 @@ export default function ManageFictionScreen({ route, navigation }) {
             <Input
               value={summary}
               onChangeText={setSummary}
-              onBlur={() => setSummary(summary.trim())}
+              onBlur={() => setSummary(summary.trim())} // trim dès qu'on finit la saisie
               placeholder="Copier/coller le résumé d'origine, ou écrire le vôtre !"
-              multiline
+              multiline   // au début j'allais mettre <Input multiline={true} /> mais c'est la même chose
               numberOfLines={5}
               style={{ minHeight: 100, textAlignVertical: "top" }}
               autoCapitalize="sentences"
@@ -400,8 +401,8 @@ export default function ManageFictionScreen({ route, navigation }) {
             <View style={styles.numberCol}>
               <Text style={styles.sectionLabel}>Nombre de chapitres</Text>
               <Input
-                value={String(numberOfChapters)}
-                onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))}
+                value={String(numberOfChapters)}       // TextInput n'accepte que des strings donc on transforme les chiffres de String
+                onChangeText={(value) => setNumberOfChapters(value.replace(/[^0-9]/g, ""))} // tout ce qui n'est pas un chiffre est supprimé par replace (en vérité, remplacé par "")
                 keyboardType="numeric"
                 placeholder="21"
               />
@@ -423,7 +424,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           </View>
 
           <View style={styles.section}>
-            <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />
+            <LastChapterRead value={lastChapterRead} onChange={setLastChapterRead} />{/* Dernier chapitre lu : Input + boutons +/- */}
           </View>
 
           <View style={styles.section}>
@@ -431,7 +432,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           </View>
 
           <View style={styles.section}>
-            <TagSelector
+            <TagSelector //LINK - ../docs-frontend/screens/ManageFictionScreen.md#5
               availableTags={tags}
               selectedTags={selectedTags}
               onAdd={handleAddTag}

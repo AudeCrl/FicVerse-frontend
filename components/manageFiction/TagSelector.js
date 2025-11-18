@@ -7,38 +7,26 @@ import Tag from "../fiction/Tag";
 import { useTheme } from "../../context/ThemeContext.js";
 import { typography } from "../../styles/globalStyles.js";
 
-/**
- * TagSelector - Composant DUMB pour la sélection de tags
- *
- * Props:
- * - availableTags: Array - Tous les tags disponibles (fetchés par le parent)
- * - selectedTags: Array - Tags actuellement sélectionnés
- * - onAdd: Function(tag) - Callback quand un tag est ajouté
- * - onRemove: Function(tagId) - Callback quand un tag est retiré
- * - onCreate: Function(tagName) - Callback quand un nouveau tag est créé
- * - onInputFocus: Function - Callback au focus de l'input (pour scroll)
- * - onInputChange: Function - Callback à chaque frappe (pour scroll)
- */
 export default function TagSelector({
-  availableTags = [],
-  selectedTags = [],
-  onAdd,
-  onRemove,
-  onCreate,
-  onInputFocus,
-  onInputChange,
+  availableTags = [], // Tous les tags du user (fetchés par le parent) et qui n'ont pas été sélectionnés
+  selectedTags = [],  // Tags actuellement sélectionnés
+  onAdd,              // Quand un tag est ajouté parmi les sélectionnés
+  onRemove,           // Quand un tag est retiré
+  onCreate,           // Quand un nouveau tag est créé
+  onInputFocus,       // Au focus de l'input (finalité de la fonction : pour scroll lors du focus)
+  onInputChange,      // A chaque frappe dans l'input (finalité de la fonction : pour scroll à chaque frappe)
 }) {
   const { currentTheme } = useTheme();
   const [input, setInput] = useState("");
-
-  // Suggestions filtrées (tags non sélectionnés qui matchent l'input)
+  
+  // LINK - ../../docs-frontend/components/manageFiction/TagSelector.md#1
   const suggestions = useMemo(() => {
     const inputTrim = input.trim().toLowerCase();
     const selectedIds = new Set(selectedTags.map(tag => tag._id));
     const notSelected = availableTags.filter(tag => !selectedIds.has(tag._id));
 
     if (!inputTrim) {
-      // Input vide → tri usageCount desc + alphabétique
+      // Input vide → tri usageCount desc + tri alphabétique en cas d'égalité
       return [...notSelected]
         .sort((a, b) => {
           const diff = b.usageCount - a.usageCount;
@@ -61,15 +49,10 @@ export default function TagSelector({
     return inputTrim && availableTags.some(tag => tag.name.toLowerCase() === inputTrim);
   }, [input, availableTags]);
 
-  // Ajouter un tag existant
+  // Ajouter un tag existant : la seule finalité de cette fonction est de pouvoir reset l'input lorsqu'on a ajouté un tag suggéré parmi les sélectionnés
   const handleAdd = (tag) => {
-    onAdd?.(tag);
-    setInput("");
-  };
-
-  // Retirer un tag
-  const handleRemove = (tagId) => {
-    onRemove?.(tagId);
+    onAdd(tag);
+    setInput(""); // quand le parent ManageFictionScreen a fait onAdd, on reset l'input ici
   };
 
   // Créer un nouveau tag
@@ -80,7 +63,7 @@ export default function TagSelector({
     // Vérifier que le tag n'existe pas déjà
     const exists = availableTags.find(tag => tag.name.toLowerCase() === inputTrim);
     if (!exists) {
-      onCreate?.(inputTrim);
+      onCreate(inputTrim);  // On n'envoie pas au back _id: "temporaryId". En paramètre il n'y a que inputTrim qui correspond à tagName dans le paramètre de handleCreateTag.
     }
     setInput("");
   };
@@ -94,18 +77,18 @@ export default function TagSelector({
         value={input}
         onChangeText={(text) => {
           setInput(text);
-          onInputChange?.();
+          onInputChange(); // fonction s'active uniquement seulement à chaque fois que du texte est tapé dans l'input
         }}
         placeholder="Rechercher ou créer"
         leftIcon={<Ionicons name="search" size={18} />}
-        onFocus={onInputFocus}
+        onFocus={onInputFocus} // fonction s'active directement dès qu'il y a focus
       />
 
       {/* Tags sélectionnés */}
       <Tags
         tags={selectedTags}
         withCross={true}
-        pressTag={(tag) => handleRemove(tag._id)}
+        pressTag={(tag) => onRemove(tag._id)} // ici "tag._id" correspond à "tagId" chez const handleRemoveTag = (tagId) de ManageFictionScreen
       />
 
       {/* Suggestions */}
@@ -120,8 +103,8 @@ export default function TagSelector({
       {/* Créer si pas de correspondance exacte */}
       {!!input.trim() && !exactTagExists && (
         <Tag
-          key="temporaryKey"
-          tag={{ _id: "temporaryKey", name: input.trim() }}
+          key="temporaryId"
+          tag={{ _id: "temporaryId", name: input.trim() }}
           label={`＋ Créer "${input.trim()}"`}
           onPress={handleCreate}
           withCross={false}
