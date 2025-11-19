@@ -45,7 +45,7 @@ export default function ItemSelector({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 8, alignItems: "center" }}
+        contentContainerStyle={{ gap: 8 }}
       >
         {items.map((item) => (
           <RoundedButton
@@ -60,7 +60,7 @@ export default function ItemSelector({
       </ScrollView>
 
       {itemCreation && (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
           <Input
             value={newItemValue}
             onChangeText={setNewItemValue}

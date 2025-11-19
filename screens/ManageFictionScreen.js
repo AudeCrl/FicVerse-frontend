@@ -189,33 +189,26 @@ export default function ManageFictionScreen({ route, navigation }) {
     setLang(name);
   };
 
-  const validationBeforeSave = () => {
-    const titleEmpty = title.trim().length === 0;
-    const fandomEmpty = fandomName.trim().length === 0;
-    setTitleError(titleEmpty);
-    setFandomError(fandomEmpty);
-    return !(titleEmpty || fandomEmpty);
-  };
-
-  const validationChapter = () => { // Validation : lastChapterRead ne doit pas dépasser numberOfChapters
-    const totalChapters = Number(numberOfChapters) || 0;  // en dessous on compare on fait une comparaison de nombres donc conversion au préalable
-    if (lastChapterRead > totalChapters && totalChapters > 0) {
-      Alert.alert(
-        "Erreur de validation",
-        `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${totalChapters}).`
-      );
-      return false;
-    }
-    return true;
-  };
-
   const toggleHideRate = () => {
     setDisplayRate((toggle) => !toggle);
+  };  
+
+  const errorsBeforeSave = () => {  // Si le title ou fandom est vide 
+    const titleEmpty = title.trim().length === 0; // renvoie true si title vide
+    const fandomEmpty = fandomName.trim().length === 0;
+    setTitleError(titleEmpty);  // titleError devient true si title vide
+    setFandomError(fandomEmpty);
+    return (titleEmpty || fandomEmpty);
+  };// LINK - ../docs-frontend/screens/ManageFictionScreen.md#6
+
+  const chapterError = () => { // Validation : lastChapterRead ne doit pas dépasser numberOfChapters
+    const totalChapters = Number(numberOfChapters) || 0;  // en dessous on fait une comparaison de nombres donc conversion au préalable
+    return (lastChapterRead > totalChapters && totalChapters > 0);
   };
 
   const createFiction = async () => {
-    if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
-    if (!validationChapter()) return;
+    if (errorsBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+    if (chapterError()) return Alert.alert("Erreur de validation", `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${Number(numberOfChapters) || 0}).`);
 
     try {
       const res = await fetch(`${API_URL}/fiction`, {
@@ -256,7 +249,8 @@ export default function ManageFictionScreen({ route, navigation }) {
   };
 
   const updateFiction = async () => {
-    if (!validationBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+    if (errorsBeforeSave()) return Alert.alert("Champs requis", "Titre et fandom sont obligatoires.");
+    if (chapterError()) return Alert.alert("Erreur de validation", `Le dernier chapitre lu (${lastChapterRead}) ne peut pas dépasser le nombre total de chapitres (${Number(numberOfChapters) || 0}).`);
 
     try {
       const res = await fetch(`${API_URL}/fiction/${fictionId}`, {

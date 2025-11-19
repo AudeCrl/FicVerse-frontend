@@ -11,7 +11,7 @@ export default function ChosenLink({ value, onChange }) {
     <View style={{ gap: 6 }}>
       <Text style={{ ...typography.label, color: currentTheme.text }}>Lien</Text>
       <Input
-        value={typeof value === "string" ? value : ""}
+        value={value}
         onChangeText={onChange}
         placeholder="https://archiveofourown.org/..."
         keyboardType="url"

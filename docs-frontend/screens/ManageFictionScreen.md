@@ -55,3 +55,14 @@ const [fandoms, tags, authors] = await Promise.all([
               onInputFocus={() => scrollRef.current?.scrollToEnd({ animated: true })}
               onInputChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
             />
+
+/* ANCHOR[id=6] On ne met pas return (titleError || fandomError); sachant qu'au-dessus il y a le setTitleError, setFandomError car les useState sont asynchrones et le re-render arrive après le return.
+Chronologie :
+1. Appui sur "Créer"
+2. createFiction() s'exécute
+3. errorsBeforeSave() calcule titleEmpty/fandomEmpty
+4. setTitleError/setFandomError programmés
+5. return (titleEmpty || fandomEmpty) ← valeur immédiate
+6. Si erreur → Alert + return (pas de fetch)
+7. Re-render → labels rouges affichés
+*/

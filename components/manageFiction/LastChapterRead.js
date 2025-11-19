@@ -13,7 +13,7 @@ export default function LastChapterRead({ value = 0, onChange, min = 0, sectionL
     return clean === "" ? "0" : clean;  // Si inputValue est vide alors on affiche "0", sinon on affiche la valeur de inputValue
   };
 
-  const decrement = () => onChange(Math.max(min, Number(value) - 1));   // Math.max est une méthode qui sort la grande valeur parmi les valeurs entre parenthèses. En mettant min = 0 en props, on dit que les chapitres ne descendront jamais en dessous de 0, peu importe à quel point la 2nd valeur décrémente.
+  const decrement = () => onChange(Math.max(min, Number(value) - 1));   // Math.max est une méthode qui sort la plus grande valeur parmi les valeurs entre parenthèses. En mettant min = 0 en props, on dit que les chapitres ne descendront jamais en dessous de 0, peu importe à quel point la 2nd valeur décrémente.
   const increment = () => onChange(Number(value) + 1);
 
   const styles = StyleSheet.create({

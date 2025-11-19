@@ -21,7 +21,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 console.log(API_URL);
 
 export default function AuthScreen({ navigation, route }) {
-  // provient de ProfileScreen avec la fonction handleLogout. Depuis ProfileScreen, un initialForm login est envoyé vers Auth et si cela arrive, alors initialSignUp = false et signUp = false et donc on arrive direct à la connexion
+  // LINK - ../docs-frontend/screens/AuthScreen.md#1
   const initialSignUp = route.params?.initialForm === "login" ? false : true;
 
   // true = affichage du formulaire Inscription et false = formulaire Connexion
@@ -47,13 +47,7 @@ export default function AuthScreen({ navigation, route }) {
   const dispatch = useDispatch();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  //  Explication de UseMemo en 3 lignes !
-  //  On attribue une constante pour appliquer le useMemo. Ex : checkUsername.
-  //  Finalité de useMemo : vérifier que le champ username n'est pas vide (donc .trim.length > 0).
-  //  useMemo va effectuer cette vérification à chaque fois que la variable entre crochets [ ] va changer.
-  //  Donc à chaque fois que username va changer, useMemo effectue la vérif.
-
-  // Inscription
+  // Inscription  // LINK - ../docs-frontend/screens/AuthScreen.md#2
   const checkUsername = useMemo(() => username.trim().length > 0, [username]);
 
   const checkEmailSignup = useMemo(
@@ -66,10 +60,6 @@ export default function AuthScreen({ navigation, route }) {
     [passwordSignup]
   );
 
-  // useMemo vérifie :
-  // que le champ de confirmation est égal au champ mdp, donc confirmPassword === passwordSignup
-  // qu'il n'est pas vide, donc confirmPassword.trim().length > 0,
-  // a chaque fois que confirmPassword ou passwordSignup sont modifiés, la vérification est lancée
   const checkConfirmPassword = useMemo(
     () =>
       confirmPassword === passwordSignup && confirmPassword.trim().length > 0,
@@ -108,10 +98,10 @@ export default function AuthScreen({ navigation, route }) {
     navigation.replace("TabNavigator"); // on utilise replace car on veut bloquer le retour en arrière revenir en arrière de HomeScreen à AuthScreen
   };
 
-  // Lorsqu'on appuiera sur le bouton S'inscrire, on déclenche cette fonction
+  // Lorsqu'on appuiera sur le bouton "S'inscrire", on déclenche cette fonction
   const submitSignup = async () => {
     setInvalid("");
-    setSubmittedSignup(true);
+    setSubmittedSignup(true);  // va activer isInvalid et activer le style lié aux errors
     if (!validSignup) return; // si l'un des champs est mal rempli, on ne lance même pas la route
 
     try {
@@ -126,11 +116,7 @@ export default function AuthScreen({ navigation, route }) {
       }); // on envoie le username, l'email et le password au back
 
       const data = await res.json();
-
-      // Le back nous a répondu avec la route /signup => { result : true/false, user: { token, email, username } }
-      // Si result est true, on l'envoie au reducer via dispatch
-
-      if (data.result && data.user) {
+      if (data.result && data.user) { // LINK - ../docs-frontend/screens/AuthScreen.md#3
         dispatch(
           login({
             token: data.user.token,
@@ -221,7 +207,7 @@ export default function AuthScreen({ navigation, route }) {
 
             {/* Switch entre les 2 formulaires */}
             <View style={styles.switchRow}>
-              {/* Quand on appuie sur S'inscrire, signUp devient true et on applie les styles switchBtn et switchBtnActive */}
+              {/* Quand on appuie sur S'inscrire, signUp devient true et on applique les styles switchBtn et switchBtnActive */}
               <TouchableOpacity
                 style={[
                   styles.switchBtn,
@@ -236,7 +222,7 @@ export default function AuthScreen({ navigation, route }) {
                 <Text style={styles.switchText}>Inscription</Text>
               </TouchableOpacity>
 
-              {/* Quand on appuie sur Se Connecter, signUp devient false et on applie les styles switchBtn et switchBtnActive */}
+              {/* Quand on appuie sur Se Connecter, signUp devient false et on applique les styles switchBtn et switchBtnActive */}
               <TouchableOpacity
                 style={[
                   styles.switchBtn,

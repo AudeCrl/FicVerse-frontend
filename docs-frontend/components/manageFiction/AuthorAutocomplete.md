@@ -1,1 +1,3 @@
 ```jsx
+
+// ANCHOR[id=1] Ici useEffect n'est pas redondant avec handleInputChange car dans le cas où ManageFictionScreen se monte, envoie sa value vide à AuthorAutoComplete, puis qu'il se met à jour avec le pré-remplissage si modification d'une fiction existante. Cela se fera sans action de l'utilisateur et donc AuthorAutoComplete ne sera pas au courant. Il permet de synchroniser l'input avec la valeur du parent dans le cas du pré-remplissage.
