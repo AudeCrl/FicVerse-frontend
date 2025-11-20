@@ -2,13 +2,15 @@ import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import Header from "../components/Header";
 import { typography } from "../styles/globalStyles";
 
 const AVAILABLE_LANGUAGES = [
@@ -56,15 +58,13 @@ export default function LanguagesManagerScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" size={24} color="#1F2937" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Mes langues</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <Header
+        title="Gérer mes langues"
+        screenName="manage"
+        showToggle={false}
+        onProfilePress={() => navigation.navigate("Profile")}
+      />
 
       {/* Modale de confirmation */}
       {languageToDelete && (

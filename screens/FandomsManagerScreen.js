@@ -2,15 +2,17 @@ import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
   FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import Header from "../components/Header";
 import { typography } from "../styles/globalStyles";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -126,15 +128,13 @@ export default function FandomsManagerScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" size={24} color="#1F2937" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Mes fandoms</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <Header
+        title="Gérer mes fandoms"
+        screenName="manage"
+        showToggle={false}
+        onProfilePress={() => navigation.navigate("Profile")}
+      />
 
       {/* Modale de confirmation */}
       {fandomToDelete && (
@@ -152,54 +152,59 @@ export default function FandomsManagerScreen({ navigation }) {
         />
       )}
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={18} color="#9CA3AF" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher un fandom..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#D1D5DB"
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <Feather name="search" size={18} color="#9CA3AF" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un fandom..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#D1D5DB"
+          />
+        </View>
+
+        {/* User Fandoms */}
+        <Text style={styles.sectionTitle}>
+          Mes fandoms ({userFandoms.length})
+        </Text>
+        <FlatList
+          data={userFandoms}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <TouchableOpacity onPress={() => handleRemoveFandom(item)}>
+                <Feather name="trash-2" size={18} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
+          )}
+          scrollEnabled={false}
         />
-      </View>
 
-      {/* User Fandoms */}
-      <Text style={styles.sectionTitle}>
-        Mes fandoms ({userFandoms.length})
-      </Text>
-      <FlatList
-        data={userFandoms}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <TouchableOpacity onPress={() => handleRemoveFandom(item)}>
-              <Feather name="trash-2" size={18} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
-        )}
-        scrollEnabled={false}
-      />
-
-      {/* Available Fandoms */}
-      <Text style={styles.sectionTitle}>Fandoms disponibles</Text>
-      <FlatList
-        data={filteredAvailable}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <TouchableOpacity onPress={() => handleAddFandom(item)}>
-              <Feather name="plus" size={18} color="#9C27B0" />
-            </TouchableOpacity>
-          </View>
-        )}
-        scrollEnabled={false}
-        ListEmptyMessage={
-          <Text style={styles.emptyText}>Aucun fandom disponible</Text>
-        }
-      />
+        {/* Available Fandoms */}
+        <Text style={styles.sectionTitle}>Fandoms disponibles</Text>
+        <FlatList
+          data={filteredAvailable}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              <TouchableOpacity onPress={() => handleAddFandom(item)}>
+                <Feather name="plus" size={18} color="#9C27B0" />
+              </TouchableOpacity>
+            </View>
+          )}
+          scrollEnabled={false}
+          ListEmptyMessage={
+            <Text style={styles.emptyText}>Aucun fandom disponible</Text>
+          }
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }

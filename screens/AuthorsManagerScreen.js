@@ -2,14 +2,16 @@ import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import Header from "../components/Header";
 import { typography } from "../styles/globalStyles";
 
 export default function AuthorsManagerScreen({ navigation }) {
@@ -49,15 +51,13 @@ export default function AuthorsManagerScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" size={24} color="#1F2937" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Mes auteurs</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <Header
+        title="Gérer mes auteurs"
+        screenName="manage"
+        showToggle={false}
+        onProfilePress={() => navigation.navigate("Profile")}
+      />
 
       {/* Modale de confirmation */}
       {authorToDelete && (
@@ -75,52 +75,57 @@ export default function AuthorsManagerScreen({ navigation }) {
         />
       )}
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={18} color="#9CA3AF" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher un auteur..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor="#D1D5DB"
-        />
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Search */}
+        <View style={styles.searchContainer}>
+          <Feather name="search" size={18} color="#9CA3AF" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher un auteur..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#D1D5DB"
+          />
+        </View>
 
-      {/* Add Author */}
-      <View style={styles.addContainer}>
-        <TextInput
-          style={styles.authorInput}
-          placeholder="Ajouter un auteur..."
-          value={authorInput}
-          onChangeText={setAuthorInput}
-          placeholderTextColor="#D1D5DB"
-        />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddAuthor}>
-          <Feather name="plus" size={18} color="white" />
-        </TouchableOpacity>
-      </View>
+        {/* Add Author */}
+        <View style={styles.addContainer}>
+          <TextInput
+            style={styles.authorInput}
+            placeholder="Ajouter un auteur..."
+            value={authorInput}
+            onChangeText={setAuthorInput}
+            placeholderTextColor="#D1D5DB"
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddAuthor}>
+            <Feather name="plus" size={18} color="white" />
+          </TouchableOpacity>
+        </View>
 
-      {/* Authors List */}
-      <Text style={styles.sectionTitle}>
-        Mes auteurs ({userAuthors.length})
-      </Text>
-      <FlatList
-        data={filteredAuthors}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.authorItem}>
-            <Text style={styles.authorName}>{item.name}</Text>
-            <TouchableOpacity onPress={() => handleRemoveAuthor(item)}>
-              <Feather name="trash-2" size={18} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
-        )}
-        scrollEnabled={false}
-        ListEmptyMessage={
-          <Text style={styles.emptyText}>Aucun auteur pour le moment</Text>
-        }
-      />
+        {/* Authors List */}
+        <Text style={styles.sectionTitle}>
+          Mes auteurs ({userAuthors.length})
+        </Text>
+        <FlatList
+          data={filteredAuthors}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.authorItem}>
+              <Text style={styles.authorName}>{item.name}</Text>
+              <TouchableOpacity onPress={() => handleRemoveAuthor(item)}>
+                <Feather name="trash-2" size={18} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
+          )}
+          scrollEnabled={false}
+          ListEmptyMessage={
+            <Text style={styles.emptyText}>Aucun auteur pour le moment</Text>
+          }
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
