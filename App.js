@@ -21,6 +21,7 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 import AuthScreen from "./screens/AuthScreen";
 import AuthorsManagerScreen from "./screens/AuthorsManagerScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
 import FandomsManagerScreen from "./screens/FandomsManagerScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import HomeScreen from "./screens/HomeScreen";
@@ -115,6 +116,7 @@ const RootNavigation = () => {
       <Stack.Screen name="RGPD" component={RGPD} />
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="TagsManager" component={TagsManagerScreen} />
       <Stack.Screen name="FandomsManager" component={FandomsManagerScreen} />
       <Stack.Screen name="AuthorsManager" component={AuthorsManagerScreen} />

@@ -11,7 +11,7 @@ export default function Header({
   avatarSource=require('../assets/avatar-default.png'),
   onProfilePress,
   screenName = 'default', // 'default' puour les pages existantes, et 'manage' pour ManageFictionScreen uniquement
-  showToggle = true,        // masque/affiche le bouton de bascule dark/light
+  showToggle = true,      // masque/affiche le bouton de bascule dark/light
 }) {
   const username = useSelector((state) => state.user.value.username); // on récupère le username du store reducers
   const avatar = {uri: useSelector((state) => state.user.value.avatar)}; // on récupère l'avatar du store reducers
