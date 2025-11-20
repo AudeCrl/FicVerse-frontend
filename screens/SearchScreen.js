@@ -161,7 +161,7 @@ export default function SearchScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={["top, bottom"]}>
       {/* Header */}
-      <Header onProfilePress={() => navigation.navigate("Profile")} />
+      <Header onProfilePress={() => navigation.navigate("Profile")} title="Rechercher par" />
 
       {/* Search Tabs */}
       <View style={styles.tabs}>
