@@ -197,7 +197,7 @@ export default function AuthScreen({ navigation, route }) {
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.logoContainer}>
-              <Image style={styles.logo} source={require('../assets/logoFicVerse200.png')} width={140} height={140} />
+              <Image style={styles.logo} source={require('../assets/logoFicVerse520.png')} width={140} height={140} />
             </View>
 
             <View style={styles.welcomeContainer}>
@@ -393,7 +393,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -90,    
+    marginTop: -90,
+    
   },
   logo: {
     fontSize: 24,
@@ -402,6 +403,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     borderWidth: 4,
     borderColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF',
   },
   welcomeContainer: {
     alignItems: 'center',
