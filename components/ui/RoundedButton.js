@@ -22,6 +22,7 @@ export default function RoundedButton({
         paddingHorizontal: 10,
         borderRadius: 8,
         backgroundColor: active ? currentTheme.primary : currentTheme.inactive,
+        minHeight: 40,
         ...style
       }}
     >
