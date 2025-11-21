@@ -187,7 +187,7 @@ export default function FandomsManagerScreen({ navigation }) {
         />
 
         {/* Available Fandoms */}
-        <Text style={styles.sectionTitle}>Fandoms disponibles</Text>
+        <Text style={styles.sectionTitle}>Fandoms suggérés</Text>
         <FlatList
           data={filteredAvailable}
           keyExtractor={(item) => String(item.id)}
@@ -201,7 +201,7 @@ export default function FandomsManagerScreen({ navigation }) {
           )}
           scrollEnabled={false}
           ListEmptyMessage={
-            <Text style={styles.emptyText}>Aucun fandom disponible</Text>
+            <Text style={styles.emptyText}>Aucun fandom suggéré</Text>
           }
         />
       </ScrollView>
