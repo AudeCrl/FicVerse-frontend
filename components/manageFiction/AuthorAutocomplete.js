@@ -7,7 +7,7 @@ import { typography } from "../../styles/globalStyles.js";
 
 export default function AuthorAutocomplete({
   value = "",         // Valeur actuelle de l'input author
-  suggestions = [],   // Liste des auteurs suggérés (fetchés par le parent : totalité des authors du user, sans doublons et triés par ordre alphabétique)
+  suggestions = [],   // authorList : Liste des auteurs suggérés (fetchés par le parent : totalité des authors du user, sans doublons et triés par ordre alphabétique)
   onChange,           // Callback quand la valeur change
 }) {
   const { currentTheme } = useTheme();

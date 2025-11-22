@@ -22,13 +22,13 @@ export default function ManageFictionScreen({ route, navigation }) {
 
   const user = useSelector((state) => state.user.value);
   const token = user.token;
-  const fictionId = route.params?.fictionId;  // ? après params dans le cas où on ne transmet pas de fictionId et donc go sur création de fiction
+  const fictionId = route.params?.fictionId;  // "?" après params dans le cas où on ne transmet pas de fictionId et donc go sur création de fiction
 
   // États pour les données fetchées
   const [fandoms, setFandoms] = useState([]);
   const [tags, setTags] = useState([]);
   const [languages, setLanguages] = useState([]);
-  const [authors, setAuthors] = useState([]);
+  const [authorList, setAuthorList] = useState([]);
 
   // LINK - ../docs-frontend/screens/ManageFictionScreen.md#1
   const [fandomName, setFandomName] = useState("");
@@ -59,25 +59,25 @@ export default function ManageFictionScreen({ route, navigation }) {
   useEffect(() => {
     const baseData = async () => {
       try {
-        const [fandomsResponse, tagsResponse, languagesResponse, authorsResponse] = await Promise.all([ // LINK - ../docs-frontend/screens/ManageFictionScreen.md#2
+        const [fandomsResponse, tagsResponse, languagesResponse, authorListResponse] = await Promise.all([ // LINK - ../docs-frontend/screens/ManageFictionScreen.md#2
           fetch(`${API_URL}/fandom`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_URL}/tag`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_URL}/fiction/lang`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_URL}/fiction/author`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
-        const [fandomsData, tagsData, languagesData, authorsData] = await Promise.all([
+        const [fandomsData, tagsData, languagesData, authorListData] = await Promise.all([
           fandomsResponse.json(),
           tagsResponse.json(),
           languagesResponse.json(),
-          authorsResponse.json(),
+          authorListResponse.json(),
         ]);
 
         // LINK - ../docs-frontend/screens/ManageFictionScreen.md#3
         if (fandomsData.result) setFandoms(fandomsData.fandoms);
         if (tagsData.result) setTags(tagsData.tags);
         if (languagesData.result) setLanguages(languagesData.languages);
-        if (authorsData.result) setAuthors(authorsData.authors);
+        if (authorListData.result) setAuthorList(authorListData.authorList);
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -345,7 +345,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           <View style={styles.section}>
             <AuthorAutocomplete
               value={author}
-              suggestions={authors}
+              suggestions={authorList}
               onChange={setAuthor}
             />
           </View>
