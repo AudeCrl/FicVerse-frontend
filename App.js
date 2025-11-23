@@ -121,10 +121,7 @@ const RootNavigation = () => {
       <Stack.Screen name="FandomsManager" component={FandomsManagerScreen} />
       <Stack.Screen name="AuthorsManager" component={AuthorsManagerScreen} />
       <Stack.Screen name="ManageFiction" component={ManageFictionScreen} />
-      <Stack.Screen
-        name="LanguagesManager"
-        component={LanguagesManagerScreen}
-      />
+      <Stack.Screen name="LanguagesManager" component={LanguagesManagerScreen} />
     </Stack.Navigator>
   );
 };
