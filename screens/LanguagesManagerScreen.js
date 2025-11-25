@@ -101,7 +101,7 @@ export default function LanguagesManagerScreen({ navigation }) {
       />
 
       {/* Available Languages */}
-      <Text style={styles.sectionTitle}>Langues disponibles</Text>
+      <Text style={styles.sectionTitle}>Langues suggérées</Text>
       <FlatList
         data={filteredAvailable}
         keyExtractor={(item) => item.id}
@@ -115,7 +115,7 @@ export default function LanguagesManagerScreen({ navigation }) {
         )}
         scrollEnabled={false}
         ListEmptyMessage={
-          <Text style={styles.emptyText}>Aucune langue disponible</Text>
+          <Text style={styles.emptyText}>Aucune langue suggérée</Text>
         }
       />
     </SafeAreaView>

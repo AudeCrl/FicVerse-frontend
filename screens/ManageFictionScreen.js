@@ -22,13 +22,13 @@ export default function ManageFictionScreen({ route, navigation }) {
 
   const user = useSelector((state) => state.user.value);
   const token = user.token;
-  const fictionId = route.params?.fictionId;  // ? après params dans le cas où on ne transmet pas de fictionId et donc go sur création de fiction
+  const fictionId = route.params?.fictionId;
 
   // États pour les données fetchées
   const [fandoms, setFandoms] = useState([]);
   const [tags, setTags] = useState([]);
   const [languages, setLanguages] = useState([]);
-  const [authors, setAuthors] = useState([]);
+  const [authorList, setAuthorList] = useState([]);
 
   // LINK - ../docs-frontend/screens/ManageFictionScreen.md#1
   const [fandomName, setFandomName] = useState("");
@@ -55,29 +55,40 @@ export default function ManageFictionScreen({ route, navigation }) {
   const { currentTheme } = useTheme();
   const styles = useMemo(() => createStyles(currentTheme), [currentTheme]);
 
-  // Fetch initial : 4 requêtes en parallèle pour chargement des fandoms, tags, langues et auteurs en parallèle
+  // Fetch initial : 3 requêtes en parallèle
   useEffect(() => {
     const baseData = async () => {
       try {
-        const [fandomsResponse, tagsResponse, languagesResponse, authorsResponse] = await Promise.all([ // LINK - ../docs-frontend/screens/ManageFictionScreen.md#2
+        const [fandomsResponse, tagsResponse, fictionsResponse] = await Promise.all([
           fetch(`${API_URL}/fandom`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API_URL}/tag`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/fiction/lang`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/fiction/author`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/fiction`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
-        const [fandomsData, tagsData, languagesData, authorsData] = await Promise.all([
+        const [fandomsData, tagsData, fictionsData] = await Promise.all([
           fandomsResponse.json(),
           tagsResponse.json(),
-          languagesResponse.json(),
-          authorsResponse.json(),
+          fictionsResponse.json(),
         ]);
 
-        // LINK - ../docs-frontend/screens/ManageFictionScreen.md#3
         if (fandomsData.result) setFandoms(fandomsData.fandoms);
         if (tagsData.result) setTags(tagsData.tags);
-        if (languagesData.result) setLanguages(languagesData.languages);
-        if (authorsData.result) setAuthors(authorsData.authors);
+
+        if (fictionsData.result && fictionsData.fictions) {
+          const uniqueLangs = [...new Set(
+            fictionsData.fictions
+              .map(f => f.lang)
+              .filter(Boolean)
+          )];
+          setLanguages(uniqueLangs.map(name => ({ name })));
+
+          const uniqueAuthors = [...new Set(
+            fictionsData.fictions
+              .map(f => f.author)
+              .filter(Boolean)
+          )];
+          setAuthorList(uniqueAuthors);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -116,7 +127,7 @@ export default function ManageFictionScreen({ route, navigation }) {
         console.error("GET /fiction/:id failed", error);
       }
     })();
-  }, [fictionId, token]);   // Avec fictionId en dépendance, si une nouvelle fiction nous ramène sur cette page, alors on relance le fetch
+  }, [fictionId, token]);
 
   // Handlers pour TagSelector // LINK - ../docs-frontend/screens/ManageFictionScreen.md#4
   const handleAddTag = (tag) => {
@@ -345,7 +356,7 @@ export default function ManageFictionScreen({ route, navigation }) {
           <View style={styles.section}>
             <AuthorAutocomplete
               value={author}
-              suggestions={authors}
+              suggestions={authorList}
               onChange={setAuthor}
             />
           </View>
