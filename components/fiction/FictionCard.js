@@ -1,6 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Linking from "expo-linking";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSelector } from "react-redux";
 import { useTheme } from "../../context/ThemeContext.js";
@@ -26,6 +26,11 @@ export default function FictionCard({
   const [fictionData, setFictionData] = useState(fiction);
   const user = useSelector((state) => state.user.value);
   // console.log('user =>', user);
+
+  // Synchroniser fictionData avec la prop fiction quand elle change
+  useEffect(() => {
+    setFictionData(fiction);
+  }, [fiction]);
 
   // Callback pour mettre à jour fictionData localement et remonter au parent
   const handleFictionUpdated = (updatedFiction) => {

@@ -59,8 +59,9 @@ export const FictionActionsModal = ({
     updateFiction({ rate: { value: newRateValue } });
   };
   const handleToggleHide = () => {
-    setDisplayRate(displayRate === true ? false : true);
-    updateFiction({ rate: { display: displayRate } });
+    const newDisplayValue = !displayRate;
+    setDisplayRate(newDisplayValue);
+    updateFiction({ rate: { display: newDisplayValue } });
   };
 
   // Fast update of a fiction (readingStatus, lastChapterRead or rate)
@@ -85,6 +86,13 @@ export const FictionActionsModal = ({
           const updatedFiction = {
             ...fiction,
             ...fieldToUpdate,
+            // Merge profond pour l'objet rate afin de ne pas perdre les propriétés
+            ...(fieldToUpdate.rate && {
+              rate: {
+                ...fiction.rate,
+                ...fieldToUpdate.rate,
+              },
+            }),
           };
           onFictionUpdated(updatedFiction);
         }
