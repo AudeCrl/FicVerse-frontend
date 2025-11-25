@@ -27,12 +27,12 @@ export default function FictionCard({
   const user = useSelector((state) => state.user.value);
   // console.log('user =>', user);
 
-  // Synchroniser fictionData avec la prop fiction quand elle change
+  // Keep fictionData in sync with the fiction prop when it changes
   useEffect(() => {
     setFictionData(fiction);
   }, [fiction]);
 
-  // Callback pour mettre à jour fictionData localement et remonter au parent
+  // Callback to update fictionData locally and pass the update back to the parent
   const handleFictionUpdated = (updatedFiction) => {
     setFictionData(updatedFiction);
     if (onFictionUpdated) {
