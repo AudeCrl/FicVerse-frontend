@@ -14,7 +14,6 @@ import { useDispatch } from "react-redux";
 import Input from "../components/ui/Input.js";
 import RoundedButton from "../components/ui/RoundedButton.js";
 import { login } from "../reducers/user";
-import { setThemeName, setVariant } from "../reducers/theme";
 import { typography } from "../styles/globalStyles.js";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -129,11 +128,7 @@ export default function AuthScreen({ navigation, route }) {
             appearanceMode: data.user.appearanceMode,
           })
         );
-        // On stocke le nom du thème dans le store
-        dispatch(setThemeName(data.user.theme));
-        // Idem variant dark/light
-        dispatch(setVariant(data.user.appearanceMode));
-        
+
         goToTabNavigator(); // go vers HomeScreen result: true
       } else {
         setInvalid(data.error); // dans le return en dessous, on affichera le message d'erreur à l'utilisateur

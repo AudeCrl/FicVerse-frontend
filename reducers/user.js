@@ -52,9 +52,12 @@ export const userSlice = createSlice({
         },
         updateTheme: (state, action) => {
             state.value.theme = action.payload;
+        },
+        updateAppearanceMode: (state, action) => {
+            state.value.appearanceMode = action.payload;
         }
     },
 });
 
-export const { login, logout, updateAvatar, updateUsername, updateEmail, updateNotationIcon, updateTheme } = userSlice.actions;
+export const { login, logout, updateAvatar, updateUsername, updateEmail, updateNotationIcon, updateTheme, updateAppearanceMode } = userSlice.actions;
 export default userSlice.reducer;

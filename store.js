@@ -3,19 +3,17 @@ import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import user from './reducers/user';
-import theme from './reducers/theme';
 
 // Redux Persist configuration
 const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    whitelist: ['user', 'theme'],
+    whitelist: ['user'],
 };
 
 // Combine all reducers of the app
 const rootReducer = combineReducers({
     user,
-    theme,
 });
 
 // Apply persistence layer

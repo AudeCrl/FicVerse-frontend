@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { toggleVariant, setThemeName } from '../reducers/theme';
+import { updateTheme, updateAppearanceMode } from '../reducers/user';
 import { themes } from '../styles/themes';
 
 // Create a new context for theming
@@ -10,11 +10,16 @@ const ThemeContext = createContext();
 // theme-related data and functions (light/dark mode, themeName, etc.)
 export const ThemeProvider = ({ children }) => {
     const dispatch = useDispatch();
-    const { themeName, variant } = useSelector((state) => state.theme);
-    console.log(themeName);
+    const themeName = useSelector((state) => state.user.value.theme) || 'watercolor';
+    const variant = useSelector((state) => state.user.value.appearanceMode) || 'light';
 
     // Get the currently active theme object (ex: themes.watercolor.light)
-    const currentTheme = themes[themeName][variant];
+    const currentTheme = themes[themeName]?.[variant] || themes.watercolor.light;
+
+    const toggleVariant = () => {
+        const newVariant = variant === 'light' ? 'dark' : 'light';
+        dispatch(updateAppearanceMode(newVariant));
+    };
 
     return (
         <ThemeContext.Provider
@@ -25,8 +30,8 @@ export const ThemeProvider = ({ children }) => {
                 themeName,
                 variant,
                 currentTheme, // le gros objet qui contient toutes les valeurs de couleurs du thème courant
-                setThemeName: (name) => dispatch(setThemeName(name)), // la fonction pour changer de thème
-                toggleVariant: () => dispatch(toggleVariant()), // la fonction pour basculer le mode light/dark
+                setThemeName: (name) => dispatch(updateTheme(name)), // la fonction pour changer de thème
+                toggleVariant, // la fonction pour basculer le mode light/dark
             }}
         >
             {children}

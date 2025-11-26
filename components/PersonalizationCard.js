@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "../context/ThemeContext.js";
 import { typography } from "../styles/globalStyles";
 import { updateNotationIcon, updateTheme } from "../reducers/user";
-import { setThemeName } from "../reducers/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Rate from "./fiction/Rate.js";
 
