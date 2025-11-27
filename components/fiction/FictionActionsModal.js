@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   Modal,
@@ -40,7 +40,7 @@ export const FictionActionsModal = ({
     fiction?.rate?.display ?? false
   );
 
-  // Display of a "tick" icon ton confirm when saved
+  // Display of a "tick" icon to confirm when saved
   const [readingSaved, setReadingSaved] = useState(false);
   const [chapterSaved, setChapterSaved] = useState(false);
   const [rateSaved, setRateSaved] = useState(false);
@@ -147,64 +147,121 @@ export const FictionActionsModal = ({
     }
   };
 
-  const styles = StyleSheet.create({
-    overlay: {
-      flex: 1,
-      justifyContent: "flex-end",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      zIndex: 1000,
-    },
-    modalContainer: {
-      width: "100%",
-      backgroundColor: currentTheme.background,
-      borderTopLeftRadius: 8,
-      borderTopRightRadius: 8,
-      paddingTop: 10,
-      elevation: 10,
-    },
-    header: {
-      paddingHorizontal: 15,
-      paddingBottom: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: currentTheme.inputBorder,
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    modalTitle: {
-      ...typography.h3,
-      color: currentTheme.text,
-      flex: 1,
-      flexShrink: 1,
-    },
-    mainContent: {
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      overflow: "hidden",
-    },
-    quickEditContainer: {
-      borderBottomWidth: 1,
-      borderBottomColor: currentTheme.inputBorder,
-      marginBottom: 10,
-    },
-    // --- ACTIONS (Lignes) ---
-    actionRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 14,
-    },
-    savedIcon: {
-      margin: 0,
-      padding: 0,
-    },
-    actionText: {
-      ...typography.body,
-      color: currentTheme.text,
-      marginLeft: 8,
-    },
-    editIcon: {
-      color: currentTheme.text,
-    },
-  });
+  // Memorize styles so they only update when the theme changes
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        overlay: {
+          flex: 1,
+          justifyContent: "flex-end",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 1000,
+        },
+        modalContainer: {
+          width: "100%",
+          backgroundColor: currentTheme.background,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          paddingTop: 10,
+          elevation: 10,
+        },
+        header: {
+          paddingHorizontal: 15,
+          paddingBottom: 10,
+          borderBottomWidth: 1,
+          borderBottomColor: currentTheme.inputBorder,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        },
+        modalTitle: {
+          ...typography.h3,
+          color: currentTheme.text,
+          flex: 1,
+          flexShrink: 1,
+        },
+        mainContent: {
+          paddingVertical: 10,
+          paddingHorizontal: 15,
+          overflow: "hidden",
+        },
+        quickEditContainer: {
+          borderBottomWidth: 1,
+          borderBottomColor: currentTheme.inputBorder,
+          marginBottom: 10,
+        },
+        // --- ACTIONS (Lignes) ---
+        actionRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 14,
+        },
+        savedIcon: {
+          margin: 0,
+          padding: 0,
+        },
+        actionText: {
+          ...typography.body,
+          color: currentTheme.text,
+          marginLeft: 8,
+        },
+        editIcon: {
+          color: currentTheme.text,
+        },
+        // --- DELETE CONFIRMATION MODAL ---
+        deleteModalOverlay: {
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.6)",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingTop: 300,
+        },
+        deleteModalContainer: {
+          width: "80%",
+          backgroundColor: currentTheme.background,
+          padding: 20,
+          borderRadius: 10,
+          alignItems: "center",
+        },
+        deleteModalTitle: {
+          ...typography.h3,
+          color: currentTheme.text,
+          marginBottom: 10,
+        },
+        deleteModalText: {
+          ...typography.body,
+          color: currentTheme.secondaryText,
+          textAlign: "center",
+          marginBottom: 20,
+        },
+        deleteModalButtonContainer: {
+          flexDirection: "row",
+          gap: 14,
+        },
+        cancelButton: {
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+          borderRadius: 6,
+          backgroundColor: currentTheme.inactive,
+        },
+        cancelButtonText: {
+          color: currentTheme.text,
+        },
+        deleteButton: {
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+          borderRadius: 6,
+          backgroundColor: "red",
+        },
+        deleteButtonText: {
+          color: "white",
+        },
+        closeIcon: {
+          color: currentTheme.text,
+          paddingLeft: 6,
+        },
+      }),
+    [currentTheme] // Regenerate styles only when theme changes
+  );
 
   return (
     <Modal
@@ -228,10 +285,7 @@ export const FictionActionsModal = ({
               <Ionicons
                 name="close-sharp"
                 size={23}
-                style={{
-                  color: currentTheme.text,
-                  paddingLeft: 6,
-                }}
+                style={styles.closeIcon}
               />
             </TouchableOpacity>
           </View>
@@ -307,17 +361,7 @@ export const FictionActionsModal = ({
               <Text style={styles.actionText}>Modifier la fanfiction</Text>
             </TouchableOpacity>
 
-            {/* --- ACTION 5: Duplicate fanfiction
-            <TouchableOpacity
-              style={styles.actionRow}
-              onPress={() => console.log("TODO duplicate")}
-            >
-              <Ionicons name="copy" size={22} />
-              <Text style={styles.actionText}>Dupliquer la fanfiction</Text>
-            </TouchableOpacity>
-             --- */}
-
-            {/* --- ACTION 6: Delete fanfiction --- */}
+            {/* --- ACTION 5: Delete fanfiction --- */}
             <TouchableOpacity
               style={styles.actionRow}
               onPress={() => setConfirmDeleteVisible(true)}
@@ -338,68 +382,29 @@ export const FictionActionsModal = ({
         animationType="fade"
         onRequestClose={() => setConfirmDeleteVisible(false)}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            justifyContent: "center",
-            alignItems: "center",
-            paddingTop: 300,
-          }}
-        >
-          <View
-            style={{
-              width: "80%",
-              backgroundColor: currentTheme.background,
-              padding: 20,
-              borderRadius: 10,
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                ...typography.h3,
-                color: currentTheme.text,
-                marginBottom: 10,
-              }}
-            >
+        <View style={styles.deleteModalOverlay}>
+          <View style={styles.deleteModalContainer}>
+            <Text style={styles.deleteModalTitle}>
               Supprimer la fanfiction ?
             </Text>
 
-            <Text
-              style={{
-                ...typography.body,
-                color: currentTheme.secondaryText,
-                textAlign: "center",
-                marginBottom: 20,
-              }}
-            >
+            <Text style={styles.deleteModalText}>
               Cette action est définitive.
             </Text>
 
-            <View style={{ flexDirection: "row", gap: 14 }}>
+            <View style={styles.deleteModalButtonContainer}>
               <TouchableOpacity
-                style={{
-                  paddingHorizontal: 20,
-                  paddingVertical: 10,
-                  borderRadius: 6,
-                  backgroundColor: currentTheme.inactive,
-                }}
+                style={styles.cancelButton}
                 onPress={() => setConfirmDeleteVisible(false)}
               >
-                <Text style={{ color: currentTheme.text }}>Annuler</Text>
+                <Text style={styles.cancelButtonText}>Annuler</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={{
-                  paddingHorizontal: 20,
-                  paddingVertical: 10,
-                  borderRadius: 6,
-                  backgroundColor: "red",
-                }}
+                style={styles.deleteButton}
                 onPress={handleDeleteFiction}
               >
-                <Text style={{ color: "white" }}>Supprimer</Text>
+                <Text style={styles.deleteButtonText}>Supprimer</Text>
               </TouchableOpacity>
             </View>
           </View>
