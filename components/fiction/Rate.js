@@ -54,7 +54,7 @@ export default function Rate({
 
             {/* --- Icons
             If editable = false, the icon can't be pressed (-> View instead of Pressable)
-            If editable, we had hitSlop = pressable area around the item (better UX) */}
+            If editable, we add hitSlop = pressable area around the item (better UX) */}
             <View style={styles.iconsContainer}>
                 {[1, 2, 3, 4, 5].map((index) => {
 
