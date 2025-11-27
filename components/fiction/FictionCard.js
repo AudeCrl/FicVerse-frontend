@@ -20,8 +20,7 @@ export default function FictionCard({
   onFictionUpdated,
 }) {
   const { currentTheme } = useTheme();
-  const [isFictionActionsModalVisible, setIsFictionActionsModalVisible] =
-    useState(false);
+  const [isFictionActionsModalVisible, setIsFictionActionsModalVisible] = useState(false);
   const [showAddTagModal, setShowAddTagModal] = useState(false);
   const [fictionData, setFictionData] = useState(fiction);
   const user = useSelector((state) => state.user.value);
@@ -159,7 +158,7 @@ export default function FictionCard({
   const handleAuthorPress = () => {
     if (navigation && allFictions) {
       const fictionsByAuthor = allFictions.filter(
-        (f) => f.author === fiction.author
+        (fiction) => fiction.author === fiction.author
       );
 
       navigation.setParams({
@@ -170,11 +169,7 @@ export default function FictionCard({
     }
   };
 
-  const metadata =
-    fiction.lang ||
-    fiction.storyStatus ||
-    fiction.numberOfChapters ||
-    fiction.numberOfWords ? (
+  const metadata = fiction.lang || fiction.storyStatus || fiction.numberOfChapters || fiction.numberOfWords ? (
       <View style={styles.metadataContainer}>
         <View style={styles.metadataLeftCol}>
           {!!fiction.lang && (
@@ -197,22 +192,18 @@ export default function FictionCard({
           )}
         </View>
       </View>
-    ) : null;
+  ) : null;
 
   return (
     <View style={styles.fictionCard}>
       {/* --- ReadingStatus (only in "searchResults" mode) */}
       {showReadingStatus && (
-        <Text style={styles.readingStatus}>
-          {readingStatusLabels[fiction.readingStatus]}
-        </Text>
+        <Text style={styles.readingStatus}>{readingStatusLabels[fiction.readingStatus]}</Text>
       )}
 
       {/* --- Title (with link if it exists) + "..." Icon (More) */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title} onPress={handleNavigate}>
-          {fiction.title}
-        </Text>
+        <Text style={styles.title} onPress={handleNavigate}>{fiction.title}</Text>
         <TouchableOpacity onPress={() => setIsFictionActionsModalVisible(true)}>
           <MaterialIcons name="more-horiz" size={24} style={styles.moreIcon} />
         </TouchableOpacity>
@@ -232,10 +223,7 @@ export default function FictionCard({
 
           {/* Rate */}
           {!!fiction.rate?.display && (
-            <Rate
-              iconName={user.notationIcon}
-              value={fiction?.rate?.value ?? 0}
-            />
+            <Rate iconName={user.notationIcon} value={fiction?.rate?.value ?? 0} />
           )}
         </View>
       )}
