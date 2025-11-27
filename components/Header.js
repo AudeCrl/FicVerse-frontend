@@ -1,13 +1,10 @@
 import React, { useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useTheme } from '../context/ThemeContext.js';
-import { updateAppearanceMode } from '../reducers/user';
 import { typography } from '../styles/globalStyles';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Header({
   title='Mes histoires',
@@ -16,39 +13,9 @@ export default function Header({
   screenName = 'default', // 'default' pour les pages existantes, et 'manage' pour ManageFictionScreen uniquement
   showToggle = true,      // masque/affiche le bouton de bascule dark/light
 }) {
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.user.value.token);
   const username = useSelector((state) => state.user.value.username);
   const avatar = {uri: useSelector((state) => state.user.value.avatar)};
-  const { currentTheme, variant } = useTheme();
-
-  const handleToggleVariant = async () => {
-    const newVariant = variant === 'light' ? 'dark' : 'light';
-
-    // Optimistic update - UI réactive immédiate
-    dispatch(updateAppearanceMode(newVariant));
-
-    // Sauvegarde en BDD
-    try {
-      const response = await fetch(`${API_URL}/user/appearance-mode`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ appearanceMode: newVariant }),
-      });
-      const data = await response.json();
-
-      if (!data.result) {
-        // Rollback si erreur
-        dispatch(updateAppearanceMode(variant));
-      }
-    } catch (error) {
-      console.error('Error updating appearance mode:', error);
-      dispatch(updateAppearanceMode(variant));
-    }
-  };
+  const { currentTheme, variant, toggleVariant } = useTheme();
   
 
   // Memorize styles so they only update when the theme changes
@@ -115,7 +82,7 @@ export default function Header({
           <View style={styles.container}>
             <View style={styles.left}>
                  {showToggle && (
-              <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={handleToggleVariant} />
+              <Ionicons name="toggle-outline" size={24} style={styles.toggleIcon} onPress={toggleVariant} />
             )}
                 <Text style={styles.title}>{title}</Text>
             </View>
